@@ -1,0 +1,17 @@
+@import play.api.mvc.RequestHeader 
+
+@(id: String)(implicit request: RequestHeader)
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ZX labyrinth</title>
+<script type='text/javascript' src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
+<script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
+</head>
+<body data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()" data-page-id="game">
+	<div class="container ">
+		<div id="messages"></div>
+	</div>
+</body>
+</html>

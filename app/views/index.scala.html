@@ -1,0 +1,25 @@
+@()
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ZX labyrinth</title>
+<script type='text/javascript' src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
+<script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
+</head>
+<body data-game-url="@routes.ZxController.game("")" data-page-id="index">
+	<div class="container ">
+	    <div>
+	        <form method="post" action="@routes.ZxController.createGame()">
+	            <label>Board size:</label><input type="number" name="size"></input>
+	            <label>Number of walls:</label><input type="number" name="walls"></input>
+	            <input type="submit" value="Create room"></input>
+	        </form>
+	    </div>
+	    <div>
+	        <input type="text" id="join_form_game_id"></input>
+	        <button type="button" id="join_form_button">Join game</button>
+	    </div>
+	</div>
+</body>
+</html>
