@@ -5,6 +5,7 @@ import akka.event.LoggingReceive
 import akka.actor.ActorRef
 import akka.actor.Terminated
 import akka.actor.ActorLogging
+import game.Board
 
 class GameActor(params: GameParameters) extends Actor with ActorLogging {
   val playerA: PlayerData = new PlayerData("Player A")
@@ -61,10 +62,10 @@ class GameActor(params: GameParameters) extends Actor with ActorLogging {
     }
   }
   
-  private def readyForGame(boardConfiguration: BoardConfiguration) = myPlayerData() match {
+  private def readyForGame(board: Board) = myPlayerData() match {
     case None => log.warning("Trying to start while not sitting")
     case Some(playerData) => {
-      playerData.board = boardConfiguration
+      playerData.board = board
       playerData.ready = true
       if(theOtherPlayerData().map(_.ready).getOrElse(false)) {
         startGame()
@@ -100,7 +101,7 @@ class GameActor(params: GameParameters) extends Actor with ActorLogging {
 
 class PlayerData(val name: String) {
   var seat: Option[ActorRef] = None
-  var board: BoardConfiguration = BoardConfiguration()
+  var board: Board = _
   var ready: Boolean = false
   var playing: Boolean = false
 }

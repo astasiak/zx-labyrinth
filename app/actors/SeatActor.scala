@@ -9,6 +9,7 @@ import akka.actor.ActorLogging
 import play.api.libs.json.Json
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
+import game.Board
 
 class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogging {
 
@@ -37,7 +38,7 @@ object JsonMapper {
   def mapJsToMsg(js: JsValue): InboudMessage = takeType(js) match {
     case JsError(_) => UnknownIMsg()
     case JsSuccess("chat",_) => ChatMessageIMsg((js \ "msg").as[String])
-    case JsSuccess("ready",_) => ReadyForGameIMsg(BoardConfiguration())
+    case JsSuccess("ready",_) => ReadyForGameIMsg(Board((0,0),(0,0),(0,0),List()))
     case JsSuccess("move",_) => MakeMoveIMsg(Move())
     case JsSuccess("ask",_) => AskForGameStateIMsg()
     case _ => UnknownIMsg()

@@ -1,12 +1,13 @@
 package actors
 
-case class BoardConfiguration()
+import game.Board
+
 case class Move()
 case class Position(x: Int, y: Int)
 case object Directions extends Enumeration {
   val Up, Down, Left, Right = Value
 }
-case class MoveResult(newBoard: BoardConfiguration, keepGoing: Boolean)
+case class MoveResult(newBoard: Board, keepGoing: Boolean)
 
 
 case class PlayerId(id: String)
@@ -15,7 +16,7 @@ sealed trait InboudMessage
 case class UnknownIMsg() extends InboudMessage
 case class ChatMessageIMsg(msg: String) extends InboudMessage
 case class SubscriptionIMsg() extends InboudMessage
-case class ReadyForGameIMsg(config: BoardConfiguration) extends InboudMessage
+case class ReadyForGameIMsg(board: Board) extends InboudMessage
 case class MakeMoveIMsg(move: Move) extends InboudMessage
 case class AskForGameStateIMsg() extends InboudMessage
 
