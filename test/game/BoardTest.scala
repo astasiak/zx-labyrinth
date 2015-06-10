@@ -3,12 +3,7 @@ package actors
 import org.junit.Test
 import org.junit.Assert._
 import org.junit.Before
-import game.Board
-import game.Direction
-import game.North
-import game.East
-import game.South
-import game.ProtoBorder
+import game._
 
 class BoardTest {
   
@@ -55,6 +50,18 @@ class BoardTest {
       assertEquals("Did not discover passed border", true, borderPassed().discovered)
       assertEquals("Wrong move success calculation", expectedSuccess, result.success)
       assertEquals("Wrong finish calculation", expectedFinished, board.isFinished)
+    }
+  }
+  
+  @Test def illegalPathsTest {
+    val moves = List(
+        (North, false), (West, false), (South, true), (East, true),
+        (North, true), (North, false), (East, true), (East, false),
+        (South, true), (South, true), (South, false))
+    for((dir, expectedSuccess) <- moves) {
+      val result = board.makeMove(dir)
+      board = result.newBoard
+      assertEquals("Wrong move success calculation", expectedSuccess, result.success)
     }
   }
  

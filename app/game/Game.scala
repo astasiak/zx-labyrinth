@@ -1,60 +1,58 @@
 package game
 
+import scala.collection.mutable.Map
+
 case class GameParams(size: (Int, Int), walls: Int)
-case object GameState extends Enumeration {
-  val Awaiting, Ongoing, Finished = Value
-}
 
+// representation of states in which game can be:
+sealed trait GameState
+case class Awaiting() extends GameState
+case class Ongoing(current: PlayerId) extends GameState
+case class Finished(winner: PlayerId) extends GameState
+
+// model of player identifiers
+sealed trait PlayerId { def theOther: PlayerId }
+case object PlayerA extends PlayerId { override def theOther = PlayerB }
+case object PlayerB extends PlayerId { override def theOther = PlayerA }
+
+// main implementation of game internal logic
 class Game(val params: GameParams) {
-  var playerA: Option[PlayerData] = None
-  var playerB: Option[PlayerData] = None
-  var currentPlayerA: Boolean = true
-  var winnerPlayerA: Option[Boolean] = None
-  var gameState: GameState.Value = GameState.Awaiting
+  private val players: Map[PlayerId, PlayerData] = Map()
+  var gameState: GameState = Awaiting()
   
-  def privatizeBoard(board: Board): Board = board // TODO
+  def privatize(board: Board): Board = board // TODO
   
-  def sendStates() = {
-    playerA.map {
-      val gs: GameStatus = GameStatus(currentPlayerA,
-          (playerA.map(_.board).flatten, playerB.map(_.board).flatten.map(privatizeBoard _)),
-          gameState, winnerPlayerA)
-      _.callbacks.updateStatus(gs)
+  def sitDown(playerName: String, callbacks: Callbacks): Option[PlayerId] = {
+    for(playerId <- List(PlayerA, PlayerB).filter(!players.contains(_))) {
+      players.put(playerId, new PlayerData(callbacks, playerName))
+      players.foreach {
+        _._2.callbacks.updatePlayers(players(PlayerA).name, players(PlayerA).name)
+      }
+      return Some(playerId)
     }
-    playerB.map {
-      val gs: GameStatus = GameStatus(!currentPlayerA,
-          (playerA.map(_.board).flatten.map(privatizeBoard _), playerB.map(_.board).flatten),
-          gameState, winnerPlayerA.map(!_))
-      _.callbacks.updateStatus(gs)
+    None
+  }
+  
+  def initBoard(playerId: PlayerId, board: Board) = players.get(playerId) match {
+    case None => throw new RuntimeException("Cannot init board for empty seat")
+    case Some(player) => {
+      player.board = Some(board)
+      players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, privatize(board)))
     }
   }
   
-  def sitDown(playerName: String, callbacks: Callbacks): Option[String] = (playerA, playerB) match {
-    case (None,_) => { playerA = Some(new PlayerData(callbacks, playerName)); Some("A") }
-    case (Some(_), None) => { playerB = Some(new PlayerData(callbacks, playerName)); Some("B") }
-    case (Some(_), Some(_)) => None
+  def declareMove(playerId: PlayerId, direction: Direction) = {
+    
   }
-  
-  def initBoard(playerId: String, board: Board) = (playerId match {
-    case "A" => playerA
-    case "B" => playerB
-    case _ => None
-  }).map(p=>{
-    p.board = Some(board);
-    if(playerA.flatMap(_.board).isDefined && playerB.flatMap(_.board).isDefined) {
-      gameState = GameState.Ongoing;
-      sendStates();
-    }
-  })
 }
-
-
-class PlayerData(val callbacks: Callbacks, val name: String) {
+// internal representation of player data
+private class PlayerData(val callbacks: Callbacks, val name: String) {
   var board: Option[Board] = None
 }
 
-case class GameStatus(yourMove: Boolean, boards: (Option[Board], Option[Board]), gameStatus: GameState.Value, youWon: Option[Boolean])
-
+// trait for implementing callback handler on the client side
 trait Callbacks {
-  def updateStatus(status: GameStatus)
+  def updatePlayers(playerA: String, playerB: String)
+  def updateBoard(player: PlayerId, board: Board)
+  def updateGameState(gameState: GameState)
 }

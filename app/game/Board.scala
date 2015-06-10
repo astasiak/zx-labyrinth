@@ -42,7 +42,7 @@ case class Board(
       case (North, (x, y)) => x > 0
       case (South, (x, y)) => x+1 < size._1
       case (West, (x, y)) => y > 0
-      case (East, (x, y)) => x+1 < size._2
+      case (East, (x, y)) => y+1 < size._2
     }
     def canMove: Boolean = (dir, position) match {
       case (North, (x, y)) => !borders.horizontal(x-1)(y).wall
