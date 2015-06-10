@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Assert._
 import org.junit.Before
 import game.Board
+import game.Direction
 import game.North
 import game.East
 import game.South
@@ -11,10 +12,10 @@ import game.ProtoBorder
 
 class BoardTest {
   
-  var initBoard: Board = _
+  var board: Board = _
  
   @Before def init {
-    initBoard = Board((3,3),(0,0),(2,1),List(
+    board = Board((3,3),(0,0),(2,1),List(
         ProtoBorder(0,0,true),
         ProtoBorder(1,1,true),
         ProtoBorder(1,0,false)))
@@ -28,40 +29,33 @@ class BoardTest {
   }
   
   @Test def successfulPathTest {
-    assertEquals(false, initBoard.isFinished)
+    assertEquals(false, board.isFinished)
     val moves = List(South, East, South)
     for(move <- moves) {
-      val result = initBoard.makeMove(move)
+      val result = board.makeMove(move)
       assertEquals("Unsuccessful move", true, result.success)
-      initBoard = result.newBoard
+      board = result.newBoard
     }
-    assertEquals("Not finished when expected", true, initBoard.isFinished)
+    assertEquals("Not finished when expected", true, board.isFinished)
   }
   
   @Test def wrongPathsTest {
-    assertEquals("Prematurely finished", false, initBoard.isFinished)
-    assertEquals("Wrong initial state", false, initBoard.borders.vertical(0)(0).discovered)
-    var result = initBoard.makeMove(East)
-    initBoard = result.newBoard
-    assertEquals("Successful move", false, result.success)
-    assertEquals("Discovered border on move", true, initBoard.borders.vertical(0)(0).discovered)
-    assertEquals("Prematurely finished", false, initBoard.isFinished)
-    assertEquals("Wrong initial state",false, initBoard.borders.horizontal(0)(0).discovered)
-    result = initBoard.makeMove(South)
-    initBoard = result.newBoard
-    assertEquals("Unsuccessful move", true, result.success)
-    assertEquals("Discovered border on move", true, initBoard.borders.horizontal(0)(0).discovered)
-    assertEquals("Prematurely finished", false, initBoard.isFinished)
-    result = initBoard.makeMove(South)
-    initBoard = result.newBoard
-    assertEquals("Successful move", false, result.success)
-    assertEquals("Prematurely finished", false, initBoard.isFinished)
-    result = initBoard.makeMove(East)
-    initBoard = result.newBoard
-    assertEquals("Prematurely finished", false, initBoard.isFinished)
-    result = initBoard.makeMove(South)
-    initBoard = result.newBoard
-    assertEquals("Not finished when expected", true, initBoard.isFinished)
+    val moves = List(
+        (East, false, false),
+        (South, true, false),
+        (South, false, false),
+        (East, true, false),
+        (South, true, true))
+    for((dir, expectedSuccess, expectedFinished) <- moves) {
+      val result = board.makeMove(dir)
+      val (x, y) = board.position
+      val borderPassed = ()=>(if(List(South,North).contains(dir)) board.borders.horizontal else board.borders.vertical)(x)(y)
+      assertEquals("Prematurely discovered border", false, borderPassed().discovered)
+      board = result.newBoard
+      assertEquals("Did not discover passed border", true, borderPassed().discovered)
+      assertEquals("Wrong move success calculation", expectedSuccess, result.success)
+      assertEquals("Wrong finish calculation", expectedFinished, board.isFinished)
+    }
   }
  
 }
