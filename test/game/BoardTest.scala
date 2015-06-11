@@ -1,15 +1,15 @@
 package actors
 
-import org.junit.Test
-import org.junit.Assert._
-import org.junit.Before
 import game._
 
-class BoardTest {
+import org.scalatest.FunSuite
+import org.scalatest.BeforeAndAfter
+
+class BoardTest extends FunSuite with BeforeAndAfter {
   
   var board: Board = _
  
-  @Before def init {
+  before {
     board = Board((3,3),(0,0),(2,1),List(
         ProtoBorder(0,0,true),
         ProtoBorder(1,1,true),
@@ -23,18 +23,18 @@ class BoardTest {
       // +-+-+-+
   }
   
-  @Test def successfulPathTest {
-    assertEquals(false, board.isFinished)
+  test("successful paths") {
+    assert(false === board.isFinished)
     val moves = List(South, East, South)
     for(move <- moves) {
       val result = board.makeMove(move)
-      assertEquals("Unsuccessful move", true, result.success)
+      assert(true === result.success, "Unsuccessful move")
       board = result.newBoard
     }
-    assertEquals("Not finished when expected", true, board.isFinished)
+    assert(true === board.isFinished, "Not finished when expected")
   }
   
-  @Test def wrongPathsTest {
+  test("wrong paths") {
     val moves = List(
         (East, false, false),
         (South, true, false),
@@ -45,15 +45,15 @@ class BoardTest {
       val result = board.makeMove(dir)
       val (x, y) = board.position
       val borderPassed = ()=>(if(List(South,North).contains(dir)) board.borders.horizontal else board.borders.vertical)(x)(y)
-      assertEquals("Prematurely discovered border", false, borderPassed().discovered)
+      assert(false === borderPassed().discovered, "Prematurely discovered border")
       board = result.newBoard
-      assertEquals("Did not discover passed border", true, borderPassed().discovered)
-      assertEquals("Wrong move success calculation", expectedSuccess, result.success)
-      assertEquals("Wrong finish calculation", expectedFinished, board.isFinished)
+      assert(true === borderPassed().discovered, "Did not discover passed border")
+      assert(expectedSuccess === result.success, "Wrong move success calculation")
+      assert(expectedFinished === board.isFinished, "Wrong finish calculation")
     }
   }
   
-  @Test def illegalPathsTest {
+  test("illegal paths")  {
     val moves = List(
         (North, false), (West, false), (South, true), (East, true),
         (North, true), (North, false), (East, true), (East, false),
@@ -61,7 +61,7 @@ class BoardTest {
     for((dir, expectedSuccess) <- moves) {
       val result = board.makeMove(dir)
       board = result.newBoard
-      assertEquals("Wrong move success calculation", expectedSuccess, result.success)
+      assert(expectedSuccess === result.success, "Wrong move success calculation")
     }
   }
  

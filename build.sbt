@@ -12,8 +12,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % "2.3.4",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.webjars" % "flot" % "0.8.0",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test"
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
+  "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
 )
 
 
 fork in run := true
+
+EclipseKeys.createSrc := EclipseCreateSrc.All
