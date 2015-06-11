@@ -39,6 +39,10 @@ class Game(val params: GameParams) {
     case (Awaiting, Some(player)) => {
       // TODO: validation of size and number of walls
       player.board = Some(board)
+      if(players.get(playerId.theOther).flatMap(_.board)!=None) {
+        gameState = Ongoing(PlayerA)
+        players.values.foreach(_.callbacks.updateGameState(gameState))
+      }
       players.values.foreach(_.callbacks.updateBoard(playerId, privatize(board)))
     }
     case (_, None) =>
