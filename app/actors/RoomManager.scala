@@ -5,8 +5,7 @@ import scala.util.Random
 import akka.actor.ActorRef
 import play.libs.Akka
 import akka.actor.Props
-
-case class GameParameters(size: Int, numberOfWalls: Int)
+import game.GameParams
 
 object RoomManager {
 
@@ -19,7 +18,7 @@ object RoomManager {
     else calculateNewId()
   }
 
-  def createGame(params: GameParameters): String = {
+  def createGame(params: GameParams): String = {
     val id = calculateNewId()
     val gameActor = Akka.system().actorOf(Props(classOf[GameActor],params))
     rooms += id->gameActor

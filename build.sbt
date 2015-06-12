@@ -14,7 +14,9 @@ libraryDependencies ++= Seq(
   "org.webjars" % "flot" % "0.8.0",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
+  "com.google.guava" % "guava" % "18.0",
+  "com.google.code.findbugs" % "jsr305" % "3.0.0"
 )
 
 

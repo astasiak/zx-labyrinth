@@ -10,11 +10,14 @@ import play.api.libs.json.Json
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
 import game.Board
+import game.North
+import game.PlayerId
+import game.PlayerA
+import game.GameState
 
 class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogging {
 
   override def preStart() = {
-    gameActor ! SubscriptionIMsg
     out ! Json.obj("type"->"registering")
   }
   
@@ -37,20 +40,25 @@ object JsonMapper {
   private def takeType(js: JsValue) = (js \ "type").validate[String]
   def mapJsToMsg(js: JsValue): InboudMessage = takeType(js) match {
     case JsError(_) => UnknownIMsg()
+    case JsSuccess("sit",_) => SubscriptionIMsg((js \ "name").as[String])
     case JsSuccess("chat",_) => ChatMessageIMsg((js \ "msg").as[String])
-    case JsSuccess("ready",_) => ReadyForGameIMsg(Board((0,0),(0,0),(0,0),List()))
-    case JsSuccess("move",_) => MakeMoveIMsg(Move())
+    case JsSuccess("ready",_) => InitBoardIMsg(Board((0,0),(0,0),(0,0),List()))
+    case JsSuccess("move",_) => MakeMoveIMsg(North)
     case JsSuccess("ask",_) => AskForGameStateIMsg()
     case _ => UnknownIMsg()
   }
   def mapMsgToJs(msg: OutboundMessage): JsValue = msg match {
-    case ChatMessageOMsg(msg, player) => Json.obj("type"->"chat", "player"->"player", "msg"->msg)
-    case YourMoveOMsg() => Json.obj("type"->"yourmove")
-    case NotYourMoveOMsg() => Json.obj("type"->"notyourmove")
-    case MoveResultOMsg(Position(x,y),direction,success,PlayerId(player)) => Json.obj("type"->"moved","from"->Json.obj("x"->x,"y"->y),"success"->success,"player"->player)
-    case CurrentStateOMsg() => Json.obj("type"->"state")
-    case GameEndedOMsg(PlayerId(winner)) => Json.obj("type"->"ended","winner"->winner)
+    case ChatMessageOMsg(player, msg) => Json.obj("type"->"chat", "player"->player, "msg"->msg)
     case TechnicalMessageOMsg(msg) => Json.obj("type"->"technical","msg"->msg)
+    case SitDownSuccessOMsg(playerId) => Json.obj("type"->"sit_ok","player"->mapPlayerId(playerId))
+    case SitDownFailOMsg() => Json.obj("type"->"sit_fail")
+    case UpdateBoardOMsg(player, board) => Json.obj("type"->"update_board","board"->mapBoard(board))
+    case UpdatePlayersOMsg(playerA, playerB) => Json.obj("type"->"update_players","a"->mapPlayer(playerA),"b"->mapPlayer(playerB))
+    case UpdateStateOMsg(gameState) => Json.obj("type"->"update_state","state"->mapState(gameState))
     case other => Json.obj("type"->"unknown")
   }
+  def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"
+  def mapBoard(board: Board) = board.toString
+  def mapPlayer(player: Option[String]) = player.toString
+  def mapState(gameState: GameState) = gameState.toString
 }

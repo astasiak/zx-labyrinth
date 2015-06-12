@@ -9,7 +9,6 @@ import play.api.mvc.Controller
 import play.api.mvc.WebSocket
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
-import actors.GameParameters
 import actors.RoomManager
 import actors.SeatActor
 

@@ -1,111 +1,75 @@
 package actors
 
-import akka.actor.Actor
 import akka.event.LoggingReceive
-import akka.actor.ActorRef
 import akka.actor.Terminated
+import akka.actor.Actor
+import akka.actor.ActorRef
 import akka.actor.ActorLogging
 import game.Board
+import game.GameParams
+import game.Game
+import game.PlayerId
+import com.google.common.collect.BiMap
+import game.Direction
+import com.google.common.collect.HashBiMap
+import scala.collection.JavaConversions._
+import game.Callbacks
+import game.GameState
 
-class GameActor(params: GameParameters) extends Actor with ActorLogging {
-  val playerA: PlayerData = new PlayerData("Player A")
-  val playerB: PlayerData = new PlayerData("Player B")
-  val players = Set(playerA, playerB)
-  var status: GameStatus.Value = GameStatus.New
-  // gameFinished / winner / ongoing
+private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
+  def updatePlayers(playerA: Option[String], playerB: Option[String]) = seatActor ! UpdatePlayersOMsg(playerA, playerB)
+  def updateBoard(playerId: PlayerId, board: Board) = seatActor ! UpdateBoardOMsg(playerId, board)
+  def updateGameState(gameState: GameState) = seatActor ! UpdateStateOMsg(gameState)
+}
+
+class GameActor(params: GameParams) extends Actor with ActorLogging {
+  var game: Game = new Game(params)
+  val playerMap: BiMap[PlayerId, ActorRef] = HashBiMap.create() // TODO maybe not necessary?
   
   override def receive = LoggingReceive {
+    case SubscriptionIMsg(playerName) => sitDown(playerName)
     case ChatMessageIMsg(msg) => chat(msg)
-    case SubscriptionIMsg => sitDown()
     case Terminated(seat) => standUp(seat)
-    case ReadyForGameIMsg(boardConfiguration) => readyForGame(boardConfiguration)
+    case InitBoardIMsg(board) => initBoard(board)
     case MakeMoveIMsg(move) => makeMove(move)
     case AskForGameStateIMsg() => askForGameState()
     case other => log.error("unhandled: " + other)
   }
   
-  private def chat(msg: String) = myPlayerData() match {
-    case None => log.warning("Trying to start while not sitting")
-    case Some(playerData) => players.flatMap(_.seat).foreach(_ ! ChatMessageOMsg(playerData.name,msg))
-  }
-  
-  private def sitDown() = (playerA.seat, playerB.seat) match {
-    case (None,_) => sitDownThere(playerA)
-    case (Some(_), None) => sitDownThere(playerB)
-    case (Some(_), Some(_)) => sender ! SitDownResultOMsg(false)
-  }
-  
-  private def sitDownThere(playerData: PlayerData) {
-    playerData.seat = Some(sender);
-    context watch sender
-    // send OK
-    // save name
-  }
-  
-  private def myPlayerData() = {
-    if(Some(sender)==playerA.seat) Some(playerA)
-    else if(Some(sender)==playerB.seat) Some(playerB)
-    else None
-  }
-  
-  private def theOtherPlayerData() = {
-    if(Some(sender)==playerA.seat) Some(playerB)
-    else if(Some(sender)==playerA.seat) Some(playerA)
-    else None
-  }
-  
-  private def standUp(seat: ActorRef) = myPlayerData() match {
-    case None => log.warning("Trying to stand up while not sitting")
-    case Some(playerData) => {
-      playerData.seat = None
-      playerData.ready = false
-    }
-  }
-  
-  private def readyForGame(board: Board) = myPlayerData() match {
-    case None => log.warning("Trying to start while not sitting")
-    case Some(playerData) => {
-      playerData.board = board
-      playerData.ready = true
-      if(theOtherPlayerData().map(_.ready).getOrElse(false)) {
-        startGame()
+  private def sitDown(playerName: String) = {
+    val playerId = game.sitDown(playerName, new AkkaSeatCallbacks(sender))
+    playerId match {
+      case None => sender ! SitDownFailOMsg()
+      case Some(playerId) => {
+        playerMap.put(playerId, sender)
+        sender ! SitDownSuccessOMsg(playerId)
       }
     }
   }
   
-  private def startGame() = {
-    if(status!=GameStatus.New) {
-      log.warning("Trying to start already started game")
-    } else if(playerA.seat==None || playerB.seat==None) {
-      log.warning("Trying to start a game without players")
-    } else {
-      status = GameStatus.Ongoing
-      playerA.playing = true
-      playerB.playing = false
-      playerA.seat.map(_ ! YourMoveOMsg)
+  private def chat(msg: String) = myPlayerId() match {
+    case None => throw new RuntimeException("Trying to chat while not sitting")
+    case Some(playerId) => playerMap.values().foreach {
+      _ ! ChatMessageOMsg(game.getPlayerName(playerId).get,msg)
     }
   }
   
-  private def makeMove(move: Move) = {
-    if(!myPlayerData().get.playing) {
-      sender ! NotYourMoveOMsg
-    } else {
-      
-    }
+  private def standUp(seat: ActorRef) = ???
+  
+  private def initBoard(board: Board) = myPlayerId() match {
+    case None => throw new RuntimeException("Trying to init board while not sitting")
+    case Some(playerId) => game.initBoard(playerId, board)
   }
   
-  private def askForGameState() = {
-    sender ! TechnicalMessageOMsg("received ASK")
+  private def makeMove(move: Direction) = myPlayerId() match {
+    case None => throw new RuntimeException("Trying to init board while not sitting")
+    case Some(playerId) => game.declareMove(playerId, move)
   }
-}
-
-class PlayerData(val name: String) {
-  var seat: Option[ActorRef] = None
-  var board: Board = _
-  var ready: Boolean = false
-  var playing: Boolean = false
-}
-
-case object GameStatus extends Enumeration {
-  val New, Ongoing, Finished = Value
+  
+  private def askForGameState() = ???
+  
+  private def myPlayerId() = {
+    val playerId = playerMap.inverse().get(sender)
+    if(playerId==null) None else Some(playerId)
+  }
 }

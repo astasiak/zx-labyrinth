@@ -1,34 +1,29 @@
 package actors
 
 import game.Board
+import game.PlayerId
+import game.Direction
+import game.GameState
 
-case class Move()
 case class Position(x: Int, y: Int)
-case object Directions extends Enumeration {
-  val Up, Down, Left, Right = Value
-}
 case class MoveResult(newBoard: Board, keepGoing: Boolean)
-
-
-case class PlayerId(id: String)
 
 sealed trait InboudMessage
 case class UnknownIMsg() extends InboudMessage
 case class ChatMessageIMsg(msg: String) extends InboudMessage
-case class SubscriptionIMsg() extends InboudMessage
-case class ReadyForGameIMsg(board: Board) extends InboudMessage
-case class MakeMoveIMsg(move: Move) extends InboudMessage
+case class SubscriptionIMsg(playerName: String) extends InboudMessage
+case class InitBoardIMsg(board: Board) extends InboudMessage
+case class MakeMoveIMsg(move: Direction) extends InboudMessage
 case class AskForGameStateIMsg() extends InboudMessage
 
 
 
 sealed trait OutboundMessage
-case class ChatMessageOMsg(msg: String, player: String) extends OutboundMessage
-case class YourMoveOMsg() extends OutboundMessage
-case class NotYourMoveOMsg() extends OutboundMessage
-case class MoveResultOMsg(from: Position, dir: Directions.Value, success: Boolean, player: PlayerId) extends OutboundMessage
-case class CurrentStateOMsg() extends OutboundMessage
-case class GameEndedOMsg(winner: PlayerId) extends OutboundMessage
-case class SitDownResultOMsg(success: Boolean) extends OutboundMessage
+case class ChatMessageOMsg(player: String, msg: String) extends OutboundMessage
+case class SitDownSuccessOMsg(playerId: PlayerId) extends OutboundMessage
+case class SitDownFailOMsg() extends OutboundMessage
+case class UpdateBoardOMsg(player: PlayerId, board: Board) extends OutboundMessage
+case class UpdatePlayersOMsg(playerA: Option[String], playerB: Option[String]) extends OutboundMessage
+case class UpdateStateOMsg(gameState: GameState) extends OutboundMessage
 
 case class TechnicalMessageOMsg(msg: String) extends OutboundMessage

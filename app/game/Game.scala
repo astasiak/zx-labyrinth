@@ -22,6 +22,8 @@ class Game(val params: GameParams) {
   
   def privatize(board: Board): Board = board // TODO
   
+  def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
+  
   def sitDown(playerName: String, callbacks: Callbacks): Option[PlayerId] = {
     for(playerId <- List(PlayerA, PlayerB).filter(!players.contains(_))) {
       players.put(playerId, new PlayerData(callbacks, playerName))
@@ -32,7 +34,7 @@ class Game(val params: GameParams) {
       }
       return Some(playerId)
     }
-    None
+    return None
   }
   
   def initBoard(playerId: PlayerId, board: Board) = (gameState, players.get(playerId)) match {
