@@ -1,15 +1,13 @@
-package actors
+package actors.messages
 
-import game.Board
-import game.PlayerId
-import game.Direction
-import game.GameState
+import game._
 
 case class Position(x: Int, y: Int)
 case class MoveResult(newBoard: Board, keepGoing: Boolean)
 
 sealed trait InboudMessage
 case class UnknownIMsg() extends InboudMessage
+case class ErrorIMsg(msg: String) extends InboudMessage
 case class ChatMessageIMsg(msg: String) extends InboudMessage
 case class SubscriptionIMsg(playerName: String) extends InboudMessage
 case class InitBoardIMsg(board: Board) extends InboudMessage
@@ -27,3 +25,4 @@ case class UpdatePlayersOMsg(playerA: Option[String], playerB: Option[String]) e
 case class UpdateStateOMsg(gameState: GameState) extends OutboundMessage
 
 case class TechnicalMessageOMsg(msg: String) extends OutboundMessage
+case class ErrorOMsg(msg: String) extends OutboundMessage

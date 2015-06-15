@@ -15,7 +15,7 @@ import game.Ongoing
 class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
   var game: Game = _
   
-  val someBoard = Board((3,3), (0,0), (2,1), List())
+  val someBoard = Board.create((3,3), (0,0), (2,1), List())
   
   before {
     game = new Game(GameParams((3,3),5))

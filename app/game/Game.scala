@@ -1,6 +1,8 @@
 package game
 
 import scala.collection.mutable.Map
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 case class GameParams(size: (Int, Int), walls: Int)
 
@@ -15,8 +17,12 @@ sealed trait PlayerId { def theOther: PlayerId }
 case object PlayerA extends PlayerId { override def theOther = PlayerB }
 case object PlayerB extends PlayerId { override def theOther = PlayerA }
 
+//sealed trait GameError
+//case class GenericError(msg: String) extends GameError
+
 // main implementation of game internal logic
 class Game(val params: GameParams) {
+  private val LOGGER: Logger = LoggerFactory.getLogger("Game engine")
   private val players: Map[PlayerId, PlayerData] = Map()
   var gameState: GameState = Awaiting
   
@@ -48,9 +54,9 @@ class Game(val params: GameParams) {
       players.values.foreach(_.callbacks.updateBoard(playerId, privatize(board)))
     }
     case (_, None) =>
-      throw new RuntimeException("Cannot init board for empty seat")
+      LOGGER.warn("Cannot init board for empty seat")
     case _ =>
-      throw new RuntimeException("Cannot init board when game has started")
+      LOGGER.warn("Cannot init board when game has started")
   }
   
   def declareMove(playerId: PlayerId, direction: Direction) = gameState match {
@@ -66,9 +72,9 @@ class Game(val params: GameParams) {
       players.values.foreach(_.callbacks.updateGameState(gameState))
     }
     case Ongoing(currentPlayer) if playerId!=currentPlayer =>
-      throw new RuntimeException("Cannot move during the opponent's turn")
+      LOGGER.warn("Cannot move during the opponent's turn")
     case _ =>
-      throw new RuntimeException("Game has to be ongoing to make move")
+      LOGGER.warn("Game has to be ongoing to make move")
   }
 }
 // internal representation of player data
@@ -81,4 +87,5 @@ trait Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String])
   def updateBoard(player: PlayerId, board: Board)
   def updateGameState(gameState: GameState)
+  //def onError(error: GameError) // ?
 }

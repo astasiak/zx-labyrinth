@@ -15,6 +15,7 @@ import com.google.common.collect.HashBiMap
 import scala.collection.JavaConversions._
 import game.Callbacks
 import game.GameState
+import actors.messages._
 
 private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String]) = seatActor ! UpdatePlayersOMsg(playerA, playerB)
@@ -48,7 +49,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   }
   
   private def chat(msg: String) = myPlayerId() match {
-    case None => throw new RuntimeException("Trying to chat while not sitting")
+    case None => log.warning("Trying to chat while not sitting")
     case Some(playerId) => playerMap.values().foreach {
       _ ! ChatMessageOMsg(game.getPlayerName(playerId).get,msg)
     }
@@ -57,12 +58,12 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   private def standUp(seat: ActorRef) = ???
   
   private def initBoard(board: Board) = myPlayerId() match {
-    case None => throw new RuntimeException("Trying to init board while not sitting")
+    case None => log.warning("Trying to init board while not sitting")
     case Some(playerId) => game.initBoard(playerId, board)
   }
   
   private def makeMove(move: Direction) = myPlayerId() match {
-    case None => throw new RuntimeException("Trying to init board while not sitting")
+    case None => log.warning("Trying to make move while not sitting")
     case Some(playerId) => game.declareMove(playerId, move)
   }
   

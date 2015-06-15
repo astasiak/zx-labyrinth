@@ -10,7 +10,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
   var board: Board = _
  
   before {
-    board = Board((3,3),(0,0),(2,1),List(
+    board = Board.create((3,3),(0,0),(2,1),List(
         ProtoBorder(0,0,true),
         ProtoBorder(1,1,true),
         ProtoBorder(1,0,false)))
@@ -23,7 +23,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
       // +-+-+-+
   }
   
-  test("successful paths") {
+  test("modelling successful paths") {
     assert(false === board.isFinished)
     val moves = List(South, East, South)
     for(move <- moves) {
@@ -34,7 +34,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
     assert(true === board.isFinished, "Not finished when expected")
   }
   
-  test("wrong paths") {
+  test("modelling wrong paths") {
     val moves = List(
         (East, false, false),
         (South, true, false),
@@ -53,7 +53,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
     }
   }
   
-  test("illegal paths")  {
+  test("modelling illegal paths")  {
     val moves = List(
         (North, false), (West, false), (South, true), (East, true),
         (North, true), (North, false), (East, true), (East, false),

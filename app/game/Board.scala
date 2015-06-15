@@ -61,11 +61,11 @@ case class Board(
 
 case class ProtoBorder(x: Int, y: Int, vertical: Boolean)
 object Board {
-  def apply(size: (Int, Int), start: (Int, Int), meta: (Int, Int), borders: List[ProtoBorder]): Board = {
+  def create(size: (Int, Int), start: (Int, Int), meta: (Int, Int), borders: List[ProtoBorder]): Board = {
     val newBorder = Border(false, false)
     val newWall = Border(true, false)
-    var vBorders = Vector.fill(size._1){MutableList.fill(size._2-1){newBorder}}
-    var hBorders = Vector.fill(size._1-1){MutableList.fill(size._2){newBorder}}
+    val vBorders = Vector.fill(size._1){MutableList.fill(size._2-1){newBorder}}
+    val hBorders = Vector.fill(size._1-1){MutableList.fill(size._2){newBorder}}
     for(border <- borders.filter(_.vertical)) {
       vBorders(border.x)(border.y) = newWall
     }
