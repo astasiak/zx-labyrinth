@@ -53,9 +53,7 @@ object JsonMapper {
     case Some("w") => MakeMoveIMsg(West)
     case Some(other) => ErrorIMsg("Cannot parse 'chat' message - bad value '%s'".format(other))
   }
-  private def mapAskMsg(js: JsValue) = ???
-  
-  
+  private def mapAskMsg(js: JsValue) = AskForParamsIMsg()
   
   def mapMsgToJs(msg: OutboundMessage): JsValue = msg match {
     case TechnicalMessageOMsg(msg) => Json.obj("type"->"technical","msg"->msg)
@@ -66,6 +64,7 @@ object JsonMapper {
     case UpdateBoardOMsg(playerId, board) => Json.obj("type"->"update_board","player"->mapPlayerId(playerId),"board"->mapBoard(board))
     case UpdatePlayersOMsg(playerA, playerB) => Json.obj("type"->"update_players","a"->mapPlayer(playerA),"b"->mapPlayer(playerB))
     case UpdateStateOMsg(gameState) => Json.obj("type"->"update_state","state"->mapState(gameState))
+    case ParamsOMsg(GameParams((x,y),walls)) => Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls)
     case other => Json.obj("type"->"unknown")
   }
   private def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"

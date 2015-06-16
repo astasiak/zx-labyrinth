@@ -1,0 +1,23 @@
+.start, .meta { width: 20px; height: 20px; padding: 0.5em; margin: 5px ; background-color: yellow; text-align: center; }
+.start.active, .meta.active { cursor: move; }
+.start-box, .meta-box { display: inline-block; }
+.clear-float { clear: left; }
+.start-meta { background: #bbb; display: inline-block; margin: 5px;}
+.submit-button {background-color: #aaa; display: inline-block; padding: 10px; color: #fff; }
+.submit-button.active {background-color: #088;}
+.submit-button.active:hover {background-color: #0aa; cursor: pointer; }
+
+.field-hovered { background-color: blue !important; }
+table.board { border: none; border-spacing: 0px; }
+.board td.borderV {width: 5px; padding: 0px;}
+.board td.borderH {height: 5px; padding: 0px;}
+.board td.corner {height: 5px; width: 5px; padding: 0px;}
+.board td.field { border: 0px; background-color: #ffb; width: 40px; height: 40px; }
+.borderV.selected, .borderH.selected, .corner.selected {background-color: #000;}
+.borderV:hover, .borderH:hover {background-color: #ccc;}
+.borderV.selected:hover, .borderH.selected:hover {background-color: #888;}
+
+.playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #500; color: #fff; }
+.boardContainer { float: left; padding: 10px; margin: 10px; background-color: #fef; }
+.boardContainer.my { background-color: #f77; }
+.boardArea { padding: 10px; margin: 10px; background-color: #fff;}

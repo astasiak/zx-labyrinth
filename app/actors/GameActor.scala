@@ -33,7 +33,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case Terminated(seat) => standUp(seat)
     case InitBoardIMsg(board) => initBoard(board)
     case MakeMoveIMsg(move) => makeMove(move)
-    case AskForGameStateIMsg() => askForGameState()
+    case AskForParamsIMsg() => askForGameState()
     case other => log.error("unhandled: " + other)
   }
   
@@ -67,7 +67,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case Some(playerId) => game.declareMove(playerId, move)
   }
   
-  private def askForGameState() = ???
+  private def askForGameState() = sender ! ParamsOMsg(params)
   
   private def myPlayerId() = {
     val playerId = playerMap.inverse().get(sender)
