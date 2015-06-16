@@ -1,23 +1,37 @@
+# TODO unify numeration (mapMsgToBoard,mapBoardToMsg,game.board...)
 mapMsgToBoard = (msg) ->
   board =
-    start: [1, 1]
-    meta: [1, 2]
+    start: msg.start
+    meta: msg.end
     borders: []
-  for i in [0..3]
+  x = msg.size[0]
+  y = msg.size[1]
+  for i in [0..x]
     row = []
-    for j in [0..3]
-      row.push({h:false, v:false})
+    for j in [0..y]
+      hh = if j==0 then false else msg.wallsH[(j-1)*y+i]=='-'
+      vv = if i==0 then false else msg.wallsV[j*(y-1)+i-1]=='-'
+      row.push({h:hh, v:vv})
     board.borders.push(row)
-  board.borders[1][1] = {h:true, v:true}
   board
 
-mapBoardToMsg = (board) ->
+mapBoardToMsg = (board, params) ->
+  wallsH = ""
+  for i in [1..params.width-1]
+    for j in [0..params.height-1]
+      symbol = if board.borders[j][i].h then '-' else ' '
+      wallsH = wallsH + symbol
+  wallsV = ""
+  for i in [0..params.width-1]
+    for j in [1..params.height-1]
+      symbol = if board.borders[j][i].v then '-' else ' '
+      wallsV = wallsV + symbol
   msg =
-    size: [3, 3]
-    start: [0, 0]
-    end: [0, 0]
-    wallsH: " -    "
-    wallsV: " -    "
+    size: [params.width,params.height]
+    start: parseInt(i) for i in board.start
+    end: parseInt(i) for i in board.meta
+    wallsH: wallsH
+    wallsV: wallsV
   msg
 
 wsSend = (obj) ->
@@ -30,14 +44,14 @@ createBoards = (params) ->
   window.boardB = new Board("#boardB", params)
   window.boardA.setSubmit ->
     window.boardA.setEditable(false)
-    board = mapBoardToMsg(window.boardA.getBoard())
+    board = mapBoardToMsg(window.boardA.getBoard(),params)
     board.type = "init"
     wsSend(board)
   window.boardB.setSubmit ->
     window.boardB.setEditable(false)
-    board = mapBoardToMsg(window.boardB.getBoard())
+    board = mapBoardToMsg(window.boardB.getBoard(),params)
     board.type = "init"
-    wsSend(board)
+    wsSend(board) # TODO remove copy-paste
 
 wsHandler = (data) ->
   console.log("WS> "+data)
