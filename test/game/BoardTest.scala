@@ -24,6 +24,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
   }
   
   test("modelling successful paths") {
+    println(board.toFancyString)
     assert(false === board.isFinished)
     val moves = List(South, East, South)
     for(move <- moves) {

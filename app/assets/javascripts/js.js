@@ -73,28 +73,28 @@ function Board(selector,params) {
     for(var i=0;i<this.game.params.height;i++) {
       for(var j=0;j<this.game.params.width;j++) {
         if(this.game.board.borders[i][j]['h']) {
-          thisView.getBorder(i,j,'H').addClass("selected");
+          thisView.getBorder(j,i,'H').addClass("selected");
         } else {
-          thisView.getBorder(i,j,'H').removeClass("selected");
+          thisView.getBorder(j,i,'H').removeClass("selected");
         }
         if(this.game.board.borders[i][j]['v']) {
-          thisView.getBorder(i,j,'V').addClass("selected");
+          thisView.getBorder(j,i,'V').addClass("selected");
         } else {
-          thisView.getBorder(i,j,'V').removeClass("selected");
+          thisView.getBorder(j,i,'V').removeClass("selected");
         }
       }
     }
     for(var i=1;i<this.game.params.height;i++) {
       for(var j=1;j<this.game.params.width;j++) {
         var neighbours = 0;
-        if(this.game.board.borders[i][j]['h']) neighbours++;
         if(this.game.board.borders[i][j]['v']) neighbours++;
-        if(this.game.board.borders[i-1][j]['h']) neighbours++;
-        if(this.game.board.borders[i][j-1]['v']) neighbours++;
+        if(this.game.board.borders[i][j]['h']) neighbours++;
+        if(this.game.board.borders[i-1][j]['v']) neighbours++;
+        if(this.game.board.borders[i][j-1]['h']) neighbours++;
         if(neighbours>1) {
-          thisView.getCorner(i,j).addClass("selected");
+          thisView.getCorner(j,i).addClass("selected");
         } else {
-          thisView.getCorner(i,j).removeClass("selected");
+          thisView.getCorner(j,i).removeClass("selected");
         }
       }
     }
@@ -156,12 +156,12 @@ function Board(selector,params) {
       var x = parseInt($(this).attr("data-x"));
       var y = parseInt($(this).attr("data-y"));
       var type = $(this).hasClass("borderH") ? 'h' : 'v';
-      var current = thisView.game.board.borders[x][y][type];
+      var current = thisView.game.board.borders[y][x][type];
       if(current) {
-        thisView.game.board.borders[x][y][type] = false;
+        thisView.game.board.borders[y][x][type] = false;
         thisView.game.bordersUsed--;
       } else if(thisView.game.bordersUsed<thisView.game.params.borders) {
-        thisView.game.board.borders[x][y][type] = true;
+        thisView.game.board.borders[y][x][type] = true;
         thisView.game.bordersUsed++;
       }
       thisView.redrawBorders();

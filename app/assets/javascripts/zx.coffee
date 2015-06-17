@@ -6,24 +6,24 @@ mapMsgToBoard = (msg) ->
     borders: []
   x = msg.size[0]
   y = msg.size[1]
-  for i in [0..x]
+  for j in [0..y-1]
     row = []
-    for j in [0..y]
-      hh = if j==0 then false else msg.wallsH[(j-1)*y+i]=='-'
-      vv = if i==0 then false else msg.wallsV[j*(y-1)+i-1]=='-'
+    for i in [0..x-1]
+      hh = if j==0 then false else msg.wallsH[(j-1)*x+i]=='-'
+      vv = if i==0 then false else msg.wallsV[j*(x-1)+i-1]=='-'
       row.push({h:hh, v:vv})
     board.borders.push(row)
   board
 
 mapBoardToMsg = (board, params) ->
   wallsH = ""
-  for i in [1..params.width-1]
-    for j in [0..params.height-1]
+  for j in [1..params.height-1]
+    for i in [0..params.width-1]
       symbol = if board.borders[j][i].h then '-' else ' '
       wallsH = wallsH + symbol
   wallsV = ""
-  for i in [0..params.width-1]
-    for j in [1..params.height-1]
+  for j in [0..params.height-1]
+    for i in [1..params.width-1]
       symbol = if board.borders[j][i].v then '-' else ' '
       wallsV = wallsV + symbol
   msg =

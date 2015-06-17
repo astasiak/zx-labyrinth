@@ -56,10 +56,35 @@ case class Board(
   }
   
   def isFinished: Boolean = position == meta
+  def toFancyString = {
+    val builder = new StringBuilder
+    for(row <- 0 until size._1) {
+      for(col <- 0 until size._2) {
+        builder ++= "+"
+        builder ++= (if (row==0 || borders.horizontal(row-1)(col).wall) "-" else " ")
+      }
+      builder ++= "+\n"
+      for(col <- 0 until size._2) {
+        builder ++= (if (col==0 || borders.vertical(row)(col-1).wall) "|" else " ")
+        val thisField = (row,col)
+        builder ++= (if(thisField==start && thisField==position) "S"
+          else if(thisField==meta && thisField==position) "M"
+          else if(thisField==start) "s"
+          else if(thisField==meta) "m"
+          else if(thisField==position) "!"
+          else " ")
+      }
+      builder ++= "|\n"
+    }
+    for(col <- 0 until size._2) {
+      builder ++= "+-"
+    }
+    builder ++= "+"
+  }
 }
 
 
-case class ProtoBorder(x: Int, y: Int, vertical: Boolean)
+case class ProtoBorder(y: Int, x: Int, vertical: Boolean)
 object Board {
   def create(size: (Int, Int), start: (Int, Int), meta: (Int, Int), borders: List[ProtoBorder]): Board = {
     val newBorder = Border(false, false)
@@ -67,10 +92,10 @@ object Board {
     val vBorders = Vector.fill(size._1){MutableList.fill(size._2-1){newBorder}}
     val hBorders = Vector.fill(size._1-1){MutableList.fill(size._2){newBorder}}
     for(border <- borders.filter(_.vertical)) {
-      vBorders(border.x)(border.y) = newWall
+      vBorders(border.y)(border.x) = newWall
     }
     for(border <- borders.filter(!_.vertical)) {
-      hBorders(border.x)(border.y) = newWall
+      hBorders(border.y)(border.x) = newWall
     }
     val vBordersVector = vBorders.map(_.toVector)
     val hBordersVector = hBorders.map(_.toVector)

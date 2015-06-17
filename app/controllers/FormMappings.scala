@@ -8,9 +8,10 @@ object FormMappings {
 
   implicit def mapPostToGameParameters(request: Request[AnyContent]): GameParams = {
     val form = request.body.asFormUrlEncoded
-    val size = form.get("size")(0).toInt
+    val width = form.get("width")(0).toInt
+    val height = form.get("height")(0).toInt
     val numberOfWalls = form.get("walls")(0).toInt
-    GameParams((size, size), numberOfWalls)
+    GameParams((width, height), numberOfWalls)
   }
 
 }

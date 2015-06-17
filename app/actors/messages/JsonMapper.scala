@@ -28,9 +28,11 @@ object JsonMapper {
     val wallsH = (js \ "wallsH").asOpt[String]
     val wallsV = (js \ "wallsV").asOpt[String]
     (size, start, end, wallsH, wallsV) match {
-      case (Some(size), Some(start), Some(end), Some(wallsH), Some(wallsV)) => {
-        val wallsList = mapBorders(wallsH,false,size._1)++mapBorders(wallsV,true,size._1-1)
-        InitBoardIMsg(Board.create(size,start,end,wallsList.toList))
+      case (Some((width,height)), Some(start), Some(end), Some(wallsH), Some(wallsV)) => {
+        val wallsList = (mapBorders(wallsH,false,width)++mapBorders(wallsV,true,width-1)).toList
+        val board = Board.create((height,width),start.swap,end.swap,wallsList)
+        println(board.toFancyString)
+        InitBoardIMsg(board)
       }
       case _ => ErrorIMsg("Cannot parse 'init' message")
     }
@@ -70,7 +72,7 @@ object JsonMapper {
   private def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"
   private def mapBoard(board: Board) = {
     implicit def mapPairToJsArr(a: (Int,Int)): JsValueWrapper = Json.arr(a._1, a._2)
-    Json.obj("size"->board.size, "start"->board.start, "end"->board.meta, "pos"->board.position,
+    Json.obj("size"->board.size.swap, "start"->board.start.swap, "end"->board.meta.swap, "pos"->board.position.swap,
         "wallsH"->mapBorders(board.borders.horizontal), "wallsV"->mapBorders(board.borders.vertical))
   }
   private def mapBorders(borders: Vector[Vector[Border]]) = borders.flatten.map(_ match {
