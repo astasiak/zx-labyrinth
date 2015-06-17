@@ -31,6 +31,16 @@ case class Board(
     meta: (Int, Int),
     borders: Borders) {
   
+  def privatize = {
+    def privatizeBorders(bordersSet: Vector[Vector[Border]]) = bordersSet.map(_.map(_ match {
+      case Border(true,false) => Border(false,false)
+      case otherBorder => otherBorder
+    }))
+    val newVBorders = privatizeBorders(borders.vertical)
+    val newHBorders = privatizeBorders(borders.horizontal)
+    Board(size,position,start,meta,Borders(newVBorders,newHBorders))
+  }
+  
   def makeMove(dir: Direction): MoveResult = {
     def move: (Int, Int) = (dir, position) match {
       case (North, (x, y)) => (x-1,y)

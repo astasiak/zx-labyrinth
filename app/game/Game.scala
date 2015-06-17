@@ -26,8 +26,6 @@ class Game(val params: GameParams) {
   private val players: Map[PlayerId, PlayerData] = Map()
   var gameState: GameState = Awaiting
   
-  def privatize(board: Board): Board = board // TODO
-  
   def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
   
   def sitDown(playerName: String, callbacks: Callbacks): Option[PlayerId] = {
@@ -43,6 +41,11 @@ class Game(val params: GameParams) {
     return None
   }
   
+  def sendBoardToPlayers(playerId: PlayerId, board: Board) = {
+    players.get(playerId).map(_.callbacks.updateBoard(playerId, board))
+    players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
+  }
+  
   def initBoard(playerId: PlayerId, board: Board) = (gameState, players.get(playerId)) match {
     case (Awaiting, Some(player)) => {
       // TODO: validation of size and number of walls
@@ -51,7 +54,7 @@ class Game(val params: GameParams) {
         gameState = Ongoing(PlayerA)
         players.values.foreach(_.callbacks.updateGameState(gameState))
       }
-      players.values.foreach(_.callbacks.updateBoard(playerId, privatize(board)))
+      sendBoardToPlayers(playerId, board)
     }
     case (_, None) =>
       LOGGER.warn("Cannot init board for empty seat")
@@ -61,10 +64,10 @@ class Game(val params: GameParams) {
   
   def declareMove(playerId: PlayerId, direction: Direction) = gameState match {
     case Ongoing(currentPlayer) if playerId==currentPlayer => {
-      val player = players.get(playerId).get
+      val player = players.get(playerId.theOther).get
       val result = player.board.get.makeMove(direction)
       player.board = Some(result.newBoard)
-      players.values.foreach(_.callbacks.updateBoard(playerId, result.newBoard))
+      sendBoardToPlayers(playerId.theOther, result.newBoard)
       gameState =
         if(result.newBoard.isFinished) Finished(playerId)
         else if(result.success) Ongoing(playerId)

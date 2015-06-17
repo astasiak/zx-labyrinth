@@ -4,6 +4,7 @@ function Game(params) {
   this.board = {
     start: undefined,
     meta: undefined,
+    position: undefined,
     borders: []
   };
   this.bordersUsed = 0;
@@ -56,6 +57,7 @@ function Board(selector,params) {
     this.redrawStart();
     this.redrawMeta();
     this.redrawBorders();
+    this.redrawPosition();
   }
   this.getBoard = function() {
     return this.game.board;
@@ -113,6 +115,13 @@ function Board(selector,params) {
   }
   this.redrawStart = function() {this.redrawEndpoint(this.find(".start"),this.find(".start-box"),this.game.board.start);}
   this.redrawMeta = function() {this.redrawEndpoint(this.find(".meta"),this.find(".meta-box"),this.game.board.meta);}
+  this.redrawPosition = function() {
+    this.find(".field").removeClass("currentPosition");
+    position = this.game.board.position;
+    if(position) {
+      this.getElem(position[0],position[1]).addClass("currentPosition");
+    }
+  }
   this.createDraggableStartAndMeta = function() {
     this.find( ".start, .meta" ).draggable();
     this.find( ".field" ).droppable({

@@ -13,6 +13,7 @@ table.board { border: none; border-spacing: 0px; }
 .board td.borderH {height: 5px; padding: 0px;}
 .board td.corner {height: 5px; width: 5px; padding: 0px;}
 .board td.field { border: 0px; background-color: #ffb; width: 40px; height: 40px; }
+.board td.field.currentPosition { background-color: #f00; }
 .borderV.selected, .borderH.selected, .corner.selected {background-color: #000;}
 .borderV:hover, .borderH:hover {background-color: #ccc;}
 .borderV.selected:hover, .borderH.selected:hover {background-color: #888;}
@@ -21,3 +22,6 @@ table.board { border: none; border-spacing: 0px; }
 .boardContainer { float: left; padding: 10px; margin: 10px; background-color: #fef; }
 .boardContainer.my { background-color: #f77; }
 .boardArea { padding: 10px; margin: 10px; background-color: #fff;}
+
+.moveButton { float: left; padding: 5px; margin: 5px; background-color: #505; color: #fff; cursor: pointer; }
+#containerA { clear: both; }

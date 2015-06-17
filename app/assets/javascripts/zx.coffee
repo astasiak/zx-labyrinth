@@ -3,14 +3,15 @@ mapMsgToBoard = (msg) ->
   board =
     start: msg.start
     meta: msg.end
+    position: msg.pos
     borders: []
   x = msg.size[0]
   y = msg.size[1]
   for j in [0..y-1]
     row = []
     for i in [0..x-1]
-      hh = if j==0 then false else msg.wallsH[(j-1)*x+i]=='-'
-      vv = if i==0 then false else msg.wallsV[j*(x-1)+i-1]=='-'
+      hh = if j==0 then false else msg.wallsH[(j-1)*x+i] in ['-','=']
+      vv = if i==0 then false else msg.wallsV[j*(x-1)+i-1] in ['-','=']
       row.push({h:hh, v:vv})
     board.borders.push(row)
   board
@@ -33,6 +34,17 @@ mapBoardToMsg = (board, params) ->
     wallsH: wallsH
     wallsV: wallsV
   msg
+
+initMoveButtons = () ->
+  $("#move_up").click ->
+    wsSend({"type":"move","dir":"n"})
+  $("#move_down").click ->
+    wsSend({"type":"move","dir":"s"})
+  $("#move_left").click ->
+    wsSend({"type":"move","dir":"w"})
+  $("#move_right").click ->
+    wsSend({"type":"move","dir":"e"})
+
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)
@@ -98,3 +110,4 @@ $ ->
       console.log("Websocket closed!");
     $("#sit_button").click ->
       wsSend({"type":"sit","name":$("#name_input").val()})
+    initMoveButtons()
