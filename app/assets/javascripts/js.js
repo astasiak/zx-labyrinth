@@ -208,10 +208,3 @@ function Board(selector,params) {
   this.makeSubmitButton();
   this.setEditable(false);
 }
-/*
-$(function() {
-  response = {width:5,height:5,borders:5};
-  console.log("Received game parameters: ("+response.width+","+response.height+"/"+response.borders+")");
-  window.view = new Board("#boardA",response);
-  window.view2 = new Board("#boardB",response);
-});*/

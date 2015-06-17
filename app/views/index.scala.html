@@ -5,18 +5,19 @@
 <head>
 <title>ZX labyrinth</title>
 <script type='text/javascript' src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
-<script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
+<script type='text/javascript' src='@routes.Assets.at("javascripts/index.js")'></script>
 </head>
-<body data-game-url="@routes.ZxController.game("")" data-page-id="index">
+<body data-game-url="@routes.ZxController.game("")">
 	<div class="container ">
 	    <div>
 	        <form method="post" action="@routes.ZxController.createGame()">
-	            <label>Board width:</label><input type="number" name="width"></input>
-	            <label>Board height:</label><input type="number" name="height"></input>
-	            <label>Number of walls:</label><input type="number" name="walls"></input>
-	            <input type="submit" value="Create room"></input>
+	            <div><label>Board width:</label><input type="number" name="width"></input></div>
+	            <div><label>Board height:</label><input type="number" name="height"></input></div>
+	            <div><label>Number of walls:</label><input type="number" name="walls"></input></div>
+	            <div><input type="submit" value="Create room"></input></div>
 	        </form>
 	    </div>
+	    <hr/>
 	    <div>
 	        <input type="text" id="join_form_game_id"></input>
 	        <button type="button" id="join_form_button">Join game</button>

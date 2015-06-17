@@ -12,11 +12,11 @@
   <script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
   <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/css.css")" media="screen" />
 </head>
-<body data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()" data-page-id="game">
+<body data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()">
 	<div class="container ">
 		<div id="messages"></div>
 		<input type="text" id="name_input"/><button type="button" id="sit_button">Usiądź</button>
-		<div>Stan gry: <span id="state_msg">Unknown</span></div>
+		<div id="gameState"></div>
 		<div>
 			<div id="move_up" class="moveButton">Up</div>
 			<div id="move_down" class="moveButton">Down</div>

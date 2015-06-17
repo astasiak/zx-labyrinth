@@ -18,10 +18,13 @@ table.board { border: none; border-spacing: 0px; }
 .borderV:hover, .borderH:hover {background-color: #ccc;}
 .borderV.selected:hover, .borderH.selected:hover {background-color: #888;}
 
+#gameState { font-size: larger; padding: 15px; margin: 15px; background-color: #000; color: #fff;}
 .playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #500; color: #fff; }
-.boardContainer { float: left; padding: 10px; margin: 10px; background-color: #fef; }
-.boardContainer.my { background-color: #f77; }
+.boardContainer { float: left; padding: 10px; margin: 10px; background-color: #844; }
+.boardContainer.my { background-color: #f44; }
 .boardArea { padding: 10px; margin: 10px; background-color: #fff;}
 
 .moveButton { float: left; padding: 5px; margin: 5px; background-color: #505; color: #fff; cursor: pointer; }
 #containerA { clear: both; }
+.boardContainer.current .boardArea { background-color: #8f8; }
+.boardContainer.winner .playerName { background-color: #f00; color: #ff4; }

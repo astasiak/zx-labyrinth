@@ -65,6 +65,36 @@ createBoards = (params) ->
     board.type = "init"
     wsSend(board) # TODO remove copy-paste
 
+makeBlinking = (selector) ->
+  setInterval ->
+    $(selector).animate({backgroundColor:"#a00"},400).animate({backgroundColor:"#f66"},400)
+  , 400
+
+translateStatus = (status) ->
+  stateString = "Nieznany stan gry"
+  if status=="Awaiting"
+    stateString = "Oczekiwanie na rozpoczęcie gry"
+  else if status=="Ongoing(PlayerA)"
+    stateString = "Ruch wykonuje "+$("#playerA").text()
+    $("#containerB").addClass("current")
+    $("#containerA").removeClass("current")
+  else if status=="Ongoing(PlayerB)"
+    stateString = "Ruch wykonuje "+$("#playerB").text()
+    $("#containerA").addClass("current")
+    $("#containerB").removeClass("current")
+  else if status=="Finished(PlayerA)"
+    stateString = "Grę wygrał "+$("#playerA").text()
+    $("#containerA").addClass("winner")
+    makeBlinking("#containerA")
+  else if status=="Finished(PlayerB)"
+    stateString = "Grę wygrał "+$("#playerB").text()
+    $("#containerB").addClass("winner")
+    makeBlinking("#containerB")
+  else if status=="INIT_PSEUDOSTATE"
+    stateString = "Oczekiwanie na rozpoczęcie gry"
+  console.log(stateString)
+  $("#gameState").text(stateString)
+
 wsHandler = (data) ->
   console.log("WS> "+data)
   data = JSON.parse(data)
@@ -76,7 +106,7 @@ wsHandler = (data) ->
       borders: data.walls
     createBoards(params)
   else if data.type == "update_state"
-    $("#state_msg").text(data.state)
+    translateStatus(data.state)
   else if data.type == "update_players"
     $("#playerA").text(data.a)
     $("#playerB").text(data.b)
@@ -94,20 +124,16 @@ wsHandler = (data) ->
     board.setBoard(mapMsgToBoard(data.board))
 
 $ ->
-  page = $("body").data("page-id")
-  if page=="index"
-    $("#join_form_button").click ->
-      window.location.href = $("body").data("game-url")+$("#join_form_game_id").val()
-  else if page=="game"
-    wsUrl = $("body").data("ws-url")
-    if location.protocol=="https:"
-      wsUrl = wsUrl.replace("ws:","wss:")
-    $("#messages").text(wsUrl)
-    window.gameWs = new WebSocket(wsUrl)
-    window.gameWs.onmessage = (msg) ->
-      wsHandler(msg.data)
-    window.gameWs.onclose = () ->
-      console.log("Websocket closed!");
-    $("#sit_button").click ->
-      wsSend({"type":"sit","name":$("#name_input").val()})
-    initMoveButtons()
+  wsUrl = $("body").data("ws-url")
+  if location.protocol=="https:"
+    wsUrl = wsUrl.replace("ws:","wss:")
+  $("#messages").text(wsUrl)
+  window.gameWs = new WebSocket(wsUrl)
+  window.gameWs.onmessage = (msg) ->
+    wsHandler(msg.data)
+  window.gameWs.onclose = () ->
+    console.log("Websocket closed!");
+  $("#sit_button").click ->
+    wsSend({"type":"sit","name":$("#name_input").val()})
+  initMoveButtons()
+  translateStatus("INIT_PSEUDOSTATE")
