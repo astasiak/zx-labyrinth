@@ -27,8 +27,8 @@ class JsonMapperTest extends FunSuite {
     val boardJson = Json.obj(
         "type"->"init",
         "size"->Json.arr(3,3),
-        "start"->Json.arr(0,1),
-        "end"->Json.arr(1,2),
+        "start"->Json.arr(1,0),
+        "end"->Json.arr(2,1),
         "wallsH"->".-...-",
         "wallsV"->".....-")
     val message = JsonMapper.mapJsToMsg(boardJson)
