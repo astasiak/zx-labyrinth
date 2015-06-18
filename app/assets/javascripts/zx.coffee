@@ -54,7 +54,7 @@ onBoardSubmit = (params,boardRef) ->
       alert("Umieść start i metę")
       return
     board.type = "init"
-    window.boardA.setEditable(false)
+    boardRef.setEditable(false)
     wsSend(board)
 
 createBoards = (params) ->
@@ -63,13 +63,36 @@ createBoards = (params) ->
   onBoardSubmit(params,window.boardA)
   onBoardSubmit(params,window.boardB)
 
+bindArrowKeys = ->
+  $(document).keydown (e) ->
+    if $("#chatInput").is(":focus")
+      return
+    if e.keyCode == 37
+      dir = "w"
+    else if e.keyCode == 38
+      dir = "n"
+    else if e.keyCode == 39
+      dir = "e"
+    else if e.keyCode == 40
+      dir = "s"
+    else
+      return
+    wsSend({"type":"move","dir":dir})
+
 makeBlinking = (selector) ->
   setInterval ->
     $(selector).animate({backgroundColor:"#a00"},400).animate({backgroundColor:"#f66"},400)
   , 400
 
+printMessageAboutWinner = (winnerId) ->
+  if winnerId==window.myPlayerId
+    addChatTechnicalMessage("Wygrałeś!")
+  else
+    addChatTechnicalMessage("Przegrałeś")
+
 translateStatus = (status) ->
   stateString = "Nieznany stan gry"
+  playAnimation = true
   if status=="Awaiting"
     stateString = "Oczekiwanie na rozpoczęcie gry"
   else if status=="Ongoing(PlayerA)"
@@ -84,14 +107,21 @@ translateStatus = (status) ->
     stateString = "Grę wygrał "+$("#playerA").text()
     $("#containerA").addClass("winner")
     makeBlinking("#containerA")
+    printMessageAboutWinner("A")
   else if status=="Finished(PlayerB)"
     stateString = "Grę wygrał "+$("#playerB").text()
     $("#containerB").addClass("winner")
     makeBlinking("#containerB")
+    printMessageAboutWinner("B")
   else if status=="INIT_PSEUDOSTATE"
     stateString = "Oczekiwanie na rozpoczęcie gry"
-  console.log(stateString)
+    playAnimation = false
+  if $("#gameState").text()==stateString
+    playAnimation = false 
   $("#gameState").text(stateString)
+  if playAnimation
+    for color in ["#ff0","#00f","#000"]
+      $("#gameState").animate({backgroundColor:color},200)
 
 addNewMessage = (player,text) ->
   newRow = '<div class="chatRow"><span class="messageSender">'
@@ -102,7 +132,18 @@ addNewMessage = (player,text) ->
   chatHistory = $("#chatHistory")
   chatHistory.append(newRow)
   chatHistory.scrollTop(chatHistory.height())
-  
+
+addChatTechnicalMessage = (text) ->
+  newRow = '<div class="technical">'+text+'</div>'
+  chatHistory = $("#chatHistory")
+  chatHistory.append(newRow)
+  chatHistory.scrollTop(chatHistory.height())
+
+askForName = ->
+  name = ""
+  while not name
+    name = prompt("Podaj imię gracza")
+  wsSend({"type":"sit","name":name})
 
 wsHandler = (data) ->
   console.log("WS> "+data)
@@ -122,9 +163,11 @@ wsHandler = (data) ->
   else if data.type == "sit_ok"
     if data.player == "A"
       window.myBoard = boardA
+      window.myPlayerId = "A"
       $("#containerA").addClass("my")
     else # "B"
       window.myBoard = boardB
+      window.myPlayerId = "B"
       $("#containerB").addClass("my")
     window.myBoard.setEditable(true)
   else if data.type == "sit_fail"
@@ -148,14 +191,11 @@ $ ->
   wsUrl = $("body").data("ws-url")
   if location.protocol=="https:"
     wsUrl = wsUrl.replace("ws:","wss:")
-  $("#messages").text(wsUrl)
   window.gameWs = new WebSocket(wsUrl)
   window.gameWs.onmessage = (msg) ->
     wsHandler(msg.data)
   window.gameWs.onclose = () ->
     console.log("Websocket closed!");
-  $("#sit_button").click ->
-    wsSend({"type":"sit","name":$("#name_input").val()})
   initMoveButtons()
   translateStatus("INIT_PSEUDOSTATE")
   onChatKeydown = (e) ->
@@ -163,4 +203,6 @@ $ ->
       wsSend({"type":"chat","msg":$("#chatInput").val()})
       $("#chatInput").val("")
   $("#chatInput").bind("keydown",onChatKeydown)
-    
+  bindArrowKeys()
+  askForName()
+

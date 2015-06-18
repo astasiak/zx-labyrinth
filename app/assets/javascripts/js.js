@@ -72,14 +72,17 @@ function Board(selector,params) {
   this.getCorner = function(x,y) {return this.find(".corner[data-x="+x+"][data-y="+y+"]");}
   this.getElem = function(x,y) {return this.find(".field[data-x="+x+"][data-y="+y+"]");}
   this.redrawBorders = function() {
+    var borderCounter = 0;
     for(var i=0;i<this.game.params.height;i++) {
       for(var j=0;j<this.game.params.width;j++) {
         if(this.game.board.borders[i][j]['h']) {
+          borderCounter++;
           thisView.getBorder(j,i,'H').addClass("selected");
         } else {
           thisView.getBorder(j,i,'H').removeClass("selected");
         }
         if(this.game.board.borders[i][j]['v']) {
+          borderCounter++;
           thisView.getBorder(j,i,'V').addClass("selected");
         } else {
           thisView.getBorder(j,i,'V').removeClass("selected");
@@ -100,7 +103,7 @@ function Board(selector,params) {
         }
       }
     }
-    this.find(".used-walls").text(this.game.bordersUsed);
+    this.find(".used-walls").text(borderCounter);
   }
   this.redrawEndpoint = function(object,target,position) {
     if(position) {
@@ -187,11 +190,11 @@ function Board(selector,params) {
   this.setEditable = function(editable) {
     if(editable) {
       this.editable = true;
-      this.find(".submit-button, .start, .meta").addClass("active");
+      $(this.selector).addClass("creatingLabyrinth");
       this.find( ".start, .meta" ).draggable('enable');
     } else {
       this.editable = false;
-      this.find(".submit-button, .start, .meta").removeClass("active");
+      $(this.selector).removeClass("creatingLabyrinth");
       this.find( ".start, .meta" ).draggable('disable');
     }
   }

@@ -1,11 +1,11 @@
 .start, .meta { width: 20px; height: 20px; padding: 0.5em; margin: 5px ; background-color: yellow; text-align: center; }
-.start.active, .meta.active { cursor: move; }
+.creatingLabyrinth .start, .creatingLabyrinth .meta { cursor: move; }
 .start-box, .meta-box { display: inline-block; }
 .clear-float { clear: left; }
 .start-meta { background: #bbb; display: inline-block; margin: 5px;}
 .submit-button {background-color: #aaa; display: inline-block; padding: 10px; color: #fff; }
-.submit-button.active {background-color: #088;}
-.submit-button.active:hover {background-color: #0aa; cursor: pointer; }
+.creatingLabyrinth .submit-button {background-color: #088;}
+.creatingLabyrinth .submit-button:hover {background-color: #0aa; cursor: pointer; }
 
 .field-hovered { background-color: blue !important; }
 table.board { border: none; border-spacing: 0px; }
@@ -15,8 +15,8 @@ table.board { border: none; border-spacing: 0px; }
 .board td.field { border: 0px; background-color: #ffb; width: 40px; height: 40px; }
 .board td.field.currentPosition { background-color: #f00; }
 .borderV.selected, .borderH.selected, .corner.selected {background-color: #000;}
-.borderV:hover, .borderH:hover {background-color: #ccc;}
-.borderV.selected:hover, .borderH.selected:hover {background-color: #888;}
+.creatingLabyrinth .borderV:hover, .creatingLabyrinth .borderH:hover {background-color: #ccc;}
+.creatingLabyrinth .borderV.selected:hover, .creatingLabyrinth .borderH.selected:hover {background-color: #888;}
 
 #gameState { font-size: larger; padding: 15px; margin: 15px; background-color: #000; color: #fff;}
 .playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #500; color: #fff; }
@@ -25,6 +25,7 @@ table.board { border: none; border-spacing: 0px; }
 .boardArea { padding: 10px; margin: 10px; background-color: #fff;}
 
 .moveButton { float: left; padding: 5px; margin: 5px; background-color: #505; color: #fff; cursor: pointer; }
+.moveComment { float: left; padding: 5px; margin: 5px; }
 #containerA { clear: both; }
 .boardContainer.current .boardArea { background-color: #8f8; }
 .boardContainer.winner .playerName { background-color: #f00; color: #ff4; }
@@ -34,3 +35,4 @@ table.board { border: none; border-spacing: 0px; }
 #chatInput { width: 300px; }
 #chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
 #chatHistory .messageText { font-style: italic; }
+#chatHistory .technical { font-style: italic; color: #666; }
