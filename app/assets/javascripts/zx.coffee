@@ -45,12 +45,6 @@ initMoveButtons = () ->
   $("#move_right").click ->
     wsSend({"type":"move","dir":"e"})
 
-
-wsSend = (obj) ->
-  message = JSON.stringify(obj)
-  console.log("WS< "+message)
-  window.gameWs.send(message)
-
 createBoards = (params) ->
   window.boardA = new Board("#boardA", params)
   window.boardB = new Board("#boardB", params)
@@ -95,6 +89,14 @@ translateStatus = (status) ->
   console.log(stateString)
   $("#gameState").text(stateString)
 
+addNewMessage = (player,text) ->
+  newRow = '<div class="chatRow"><span class="messageSender">'
+  newRow += player
+  newRow += '</span><span class="messageText">'
+  newRow += text
+  newRow += '</span></div>'
+  $("#chatHistory").append(newRow)
+
 wsHandler = (data) ->
   console.log("WS> "+data)
   data = JSON.parse(data)
@@ -122,6 +124,13 @@ wsHandler = (data) ->
   else if data.type == "update_board"
     board = if data.player=="A" then window.boardA else window.boardB
     board.setBoard(mapMsgToBoard(data.board))
+  else if data.type == "chat"
+    addNewMessage(data.player,data.msg)
+
+wsSend = (obj) ->
+  message = JSON.stringify(obj)
+  console.log("WS< "+message)
+  window.gameWs.send(message)
 
 $ ->
   wsUrl = $("body").data("ws-url")
@@ -137,3 +146,9 @@ $ ->
     wsSend({"type":"sit","name":$("#name_input").val()})
   initMoveButtons()
   translateStatus("INIT_PSEUDOSTATE")
+  onChatKeydown = (e) ->
+    if e.which==13
+      wsSend({"type":"chat","msg":$("#chatInput").val()})
+      $("#chatInput").val("")
+  $("#chatInput").bind("keydown",onChatKeydown)
+    

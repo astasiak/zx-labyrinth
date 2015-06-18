@@ -28,3 +28,9 @@ table.board { border: none; border-spacing: 0px; }
 #containerA { clear: both; }
 .boardContainer.current .boardArea { background-color: #8f8; }
 .boardContainer.winner .playerName { background-color: #f00; color: #ff4; }
+
+#chatBox { float: left; padding: 10px; margin: 10px; width: auto; }
+#chatHistory { overflow-y: scroll; height:300px; width: 300px; border-style: solid; }
+#chatInput { width: 300px; }
+#chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
+#chatHistory .messageText { font-style: italic; }
