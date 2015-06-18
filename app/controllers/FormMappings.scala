@@ -11,7 +11,7 @@ object FormMappings {
     val width = form.get("width")(0).toInt
     val height = form.get("height")(0).toInt
     val numberOfWalls = form.get("walls")(0).toInt
-    GameParams((width, height), numberOfWalls)
+    GameParams((height, width), numberOfWalls)
   }
 
 }

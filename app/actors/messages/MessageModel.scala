@@ -20,6 +20,7 @@ sealed trait OutboundMessage
 case class ChatMessageOMsg(player: String, msg: String) extends OutboundMessage
 case class SitDownSuccessOMsg(playerId: PlayerId) extends OutboundMessage
 case class SitDownFailOMsg() extends OutboundMessage
+case class InitBoardResultOMsg(success: Boolean) extends OutboundMessage
 case class UpdateBoardOMsg(player: PlayerId, board: Board) extends OutboundMessage
 case class UpdatePlayersOMsg(playerA: Option[String], playerB: Option[String]) extends OutboundMessage
 case class UpdateStateOMsg(gameState: GameState) extends OutboundMessage

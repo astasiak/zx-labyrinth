@@ -1,6 +1,8 @@
 package game
 
 import scala.collection.mutable.MutableList
+import scala.collection.mutable.Set
+
 
 sealed trait Direction
 case object North extends Direction
@@ -12,7 +14,7 @@ case class MoveResult(newBoard: Board, success: Boolean)
 
 case class Border(wall: Boolean, discovered: Boolean)
 case class Borders(vertical: Vector[Vector[Border]], horizontal: Vector[Vector[Border]]) {
-  def updatedBorders(set: Vector[Vector[Border]], x: Int, y: Int): Vector[Vector[Border]] = {
+  private def updatedBorders(set: Vector[Vector[Border]], x: Int, y: Int): Vector[Vector[Border]] = {
     val border = set(x)(y)
     val newBorder = Border(border.wall, true)
     return set.updated(x, set(x).updated(y, newBorder))
@@ -41,29 +43,57 @@ case class Board(
     Board(size,position,start,meta,Borders(newVBorders,newHBorders))
   }
   
+  def isValid: Boolean = {
+    def fieldWithinSize(field: (Int, Int)) =
+      Range(0,size._1).contains(field._1) &&
+      Range(0,size._2).contains(field._2)
+    def isMetaReachableFromStart = {
+      def neighbours(pos:(Int,Int)) = {
+        val directions = Set(North, East, South, West)
+        directions
+          .filter(d=>inRange(pos,d)&&canMove(pos,d))
+          .map(move(pos,_))
+      }
+      var visitedFields: Set[(Int, Int)] = Set()
+      var newFields = Set(start)
+      while(!newFields.isEmpty) {
+        visitedFields ++= newFields
+        newFields = newFields.flatMap(neighbours(_)).filter(!visitedFields.contains(_))
+      }
+      visitedFields.contains(meta)
+    }
+    if(!fieldWithinSize(position)) return false
+    if(!fieldWithinSize(start)) return false
+    if(!fieldWithinSize(meta)) return false
+    if(!isMetaReachableFromStart) return false
+    true
+  }
+  
+  private def move(position: (Int, Int), dir: Direction): (Int, Int) = (dir, position) match {
+    case (North, (x, y)) => (x-1,y)
+    case (South, (x, y)) => (x+1,y)
+    case (West, (x, y)) => (x,y-1)
+    case (East, (x, y)) => (x,y+1)
+  }
+  private def inRange(position: (Int, Int), dir: Direction): Boolean = (dir, position) match {
+    case (North, (x, y)) => x > 0
+    case (South, (x, y)) => x+1 < size._1
+    case (West, (x, y)) => y > 0
+    case (East, (x, y)) => y+1 < size._2
+  }
+  private def canMove(position: (Int, Int), dir: Direction): Boolean = (dir, position) match {
+    case (North, (x, y)) => !borders.horizontal(x-1)(y).wall
+    case (South, (x, y)) => !borders.horizontal(x)(y).wall
+    case (West, (x, y)) => !borders.vertical(x)(y-1).wall
+    case (East, (x, y)) => !borders.vertical(x)(y).wall
+  }
   def makeMove(dir: Direction): MoveResult = {
-    def move: (Int, Int) = (dir, position) match {
-      case (North, (x, y)) => (x-1,y)
-      case (South, (x, y)) => (x+1,y)
-      case (West, (x, y)) => (x,y-1)
-      case (East, (x, y)) => (x,y+1)
-    }
-    def inRange: Boolean = (dir, position) match {
-      case (North, (x, y)) => x > 0
-      case (South, (x, y)) => x+1 < size._1
-      case (West, (x, y)) => y > 0
-      case (East, (x, y)) => y+1 < size._2
-    }
-    def canMove: Boolean = (dir, position) match {
-      case (North, (x, y)) => !borders.horizontal(x-1)(y).wall
-      case (South, (x, y)) => !borders.horizontal(x)(y).wall
-      case (West, (x, y)) => !borders.vertical(x)(y-1).wall
-      case (East, (x, y)) => !borders.vertical(x)(y).wall
-    }
-    if(!inRange) MoveResult(this, false)
-    else if(canMove) MoveResult(Board(size,move,start,meta,borders.discoverBorder(position, dir)), true)
+    if(!inRange(position,dir)) MoveResult(this, false)
+    else if(canMove(position,dir)) MoveResult(Board(size,move(position,dir),start,meta,borders.discoverBorder(position, dir)), true)
     else MoveResult(Board(size,position,start,meta,borders.discoverBorder(position, dir)), false)
   }
+  
+  def numberOfBorders: Int = 0
   
   def isFinished: Boolean = position == meta
   def toFancyString = {

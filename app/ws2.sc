@@ -13,4 +13,18 @@ object ws2 {
                                                   //| nt]] = Vector(Vector(1, 2), Vector(3, 4))
   val v = vec.flatMap(x=>{x}).mkString            //> v  : String = 1234
   
+  
+  val set = Set(1,2,3)--List(1,4)                 //> set  : scala.collection.immutable.Set[Int] = Set(2, 3)
+  import game._
+  var map: scala.collection.mutable.Map[PlayerId, Int] = scala.collection.mutable.Map()
+                                                  //> map  : scala.collection.mutable.Map[game.PlayerId,Int] = Map()
+  map.put(PlayerA,1)                              //> res0: Option[Int] = None
+  map.get(PlayerA)                                //> res1: Option[Int] = Some(1)
+  val s = map.keys.toSet                          //> s  : scala.collection.immutable.Set[game.PlayerId] = Set(PlayerA)
+  val w: Set[PlayerId] = Set(PlayerA)             //> w  : Set[game.PlayerId] = Set(PlayerA)
+  val ss: Set[PlayerId] = Set(PlayerA,PlayerB)    //> ss  : Set[game.PlayerId] = Set(PlayerA, PlayerB)
+  val ss2 = Set(PlayerA,PlayerB)                  //> ss2  : scala.collection.immutable.Set[Product with Serializable with game.Pl
+                                                  //| ayerId{def theOther: Product with Serializable with game.PlayerId}] = Set(Pl
+                                                  //| ayerA, PlayerB)
+  val sss = ss--w                                 //> sss  : scala.collection.immutable.Set[game.PlayerId] = Set(PlayerB)
 }

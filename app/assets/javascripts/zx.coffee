@@ -17,6 +17,8 @@ mapMsgToBoard = (msg) ->
   board
 
 mapBoardToMsg = (board, params) ->
+  if not board.start or not board.meta
+    return undefined
   wallsH = ""
   for j in [1..params.height-1]
     for i in [0..params.width-1]
@@ -45,19 +47,21 @@ initMoveButtons = () ->
   $("#move_right").click ->
     wsSend({"type":"move","dir":"e"})
 
+onBoardSubmit = (params,boardRef) ->
+  boardRef.setSubmit ->
+    board = mapBoardToMsg(boardRef.getBoard(),params)
+    if not board
+      alert("Umieść start i metę")
+      return
+    board.type = "init"
+    window.boardA.setEditable(false)
+    wsSend(board)
+
 createBoards = (params) ->
   window.boardA = new Board("#boardA", params)
   window.boardB = new Board("#boardB", params)
-  window.boardA.setSubmit ->
-    window.boardA.setEditable(false)
-    board = mapBoardToMsg(window.boardA.getBoard(),params)
-    board.type = "init"
-    wsSend(board)
-  window.boardB.setSubmit ->
-    window.boardB.setEditable(false)
-    board = mapBoardToMsg(window.boardB.getBoard(),params)
-    board.type = "init"
-    wsSend(board) # TODO remove copy-paste
+  onBoardSubmit(params,window.boardA)
+  onBoardSubmit(params,window.boardB)
 
 makeBlinking = (selector) ->
   setInterval ->
@@ -95,7 +99,10 @@ addNewMessage = (player,text) ->
   newRow += '</span><span class="messageText">'
   newRow += text
   newRow += '</span></div>'
-  $("#chatHistory").append(newRow)
+  chatHistory = $("#chatHistory")
+  chatHistory.append(newRow)
+  chatHistory.scrollTop(chatHistory.height())
+  
 
 wsHandler = (data) ->
   console.log("WS> "+data)
@@ -114,11 +121,12 @@ wsHandler = (data) ->
     $("#playerB").text(data.b)
   else if data.type == "sit_ok"
     if data.player == "A"
-      window.boardA.setEditable(true)
+      window.myBoard = boardA
       $("#containerA").addClass("my")
     else # "B"
-      window.boardB.setEditable(true)
+      window.myBoard = boardB
       $("#containerB").addClass("my")
+    window.myBoard.setEditable(true)
   else if data.type == "sit_fail"
     alert("Nie można usiąść")
   else if data.type == "update_board"
@@ -126,6 +134,10 @@ wsHandler = (data) ->
     board.setBoard(mapMsgToBoard(data.board))
   else if data.type == "chat"
     addNewMessage(data.player,data.msg)
+  else if data.type == "init_result"
+    if not data.ok
+      alert("Niepoprawne rozmieszczenie labiryntu")
+      window.myBoard.setEditable(true)
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)

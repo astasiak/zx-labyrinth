@@ -41,10 +41,9 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     val playerId = game.sitDown(playerName, new AkkaSeatCallbacks(sender))
     playerId match {
       case None => sender ! SitDownFailOMsg()
-      case Some(playerId) => {
+      case Some(playerId) =>
         playerMap.put(playerId, sender)
         sender ! SitDownSuccessOMsg(playerId)
-      }
     }
   }
   
@@ -59,7 +58,9 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   
   private def initBoard(board: Board) = myPlayerId() match {
     case None => log.warning("Trying to init board while not sitting")
-    case Some(playerId) => game.initBoard(playerId, board)
+    case Some(playerId) =>
+      val success = game.initBoard(playerId, board)
+      sender ! InitBoardResultOMsg(success)
   }
   
   private def makeMove(move: Direction) = myPlayerId() match {
@@ -69,7 +70,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   
   private def askForGameState() = sender ! ParamsOMsg(params)
   
-  private def myPlayerId() = {
+  private def myPlayerId(): Option[PlayerId] = {
     val playerId = playerMap.inverse().get(sender)
     if(playerId==null) None else Some(playerId)
   }

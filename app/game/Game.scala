@@ -29,13 +29,17 @@ class Game(val params: GameParams) {
   def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
   
   def sitDown(playerName: String, callbacks: Callbacks): Option[PlayerId] = {
-    for(playerId <- List(PlayerA, PlayerB).filter(!players.contains(_))) {
+    for(playerId <- (Set[PlayerId](PlayerA, PlayerB)--players.keys)) {
       players.put(playerId, new PlayerData(callbacks, playerName))
       players.values.foreach {
         _.callbacks.updatePlayers(
             players.get(PlayerA).map(_.name),
             players.get(PlayerB).map(_.name))
       }
+      val opponentBoard = players.get(playerId.theOther).map(_.board).flatten
+      opponentBoard.map(board=>{
+        callbacks.updateBoard(playerId.theOther, board.privatize)
+      })
       return Some(playerId)
     }
     return None
@@ -46,20 +50,29 @@ class Game(val params: GameParams) {
     players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
   }
   
-  def initBoard(playerId: PlayerId, board: Board) = (gameState, players.get(playerId)) match {
-    case (Awaiting, Some(player)) => {
-      // TODO: validation of size and number of walls
+  def isBoardAcceptable(board: Board) = {
+    board.isValid &&
+    board.numberOfBorders<=params.walls &&
+    board.size==params.size
+  }
+  
+  def initBoard(playerId: PlayerId, board: Board): Boolean = (gameState, players.get(playerId)) match {
+    case (Awaiting, Some(player)) => if(isBoardAcceptable(board)) {
       player.board = Some(board)
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
         gameState = Ongoing(PlayerA)
         players.values.foreach(_.callbacks.updateGameState(gameState))
       }
       sendBoardToPlayers(playerId, board)
-    }
+      return true
+    } else
+      return false
     case (_, None) =>
       LOGGER.warn("Cannot init board for empty seat")
+      return false
     case _ =>
       LOGGER.warn("Cannot init board when game has started")
+      return false
   }
   
   def declareMove(playerId: PlayerId, direction: Direction) = gameState match {

@@ -65,5 +65,13 @@ class BoardTest extends FunSuite with BeforeAndAfter {
       assert(expectedSuccess === result.success, "Wrong move success calculation")
     }
   }
+  
+  test("privatizing board") {
+    
+  }
+  
+  test("validating board") {
+    
+  }
  
 }
