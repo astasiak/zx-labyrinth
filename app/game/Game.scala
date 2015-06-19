@@ -50,6 +50,12 @@ class Game(val params: GameParams) {
     players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
   }
   
+  def sendUncoveredBoards() = players.foreach(boardOwner=>{
+    players.values.foreach(receiver=>{
+      receiver.callbacks.updateBoard(boardOwner._1, boardOwner._2.board.get)
+    })
+  })
+  
   def isBoardAcceptable(board: Board) = {
     board.isValid &&
     board.numberOfBorders<=params.walls &&
@@ -80,11 +86,15 @@ class Game(val params: GameParams) {
       val player = players.get(playerId.theOther).get
       val result = player.board.get.makeMove(direction)
       player.board = Some(result.newBoard)
-      sendBoardToPlayers(playerId.theOther, result.newBoard)
       gameState =
-        if(result.newBoard.isFinished) Finished(playerId)
-        else if(result.success) Ongoing(playerId)
+        if(result.success) Ongoing(playerId)
         else Ongoing(playerId.theOther)
+      if(result.newBoard.isFinished) {
+        gameState = Finished(playerId)
+        sendUncoveredBoards()
+      } else {
+        sendBoardToPlayers(playerId.theOther, result.newBoard)
+      }
       players.values.foreach(_.callbacks.updateGameState(gameState))
     }
     case Ongoing(currentPlayer) if playerId!=currentPlayer =>

@@ -11,6 +11,7 @@ object JsonMapper {
     case Some("init") => mapInitMsg(js)
     case Some("move") => mapMoveMsg(js)
     case Some("ask") => mapAskMsg(js)
+    case Some("keep_alive") => KeepAliveIMsg()
     case _ => UnknownIMsg()
   }
   private def mapSubMsg(js: JsValue) = (js \ "name").asOpt[String] match {

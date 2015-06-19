@@ -13,6 +13,7 @@ case class SubscriptionIMsg(playerName: String) extends InboudMessage
 case class InitBoardIMsg(board: Board) extends InboudMessage
 case class MakeMoveIMsg(move: Direction) extends InboudMessage
 case class AskForParamsIMsg() extends InboudMessage
+case class KeepAliveIMsg() extends InboudMessage
 
 
 

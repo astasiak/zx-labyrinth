@@ -72,38 +72,44 @@ function Board(selector,params) {
   this.getCorner = function(x,y) {return this.find(".corner[data-x="+x+"][data-y="+y+"]");}
   this.getElem = function(x,y) {return this.find(".field[data-x="+x+"][data-y="+y+"]");}
   this.redrawBorders = function() {
-    var borderCounter = 0;
-    for(var i=0;i<this.game.params.height;i++) {
-      for(var j=0;j<this.game.params.width;j++) {
-        if(this.game.board.borders[i][j]['h']) {
-          borderCounter++;
-          thisView.getBorder(j,i,'H').addClass("selected");
-        } else {
-          thisView.getBorder(j,i,'H').removeClass("selected");
-        }
-        if(this.game.board.borders[i][j]['v']) {
-          borderCounter++;
-          thisView.getBorder(j,i,'V').addClass("selected");
-        } else {
-          thisView.getBorder(j,i,'V').removeClass("selected");
-        }
-      }
-    }
-    for(var i=1;i<this.game.params.height;i++) {
-      for(var j=1;j<this.game.params.width;j++) {
-        var neighbours = 0;
-        if(this.game.board.borders[i][j]['v']) neighbours++;
-        if(this.game.board.borders[i][j]['h']) neighbours++;
-        if(this.game.board.borders[i-1][j]['v']) neighbours++;
-        if(this.game.board.borders[i][j-1]['h']) neighbours++;
-        if(neighbours>1) {
-          thisView.getCorner(j,i).addClass("selected");
-        } else {
-          thisView.getCorner(j,i).removeClass("selected");
+    drawBordersAndCorners = function (fieldV,fieldH,cssClass) {
+      var borderCounter = 0;
+      for(var i=0;i<thisView.game.params.height;i++) {
+        for(var j=0;j<thisView.game.params.width;j++) {
+          borderData = thisView.game.board.borders[i][j]
+          if(borderData[fieldH]) {
+            borderCounter++;
+            thisView.getBorder(j,i,'H').addClass(cssClass);
+          } else {
+            thisView.getBorder(j,i,'H').removeClass(cssClass);
+          }
+          if(borderData[fieldV]) {
+            borderCounter++;
+            thisView.getBorder(j,i,'V').addClass(cssClass);
+          } else {
+            thisView.getBorder(j,i,'V').removeClass(cssClass);
+          }
         }
       }
+      for(var i=1;i<thisView.game.params.height;i++) {
+        for(var j=1;j<thisView.game.params.width;j++) {
+          var neighbours = 0;
+          if(thisView.game.board.borders[i][j][fieldV]) neighbours++;
+          if(thisView.game.board.borders[i][j][fieldH]) neighbours++;
+          if(thisView.game.board.borders[i-1][j][fieldV]) neighbours++;
+          if(thisView.game.board.borders[i][j-1][fieldH]) neighbours++;
+          if(neighbours>1) {
+            thisView.getCorner(j,i).addClass(cssClass);
+          } else {
+            thisView.getCorner(j,i).removeClass(cssClass);
+          }
+        }
+      }
+      return borderCounter;
     }
-    this.find(".used-walls").text(borderCounter);
+    numberOfSelectedBorders = drawBordersAndCorners('v','h',"selected");
+    drawBordersAndCorners('vd','hd',"discovered");
+    this.find(".used-walls").text(numberOfSelectedBorders);
   }
   this.redrawEndpoint = function(object,target,position) {
     if(position) {

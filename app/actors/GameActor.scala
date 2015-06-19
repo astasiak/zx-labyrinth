@@ -34,6 +34,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case InitBoardIMsg(board) => initBoard(board)
     case MakeMoveIMsg(move) => makeMove(move)
     case AskForParamsIMsg() => askForGameState()
+    case KeepAliveIMsg() => log.debug("Connection kept alive")
     case other => log.error("unhandled: " + other)
   }
   

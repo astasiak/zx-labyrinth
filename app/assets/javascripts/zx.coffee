@@ -12,7 +12,9 @@ mapMsgToBoard = (msg) ->
     for i in [0..x-1]
       hh = if j==0 then false else msg.wallsH[(j-1)*x+i] in ['-','=']
       vv = if i==0 then false else msg.wallsV[j*(x-1)+i-1] in ['-','=']
-      row.push({h:hh, v:vv})
+      hdis = if j==0 then false else msg.wallsH[(j-1)*x+i] in ['.','=']
+      vdis = if i==0 then false else msg.wallsV[j*(x-1)+i-1] in ['.','=']
+      row.push({h:hh, v:vv, hd:hdis, vd:vdis})
     board.borders.push(row)
   board
 
@@ -58,6 +60,9 @@ onBoardSubmit = (params,boardRef) ->
     wsSend(board)
 
 createBoards = (params) ->
+  if window.boardAlreadyCreated
+    return
+  window.boardAlreadyCreated = true
   window.boardA = new Board("#boardA", params)
   window.boardB = new Board("#boardB", params)
   onBoardSubmit(params,window.boardA)
@@ -87,8 +92,10 @@ makeBlinking = (selector) ->
 printMessageAboutWinner = (winnerId) ->
   if winnerId==window.myPlayerId
     addChatTechnicalMessage("Wygrałeś!")
+    alert("Wygrałeś!")
   else
     addChatTechnicalMessage("Przegrałeś")
+    alert("Przegrałeś")
 
 translateStatus = (status) ->
   stateString = "Nieznany stan gry"
@@ -145,10 +152,14 @@ askForName = ->
     name = prompt("Podaj imię gracza")
   wsSend({"type":"sit","name":name})
 
+wsKeepAlive = ->
+  setInterval ->
+    wsSend({"type":"keep_alive"})
+  , 20000
+
 wsHandler = (data) ->
   console.log("WS> "+data)
   data = JSON.parse(data)
-  console.log(data)
   if data.type == "params"
     params =
       width: data.x
@@ -204,5 +215,6 @@ $ ->
       $("#chatInput").val("")
   $("#chatInput").bind("keydown",onChatKeydown)
   bindArrowKeys()
+  wsKeepAlive()
   askForName()
 

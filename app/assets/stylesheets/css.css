@@ -13,8 +13,9 @@ table.board { border: none; border-spacing: 0px; }
 .board td.borderH {height: 5px; padding: 0px;}
 .board td.corner {height: 5px; width: 5px; padding: 0px;}
 .board td.field { border: 0px; background-color: #ffb; width: 40px; height: 40px; }
-.board td.field.currentPosition { background-color: #f00; }
+.board td.field.currentPosition { background-color: #00f; }
 .borderV.selected, .borderH.selected, .corner.selected {background-color: #000;}
+.borderV.selected.discovered, .borderH.selected.discovered, .corner.selected.discovered {background-color: #c00;}
 .creatingLabyrinth .borderV:hover, .creatingLabyrinth .borderH:hover {background-color: #ccc;}
 .creatingLabyrinth .borderV.selected:hover, .creatingLabyrinth .borderH.selected:hover {background-color: #888;}
 
@@ -35,4 +36,4 @@ table.board { border: none; border-spacing: 0px; }
 #chatInput { width: 300px; }
 #chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
 #chatHistory .messageText { font-style: italic; }
-#chatHistory .technical { font-style: italic; color: #666; }
+#chatHistory .technical { padding: 0px 5px; font-style: italic; color: #666; }
