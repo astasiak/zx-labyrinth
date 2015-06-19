@@ -10,21 +10,16 @@ class BoardTest extends FunSuite with BeforeAndAfter {
   var board: Board = _
  
   before {
-    board = Board.create((3,3),(0,0),(2,1),List(
-        ProtoBorder(0,0,true),
-        ProtoBorder(1,1,true),
-        ProtoBorder(1,0,false)))
-      // +-+-+-+
-      // |S|   |
-      // + + + +
-      // |   | |
-      // +-+ + +
-      // |  M  |
-      // +-+-+-+
+    board = TestUtils.mkBoard(
+       "S|   \n"+
+       " + + \n"+
+       "   | \n"+
+       "-+ + \n"+
+       "  m  "
+    )
   }
   
   test("modelling successful paths") {
-    println(board.toFancyString)
     assert(false === board.isFinished)
     val moves = List(South, East, South)
     for(move <- moves) {
@@ -62,16 +57,51 @@ class BoardTest extends FunSuite with BeforeAndAfter {
     for((dir, expectedSuccess) <- moves) {
       val result = board.makeMove(dir)
       board = result.newBoard
-      assert(expectedSuccess === result.success, "Wrong move success calculation")
+      assert(expectedSuccess === result.success)
     }
   }
   
   test("privatizing board") {
-    
+    val board1 = TestUtils.mkBoard(
+       "S    \n"+
+       " + + \n"+
+       "     \n"+
+       " + + \n"+
+       "  m  ")
+    val board2 = TestUtils.mkBoard(
+       "SI   \n"+
+       " + + \n"+
+       "     \n"+
+       " + + \n"+
+       "  m  ")
+    val board3 = TestUtils.mkBoard(
+       "sI   \n"+
+       ".+ + \n"+
+       "!    \n"+
+       "=+ + \n"+
+       "  m  ")
+    assert(board.privatize === board1)
+    board = board.makeMove(East).newBoard
+    assert(board.privatize === board2)
+    board = board.makeMove(South).newBoard.makeMove(South).newBoard
+    assert(board.privatize === board3)
   }
   
   test("validating board") {
-    
+    val correctBoard = TestUtils.mkBoard(
+        "S|   \n"+
+        " +-+ \n"+
+        " |   \n"+
+        " + + \n"+
+        "   |m")
+    val invalidBoard = TestUtils.mkBoard(
+        "S|   \n"+
+        " +-+ \n"+
+        " | | \n"+
+        " + + \n"+
+        "   |m")
+    assert(correctBoard.isValid === true)
+    assert(invalidBoard.isValid === false)
   }
  
 }

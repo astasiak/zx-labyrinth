@@ -36,4 +36,9 @@ object ws {
     case _ => "coś"
   }                                               //> yyy: (a: Any)String
   val yyyValue = yyy(kkk _)                       //> yyyValue  : String = funkcja1
+  
+  val string = "S|!\n=+.\n  m"                    //> string  : String = S|!
+                                                  //| =+.
+                                                  //|   m
+  string.split("\n")                              //> res0: Array[String] = Array(S|!, =+., "  m")
 }

@@ -32,7 +32,6 @@ object JsonMapper {
       case (Some((width,height)), Some(start), Some(end), Some(wallsH), Some(wallsV)) => {
         val wallsList = (mapBorders(wallsH,false,width)++mapBorders(wallsV,true,width-1)).toList
         val board = Board.create((height,width),start.swap,end.swap,wallsList)
-        println(board.toFancyString)
         InitBoardIMsg(board)
       }
       case _ => ErrorIMsg("Cannot parse 'init' message")
