@@ -11,6 +11,7 @@ import game.PlayerA
 import game.PlayerB
 import game.Board
 import game.Ongoing
+import game.GameState
 
 class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
   var game: Game = _
@@ -38,10 +39,6 @@ class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
     assert(game.gameState === Awaiting, "Game should be in the awaiting state")
   }
   
-  test("board validation") {
-    
-  }
-  
   test("starting game") {
     val callbacks = mock[Callbacks]
     (callbacks.updatePlayers _) expects(*,*) repeated 3 times
@@ -53,8 +50,9 @@ class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
     game.initBoard(seat1.get, someBoard)
     assert(game.gameState == Awaiting)
     
-    (callbacks.updateGameState _) expects(Ongoing(PlayerA)) repeated 2 times;
+    val initialStates = List(Ongoing(PlayerA), Ongoing(PlayerB))
+    (callbacks.updateGameState _) expects(where[GameState]{initialStates.contains(_)}) repeated 2 times;
     game.initBoard(seat2.get, someBoard)
-    assert(game.gameState === Ongoing(PlayerA))
+    assert(initialStates.contains(game.gameState))
   }
 }

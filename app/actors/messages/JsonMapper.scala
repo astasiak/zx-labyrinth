@@ -74,7 +74,8 @@ object JsonMapper {
   private def mapBoard(board: Board) = {
     implicit def mapPairToJsArr(a: (Int,Int)): JsValueWrapper = Json.arr(a._1, a._2)
     Json.obj("size"->board.size.swap, "start"->board.start.swap, "end"->board.meta.swap, "pos"->board.position.swap,
-        "wallsH"->mapBorders(board.borders.horizontal), "wallsV"->mapBorders(board.borders.vertical))
+        "wallsH"->mapBorders(board.borders.horizontal), "wallsV"->mapBorders(board.borders.vertical),
+        "history"->mapHistory(board.history))
   }
   private def mapBorders(borders: Vector[Vector[Border]]) = borders.flatten.map(_ match {
     case Border(false, false) => " "
@@ -84,4 +85,5 @@ object JsonMapper {
   }).mkString
   private def mapPlayer(player: Option[String]) = player.map(JsString(_)).getOrElse(JsNull)
   private def mapState(gameState: GameState) = gameState.toString
+  private def mapHistory(history: List[(Int, Int)]) = history.map({case(x,y)=>Json.arr(y,x)})
 }

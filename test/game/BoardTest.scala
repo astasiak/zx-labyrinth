@@ -62,29 +62,19 @@ class BoardTest extends FunSuite with BeforeAndAfter {
   }
   
   test("privatizing board") {
-    val board1 = TestUtils.mkBoard(
-       "S    \n"+
-       " + + \n"+
-       "     \n"+
-       " + + \n"+
-       "  m  ")
-    val board2 = TestUtils.mkBoard(
-       "SI   \n"+
-       " + + \n"+
-       "     \n"+
-       " + + \n"+
-       "  m  ")
-    val board3 = TestUtils.mkBoard(
-       "sI   \n"+
-       ".+ + \n"+
+    val rawBoard = TestUtils.mkBoard(
+       "S| I \n"+
+       " +.+ \n"+
        "!    \n"+
-       "=+ + \n"+
+       "-+ +=\n"+
        "  m  ")
-    assert(board.privatize === board1)
-    board = board.makeMove(East).newBoard
-    assert(board.privatize === board2)
-    board = board.makeMove(South).newBoard.makeMove(South).newBoard
-    assert(board.privatize === board3)
+    val privatizedBoard = TestUtils.mkBoard(
+       "S  I \n"+
+       " +.+ \n"+
+       "!    \n"+
+       " + +=\n"+
+       "  m  ")
+    assert(rawBoard.privatize === privatizedBoard)
   }
   
   test("validating board") {

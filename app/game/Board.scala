@@ -31,7 +31,8 @@ case class Board(
     position: (Int, Int),
     start: (Int, Int),
     meta: (Int, Int),
-    borders: Borders) {
+    borders: Borders,
+    history: List[(Int, Int)]) {
   
   def privatize = {
     def privatizeBorders(bordersSet: Vector[Vector[Border]]) = bordersSet.map(_.map(_ match {
@@ -40,7 +41,7 @@ case class Board(
     }))
     val newVBorders = privatizeBorders(borders.vertical)
     val newHBorders = privatizeBorders(borders.horizontal)
-    Board(size,position,start,meta,Borders(newVBorders,newHBorders))
+    Board(size, position, start, meta, Borders(newVBorders,newHBorders), history)
   }
   
   def isValid: Boolean = {
@@ -90,8 +91,11 @@ case class Board(
   }
   def makeMove(dir: Direction): MoveResult = {
     if(!inRange(position,dir)) MoveResult(this, false)
-    else if(canMove(position,dir)) MoveResult(Board(size,move(position,dir),start,meta,borders.discoverBorder(position, dir)), true)
-    else MoveResult(Board(size,position,start,meta,borders.discoverBorder(position, dir)), false)
+    else if(canMove(position,dir)) {
+      val newPosition = move(position,dir)
+      MoveResult(Board(size,newPosition,start,meta,borders.discoverBorder(position, dir),history:+newPosition), true)
+    }
+    else MoveResult(Board(size,position,start,meta,borders.discoverBorder(position, dir),history), false)
   }
   
   def numberOfBorders: Int = 0
@@ -139,6 +143,6 @@ object Board {
     }
     val vBordersVector = vBorders.map(_.toVector)
     val hBordersVector = hBorders.map(_.toVector)
-    return Board(size, start, start, meta, Borders(vBordersVector, hBordersVector))
+    return Board(size, start, start, meta, Borders(vBordersVector, hBordersVector),List(start))
   }
 }

@@ -5,6 +5,7 @@ mapMsgToBoard = (msg) ->
     meta: msg.end
     position: msg.pos
     borders: []
+    history: msg.history
   x = msg.size[0]
   y = msg.size[1]
   for j in [0..y-1]

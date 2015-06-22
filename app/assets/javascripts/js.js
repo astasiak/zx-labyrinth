@@ -5,7 +5,8 @@ function Game(params) {
     start: undefined,
     meta: undefined,
     position: undefined,
-    borders: []
+    borders: [],
+    history: []
   };
   this.bordersUsed = 0;
   this.board.borders = [];
@@ -58,6 +59,7 @@ function Board(selector,params) {
     this.redrawMeta();
     this.redrawBorders();
     this.redrawPosition();
+    this.redrawHistory();
   }
   this.getBoard = function() {
     return this.game.board;
@@ -121,6 +123,50 @@ function Board(selector,params) {
       of:target,
       using: function(css, calc) {$(this).animate(css, 200);}
     });
+  }
+  
+  this.centerPosition = function(element) {
+	  var elem = this.getElem(element[0],element[1])
+	  var top = elem.position().top
+	  var left = elem.position().left
+	  var height = elem.height()
+	  var width = elem.width()
+	  var centerX = left+width/2;
+	  var centerY = top+height/2;
+	  return {x:centerX,y:centerY};
+  }
+  this.redrawHistory = function() {
+	  this.find(".historyLine").remove();
+	  var historyLength = this.game.board.history.length;
+	  var prevCenter = this.centerPosition(this.game.board.history[0]);
+	  for(var i=1;i<historyLength;i++) {
+		  var historyItem = this.game.board.history[i];
+		  var center = this.centerPosition(historyItem);
+		  this.addLine(prevCenter,center);
+		  prevCenter = center;
+	  }
+  }
+  this.addLine = function(from,to) {
+	  var thickness = 2;
+	  var rad2deg = 180/Math.PI;
+	  var diffX = Math.abs(from.x-to.x);
+	  var diffY = Math.abs(from.y-to.y);
+	  console.log(diffX);
+	  console.log(diffY);
+	  console.log(from);
+	  console.log(to);
+	  var len = Math.sqrt(diffX*diffX+diffY*diffY);
+	  var degrees = Math.atan( (to.y-from.y)/(to.x-from.x) ) * rad2deg;
+	  var line = $("<div/>");
+	  line.css("position","absolute");
+	  line.css("background-color","#00f");
+	  line.css("height",(2*thickness)+"px");
+	  line.css("width",(2*thickness+len)+"px");
+	  line.css("left",((from.x+to.x-len)/2-thickness)+"px");
+	  line.css("top",((from.y+to.y)/2-thickness)+"px");
+	  line.css("transform","rotate("+degrees+"deg)");
+	  line.addClass("historyLine");
+	  this.find("div.board").append(line);
   }
   this.redrawStart = function() {this.redrawEndpoint(this.find(".start"),this.find(".start-box"),this.game.board.start);}
   this.redrawMeta = function() {this.redrawEndpoint(this.find(".meta"),this.find(".meta-box"),this.game.board.meta);}

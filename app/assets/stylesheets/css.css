@@ -1,4 +1,4 @@
-.start, .meta { width: 20px; height: 20px; padding: 0.5em; margin: 5px ; background-color: yellow; text-align: center; }
+.start, .meta { width: 20px; height: 20px; padding: 0.5em; margin: 5px ; background-color: yellow; text-align: center; z-index: 1 }
 .creatingLabyrinth .start, .creatingLabyrinth .meta { cursor: move; }
 .start-box, .meta-box { display: inline-block; }
 .clear-float { clear: left; }
@@ -37,3 +37,5 @@ table.board { border: none; border-spacing: 0px; }
 #chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
 #chatHistory .messageText { font-style: italic; }
 #chatHistory .technical { padding: 0px 5px; font-style: italic; color: #666; }
+
+.boardArea { position: relative }

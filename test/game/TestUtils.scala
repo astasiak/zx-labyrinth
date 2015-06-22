@@ -30,6 +30,6 @@ object TestUtils {
       else throw new RuntimeException("Bad board format at char: "+char)
     val horizontals = everySecond(rows,false).map(everySecond(_,true).map(mapEdge _).toVector).toVector
     val verticals = everySecond(rows,true).map(everySecond(_,false).map(mapEdge _).toVector).toVector
-    Board((height,width),pos,start,meta,Borders(verticals,horizontals))
+    Board((height,width),pos,start,meta,Borders(verticals,horizontals),List())
   }
 }
