@@ -3,6 +3,7 @@ package game
 import scala.collection.mutable.Map
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.util.Random
 
 case class GameParams(size: (Int, Int), walls: Int)
 
@@ -66,7 +67,8 @@ class Game(val params: GameParams) {
     case (Awaiting, Some(player)) => if(isBoardAcceptable(board)) {
       player.board = Some(board)
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
-        gameState = Ongoing(PlayerA)
+        val startingPlayer = Random.shuffle(List(PlayerA,PlayerB)).head
+        gameState = Ongoing(startingPlayer)
         players.values.foreach(_.callbacks.updateGameState(gameState))
       }
       sendBoardToPlayers(playerId, board)

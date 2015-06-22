@@ -65,6 +65,7 @@ case class Board(
     if(!fieldWithinSize(position)) return false
     if(!fieldWithinSize(start)) return false
     if(!fieldWithinSize(meta)) return false
+    if(meta==start) return false
     if(!isMetaReachableFromStart) return false
     true
   }
@@ -122,7 +123,6 @@ case class Board(
     builder ++= "+"
   }
 }
-
 
 case class ProtoBorder(y: Int, x: Int, vertical: Boolean)
 object Board {
