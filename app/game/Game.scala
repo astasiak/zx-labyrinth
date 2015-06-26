@@ -7,21 +7,22 @@ import scala.util.Random
 
 case class GameParams(size: (Int, Int), walls: Int)
 
-// representation of states in which game can be:
+/** representation of states in which game can be: */
 sealed trait GameState
 case object Awaiting extends GameState
 case class Ongoing(current: PlayerId) extends GameState
 case class Finished(winner: PlayerId) extends GameState
 
-// model of player identifiers
+/** model of player identifiers */
 sealed trait PlayerId { def theOther: PlayerId }
 case object PlayerA extends PlayerId { override def theOther = PlayerB }
 case object PlayerB extends PlayerId { override def theOther = PlayerA }
 
-//sealed trait GameError
-//case class GenericError(msg: String) extends GameError
-
-// main implementation of game internal logic
+/**
+ * Game objects are mutable representation of the game in the whole lifecycle
+ * from being initialized with given game parameters to joining game by players,
+ * making their moves and verifying the result (winner) of the game.
+ */
 class Game(val params: GameParams) {
   private val LOGGER: Logger = LoggerFactory.getLogger("Game engine")
   private val players: Map[PlayerId, PlayerData] = Map()
@@ -110,7 +111,7 @@ private class PlayerData(val callbacks: Callbacks, val name: String) {
   var board: Option[Board] = None
 }
 
-// trait for implementing callback handler on the client side
+/** trait for implementing callback handler on the client side */
 trait Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String])
   def updateBoard(player: PlayerId, board: Board)

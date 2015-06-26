@@ -1,4 +1,4 @@
-
+// This class represents the data presented in the view
 function Game(params) {
   this.params = params;
   this.board = {
@@ -18,11 +18,33 @@ function Game(params) {
   }
 }
 
+// This is class used to present board state in the window
+// it is created like new Board("#boardA",params), creating all the needed view elements
+// the API are the methods:
+// setBoard(board) - set the data presented
+// getBoard() - get presented data
+// setSubmit(callback) - adds callback on clicking button
 function Board(selector,params) {
   var thisView = this;
   this.selector = selector;
   this.editable = false;
   this.onsubmit = function(){}
+
+  this.setBoard = function(board) {
+    this.game.board = board
+    this.redrawStart();
+    this.redrawMeta();
+    this.redrawBorders();
+    this.redrawPosition();
+    this.redrawHistory();
+  }
+  this.getBoard = function() {
+    return this.game.board;
+  }
+  
+  this.setSubmit = function(callback) {
+	this.onsubmit = callback;
+  }
   
   this.initParams = function(params) {
     this.game = new Game(params);
@@ -51,22 +73,6 @@ function Board(selector,params) {
     }
     table.appendTo(this.find(".board"))
     this.find(".max-walls").text(this.game.params.borders);
-  }
-
-  this.setBoard = function(board) {
-    this.game.board = board
-    this.redrawStart();
-    this.redrawMeta();
-    this.redrawBorders();
-    this.redrawPosition();
-    this.redrawHistory();
-  }
-  this.getBoard = function() {
-    return this.game.board;
-  }
-  
-  this.setSubmit = function(callback) {
-	this.onsubmit = callback;
   }
   
   this.find = function(subselector) { return $(this.selector).find(subselector); }
