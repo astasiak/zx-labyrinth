@@ -4,6 +4,7 @@
 
 - [x] Presenting the history of moves 
 - [ ] "Play again" button
+- [ ] "How to play?"
 - [ ] Make blinking title in the browser on player's move or chat message
 - [ ] Allow standing up and sitting back / handle closed connections
 - [ ] Allow watching games
