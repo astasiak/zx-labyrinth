@@ -73,6 +73,8 @@ bindArrowKeys = ->
   $(document).keydown (e) ->
     if $("#chatInput").is(":focus")
       return
+    if e.keyCode >= 37 and e.keyCode <= 40
+      e.preventDefault()
     if e.keyCode == 37
       dir = "w"
     else if e.keyCode == 38
