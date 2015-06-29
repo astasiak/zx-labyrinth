@@ -11,6 +11,7 @@ import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import actors.RoomManager
 import actors.SeatActor
+import play.api.mvc.Results
 
 object ZxController extends Controller {
   
@@ -27,6 +28,13 @@ object ZxController extends Controller {
   
   def game(gameId: String) = Action { implicit request =>
     Ok(views.html.game(gameId))
+  }
+  
+  def again(gameId: String) = Action {
+    RoomManager.getContinuation(gameId) match {
+      case Some(newGameId) => Redirect(routes.ZxController.game(newGameId))
+      case None => Results.NotFound(views.html.error("Game "+gameId+" not found"))
+    }
   }
 
   def gameWs(gameId: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { implicit request =>

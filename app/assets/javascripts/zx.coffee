@@ -40,7 +40,7 @@ mapBoardToMsg = (board, params) ->
     wallsV: wallsV
   msg
 
-initMoveButtons = () ->
+initButtons = () ->
   $("#move_up").click ->
     wsSend({"type":"move","dir":"n"})
   $("#move_down").click ->
@@ -49,6 +49,8 @@ initMoveButtons = () ->
     wsSend({"type":"move","dir":"w"})
   $("#move_right").click ->
     wsSend({"type":"move","dir":"e"})
+  $("#playAgainButton").click ->
+    window.location.href += "/again"
 
 onBoardSubmit = (params,boardRef) ->
   boardRef.setSubmit ->
@@ -87,18 +89,19 @@ bindArrowKeys = ->
       return
     wsSend({"type":"move","dir":dir})
 
-makeBlinking = (selector) ->
+makeBlinking = (element) ->
+  element.addClass("winner")
   setInterval ->
-    $(selector).animate({backgroundColor:"#a00"},400).animate({backgroundColor:"#f66"},400)
+    element.animate({backgroundColor:"#a00"},400).animate({backgroundColor:"#f66"},400)
   , 400
 
 printMessageAboutWinner = (winnerId) ->
-  if winnerId==window.myPlayerId
-    addChatTechnicalMessage("Wygrałeś!")
-    alert("Wygrałeś!")
-  else
-    addChatTechnicalMessage("Przegrałeś")
-    alert("Przegrałeś")
+  $("#playAgainButton").fadeIn(400)
+  makeBlinking($("#container"+winnerId))
+  message = if winnerId==window.myPlayerId then "Wygrałeś!" else "Przegrałeś"
+  addChatTechnicalMessage(message)
+  alert(message)
+  return "Grę wygrał "+$("#player"+winnerId).text()
 
 translateStatus = (status) ->
   stateString = "Nieznany stan gry"
@@ -114,15 +117,9 @@ translateStatus = (status) ->
     $("#containerA").addClass("current")
     $("#containerB").removeClass("current")
   else if status=="Finished(PlayerA)"
-    stateString = "Grę wygrał "+$("#playerA").text()
-    $("#containerA").addClass("winner")
-    makeBlinking("#containerA")
-    printMessageAboutWinner("A")
+    stateString = printMessageAboutWinner("A")
   else if status=="Finished(PlayerB)"
-    stateString = "Grę wygrał "+$("#playerB").text()
-    $("#containerB").addClass("winner")
-    makeBlinking("#containerB")
-    printMessageAboutWinner("B")
+    stateString = printMessageAboutWinner("B")
   else if status=="INIT_PSEUDOSTATE"
     stateString = "Oczekiwanie na rozpoczęcie gry"
     playAnimation = false
@@ -210,14 +207,14 @@ $ ->
     wsHandler(msg.data)
   window.gameWs.onclose = () ->
     console.log("Websocket closed!");
-  initMoveButtons()
+  initButtons()
+  bindArrowKeys()
   translateStatus("INIT_PSEUDOSTATE")
   onChatKeydown = (e) ->
     if e.which==13
       wsSend({"type":"chat","msg":$("#chatInput").val()})
       $("#chatInput").val("")
   $("#chatInput").bind("keydown",onChatKeydown)
-  bindArrowKeys()
   wsKeepAlive()
   askForName()
 

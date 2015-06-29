@@ -2,22 +2,22 @@
 .creatingLabyrinth .start, .creatingLabyrinth .meta { cursor: move; }
 .start-box, .meta-box { display: inline-block; }
 .clear-float { clear: left; }
-.start-meta { background: #bbb; display: inline-block; margin: 5px;}
-.submit-button {background-color: #aaa; display: inline-block; padding: 10px; color: #fff; }
-.creatingLabyrinth .submit-button {background-color: #088;}
-.creatingLabyrinth .submit-button:hover {background-color: #0aa; cursor: pointer; }
+.start-meta { background: #bbb; display: inline-block; margin: 5px; }
+.submit-button { background-color: #aaa; display: inline-block; padding: 10px; color: #fff; }
+.creatingLabyrinth .submit-button { background-color: #088; }
+.creatingLabyrinth .submit-button:hover { background-color: #0aa; cursor: pointer; }
 
 .field-hovered { background-color: blue !important; }
 table.board { border: none; border-spacing: 0px; }
-.board td.borderV {width: 5px; padding: 0px;}
-.board td.borderH {height: 5px; padding: 0px;}
-.board td.corner {height: 5px; width: 5px; padding: 0px;}
+.board td.borderV { width: 5px; padding: 0px; }
+.board td.borderH { height: 5px; padding: 0px; }
+.board td.corner { height: 5px; width: 5px; padding: 0px; }
 .board td.field { border: 0px; background-color: #ffb; width: 40px; height: 40px; }
 .board td.field.currentPosition { background-color: #00f; }
-.borderV.selected, .borderH.selected, .corner.selected {background-color: #000;}
-.borderV.selected.discovered, .borderH.selected.discovered, .corner.selected.discovered {background-color: #c00;}
-.creatingLabyrinth .borderV:hover, .creatingLabyrinth .borderH:hover {background-color: #ccc;}
-.creatingLabyrinth .borderV.selected:hover, .creatingLabyrinth .borderH.selected:hover {background-color: #888;}
+.borderV.selected, .borderH.selected, .corner.selected { background-color: #000; }
+.borderV.selected.discovered, .borderH.selected.discovered, .corner.selected.discovered {background-color: #c00; }
+.creatingLabyrinth .borderV:hover, .creatingLabyrinth .borderH:hover { background-color: #ccc; }
+.creatingLabyrinth .borderV.selected:hover, .creatingLabyrinth .borderH.selected:hover {background-color: #888; }
 
 #gameState { font-size: larger; padding: 15px; margin: 15px; background-color: #000; color: #fff;}
 .playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #500; color: #fff; }
@@ -37,5 +37,8 @@ table.board { border: none; border-spacing: 0px; }
 #chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
 #chatHistory .messageText { font-style: italic; }
 #chatHistory .technical { padding: 0px 5px; font-style: italic; color: #666; }
+#playAgainButton {
+	display: none; background-color: #ff8; border-style: solid; border-color: #bb4;
+	text-align: center; margin: 5px; padding: 5px; cursor: pointer; }
 
 .boardArea { position: relative }

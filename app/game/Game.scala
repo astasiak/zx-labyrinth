@@ -47,23 +47,6 @@ class Game(val params: GameParams) {
     return None
   }
   
-  def sendBoardToPlayers(playerId: PlayerId, board: Board) = {
-    players.get(playerId).map(_.callbacks.updateBoard(playerId, board))
-    players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
-  }
-  
-  def sendUncoveredBoards() = players.foreach(boardOwner=>{
-    players.values.foreach(receiver=>{
-      receiver.callbacks.updateBoard(boardOwner._1, boardOwner._2.board.get)
-    })
-  })
-  
-  def isBoardAcceptable(board: Board) = {
-    board.isValid &&
-    board.numberOfBorders<=params.walls &&
-    board.size==params.size
-  }
-  
   def initBoard(playerId: PlayerId, board: Board): Boolean = (gameState, players.get(playerId)) match {
     case (Awaiting, Some(player)) => if(isBoardAcceptable(board)) {
       player.board = Some(board)
@@ -104,6 +87,23 @@ class Game(val params: GameParams) {
       LOGGER.warn("Cannot move during the opponent's turn")
     case _ =>
       LOGGER.warn("Game has to be ongoing to make move")
+  }
+  
+  private def sendBoardToPlayers(playerId: PlayerId, board: Board) = {
+    players.get(playerId).map(_.callbacks.updateBoard(playerId, board))
+    players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
+  }
+  
+  private def sendUncoveredBoards() = players.foreach(boardOwner=>{
+    players.values.foreach(receiver=>{
+      receiver.callbacks.updateBoard(boardOwner._1, boardOwner._2.board.get)
+    })
+  })
+  
+  private def isBoardAcceptable(board: Board) = {
+    board.isValid &&
+    board.numberOfBorders<=params.walls &&
+    board.size==params.size
   }
 }
 // internal representation of player data
