@@ -40,11 +40,15 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   }
   
   private def subscribe(playerName: String) = {
-    context watch sender
-    game.subscribe(playerName, new AkkaSeatCallbacks(sender))
-    playerMap += sender->(None,playerName)
-    playerMap.keys foreach {
-      _ ! PlayerPresenceOMsg(playerName,true)
+    val success = game.subscribe(playerName, new AkkaSeatCallbacks(sender))
+    if(success) {
+      context watch sender
+      playerMap += sender->(None,playerName)
+      playerMap.keys foreach {
+        _ ! PlayerPresenceOMsg(playerName,true)
+      }
+    } else {
+      sender ! SitDownFailOMsg()
     }
   }
   

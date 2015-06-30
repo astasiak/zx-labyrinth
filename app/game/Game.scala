@@ -33,16 +33,20 @@ class Game(val params: GameParams) {
   //def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
   
   def subscribe(userId: String, callbacks: Callbacks) = {
-    subscribers += userId->callbacks
-    callbacks.updatePlayers(
-        players.get(PlayerA).map(_.userId),
-        players.get(PlayerB).map(_.userId))
-    callbacks.updateGameState(gameState)
-    val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
-    for((id, playerData) <- players) {
-      val board = playerData.board
-      val boardToSend = if(gameFinished) board else board.map(_.privatize)
-      if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
+    if(subscribers.contains(userId)) false
+    else {
+      subscribers += userId->callbacks
+      callbacks.updatePlayers(
+          players.get(PlayerA).map(_.userId),
+          players.get(PlayerB).map(_.userId))
+      callbacks.updateGameState(gameState)
+      val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
+      for((id, playerData) <- players) {
+        val board = playerData.board
+        val boardToSend = if(gameFinished) board else board.map(_.privatize)
+        if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
+      }
+      true
     }
   }
   
