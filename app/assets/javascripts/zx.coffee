@@ -110,9 +110,29 @@ printMessageAboutWinner = (winnerId) ->
     addChatTechnicalMessage(defaultMsg)
   return defaultMsg
 
+updateTitle = () ->
+  unreadNote = if window.unreadNote then "! " else ""
+  yourTurnNote = if window.yourTurn then "* " else ""
+  $("title").text(unreadNote+yourTurnNote+window.title)
+
+showYourTurn = (isIt) ->
+  window.yourTurn = isIt
+  updateTitle()
+
+dealWithFocus = ->
+  window.isFocused = true
+  window.title = $("title").text()
+  $(window).focus ->
+    window.isFocused = true
+    window.unreadNote = false
+    updateTitle()
+  $(window).blur ->
+    window.isFocused = false
+
 translateStatus = (status) ->
   stateString = "Nieznany stan gry"
   playAnimation = true
+  showYourTurn(status == "Ongoing(Player"+window.myPlayerId+")")
   if status=="Awaiting"
     stateString = "Oczekiwanie na rozpoczęcie gry"
   else if status=="Ongoing(PlayerA)"
@@ -196,6 +216,9 @@ wsHandler = (data) ->
     board = if data.player=="A" then window.boardA else window.boardB
     board.setBoard(mapMsgToBoard(data.board))
   else if data.type == "chat"
+    if not window.isFocused
+      window.unreadNote = true
+      updateTitle()
     addNewMessage(data.player,data.msg)
   else if data.type == "init_result"
     if not data.ok
@@ -214,6 +237,7 @@ wsSend = (obj) ->
   window.gameWs.send(message)
 
 $ ->
+  dealWithFocus()
   wsUrl = $("body").data("ws-url")
   if location.protocol=="https:"
     wsUrl = wsUrl.replace("ws:","wss:")
