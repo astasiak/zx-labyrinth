@@ -10,6 +10,7 @@ import actors.messages.AskForParamsIMsg
 class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogging {
 
   override def preStart() = {
+    context watch out
     out ! Json.obj("type"->"registering")
     gameActor ! AskForParamsIMsg()
   }
@@ -19,6 +20,7 @@ class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogg
       gameActor ! JsonMapper.mapJsToMsg(js)
       out ! Json.obj("type"->"received")
     }
+    case Terminated(sender) => if(sender==out) context stop self
     case msg: OutboundMessage => out ! JsonMapper.mapMsgToJs(msg)
     case other => log.error("unhandled: " + other)
   }

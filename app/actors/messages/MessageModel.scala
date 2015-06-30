@@ -10,6 +10,7 @@ case class UnknownIMsg() extends InboudMessage
 case class ErrorIMsg(msg: String) extends InboudMessage
 case class ChatMessageIMsg(msg: String) extends InboudMessage
 case class SubscriptionIMsg(playerName: String) extends InboudMessage
+case class SitDownIMsg() extends InboudMessage
 case class InitBoardIMsg(board: Board) extends InboudMessage
 case class MakeMoveIMsg(move: Direction) extends InboudMessage
 case class AskForParamsIMsg() extends InboudMessage
@@ -19,6 +20,7 @@ case class KeepAliveIMsg() extends InboudMessage
 
 sealed trait OutboundMessage
 case class ChatMessageOMsg(player: String, msg: String) extends OutboundMessage
+case class PlayerPresenceOMsg(player: String, present: Boolean) extends OutboundMessage
 case class SitDownSuccessOMsg(playerId: PlayerId) extends OutboundMessage
 case class SitDownFailOMsg() extends OutboundMessage
 case class InitBoardResultOMsg(success: Boolean) extends OutboundMessage

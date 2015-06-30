@@ -37,8 +37,8 @@ table.board { border: none; border-spacing: 0px; }
 #chatHistory .messageSender { padding: 0px 5px; font-weight: bold; color: #060; }
 #chatHistory .messageText { font-style: italic; }
 #chatHistory .technical { padding: 0px 5px; font-style: italic; color: #666; }
-#playAgainButton {
-	display: none; background-color: #ff8; border-style: solid; border-color: #bb4;
-	text-align: center; margin: 5px; padding: 5px; cursor: pointer; }
+#playAgainButton, #joinButton { border-style: solid; text-align: center; margin: 5px; padding: 5px; cursor: pointer; }
+#playAgainButton { display: none; background-color: #ff8; border-color: #bb4; }
+#joinButton { background-color: #99f; border-color: #55b; }
 
 .boardArea { position: relative }

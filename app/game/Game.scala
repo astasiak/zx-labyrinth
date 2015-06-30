@@ -24,23 +24,47 @@ case object PlayerB extends PlayerId { override def theOther = PlayerA }
  * making their moves and verifying the result (winner) of the game.
  */
 class Game(val params: GameParams) {
+  
   private val LOGGER: Logger = LoggerFactory.getLogger("Game engine")
   private val players: Map[PlayerId, PlayerData] = Map()
+  private val subscribers: Map[String, Callbacks] = Map()
   var gameState: GameState = Awaiting
   
-  def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
+  //def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
   
-  def sitDown(playerName: String, callbacks: Callbacks): Option[PlayerId] = {
+  def subscribe(userId: String, callbacks: Callbacks) = {
+    subscribers += userId->callbacks
+    callbacks.updatePlayers(
+        players.get(PlayerA).map(_.userId),
+        players.get(PlayerB).map(_.userId))
+    callbacks.updateGameState(gameState)
+    val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
+    for((id, playerData) <- players) {
+      val board = playerData.board
+      val boardToSend = if(gameFinished) board else board.map(_.privatize)
+      if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
+    }
+  }
+  
+  def unsubscribe(userId: String) = {
+    subscribers -= userId
+  }
+  
+  def sitDown(userId: String): Option[PlayerId] = {
+    if(!subscribers.contains(userId)) {
+      LOGGER.warn("Cannot sit down if not subscribed")
+      return None
+    }
     for(playerId <- (Set[PlayerId](PlayerA, PlayerB)--players.keys)) {
-      players.put(playerId, new PlayerData(callbacks, playerName))
-      players.values.foreach {
-        _.callbacks.updatePlayers(
-            players.get(PlayerA).map(_.name),
-            players.get(PlayerB).map(_.name))
+      players.put(playerId, new PlayerData(userId))
+      subscribers.values.foreach {
+        _.updatePlayers(
+            players.get(PlayerA).map(_.userId),
+            players.get(PlayerB).map(_.userId))
       }
-      val opponentBoard = players.get(playerId.theOther).map(_.board).flatten
-      opponentBoard.map(board=>{
-        callbacks.updateBoard(playerId.theOther, board.privatize)
+      val opponentBoard = players.get(playerId.theOther).flatMap(_.board)
+      opponentBoard.foreach(board=>{
+        subscribers(userId).updateBoard(playerId.theOther, board.privatize)
       })
       return Some(playerId)
     }
@@ -53,9 +77,9 @@ class Game(val params: GameParams) {
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
         val startingPlayer = Random.shuffle(List(PlayerA,PlayerB)).head
         gameState = Ongoing(startingPlayer)
-        players.values.foreach(_.callbacks.updateGameState(gameState))
+        subscribers.values.foreach(_.updateGameState(gameState))
       }
-      sendBoardToPlayers(playerId, board)
+      sendBoardToPlayers(playerId)
       return true
     } else
       return false
@@ -79,9 +103,9 @@ class Game(val params: GameParams) {
         gameState = Finished(playerId)
         sendUncoveredBoards()
       } else {
-        sendBoardToPlayers(playerId.theOther, result.newBoard)
+        sendBoardToPlayers(playerId.theOther)
       }
-      players.values.foreach(_.callbacks.updateGameState(gameState))
+      subscribers.values.foreach(_.updateGameState(gameState))
     }
     case Ongoing(currentPlayer) if playerId!=currentPlayer =>
       LOGGER.warn("Cannot move during the opponent's turn")
@@ -89,14 +113,18 @@ class Game(val params: GameParams) {
       LOGGER.warn("Game has to be ongoing to make move")
   }
   
-  private def sendBoardToPlayers(playerId: PlayerId, board: Board) = {
-    players.get(playerId).map(_.callbacks.updateBoard(playerId, board))
-    players.get(playerId.theOther).map(_.callbacks.updateBoard(playerId, board.privatize))
+  private def sendBoardToPlayers(playerId: PlayerId) = {
+    val player = players(playerId)
+    val board = player.board.get
+    subscribers.foreach { case (userId,callback)=>
+      val boardToSend = if(userId==player.userId) board else board.privatize
+      callback.updateBoard(playerId, boardToSend)
+    }
   }
   
   private def sendUncoveredBoards() = players.foreach(boardOwner=>{
-    players.values.foreach(receiver=>{
-      receiver.callbacks.updateBoard(boardOwner._1, boardOwner._2.board.get)
+    subscribers.values.foreach(receiver=>{
+      receiver.updateBoard(boardOwner._1, boardOwner._2.board.get)
     })
   })
   
@@ -107,7 +135,7 @@ class Game(val params: GameParams) {
   }
 }
 // internal representation of player data
-private class PlayerData(val callbacks: Callbacks, val name: String) {
+private class PlayerData(val userId: String) {
   var board: Option[Board] = None
 }
 

@@ -6,7 +6,8 @@ import play.api.libs.json.Json.JsValueWrapper
 
 object JsonMapper {
   def mapJsToMsg(js: JsValue): InboudMessage = (js \ "type").asOpt[String] match {
-    case Some("sit") => mapSubMsg(js)
+    case Some("subscribe") => mapSubMsg(js)
+    case Some("sit") => mapSubSit(js)
     case Some("chat") => mapChatMsg(js)
     case Some("init") => mapInitMsg(js)
     case Some("move") => mapMoveMsg(js)
@@ -18,6 +19,7 @@ object JsonMapper {
     case None => ErrorIMsg("Cannot parse 'sit' message - no 'name'")
     case Some(name) => SubscriptionIMsg(name)
   }
+  private def mapSubSit(js: JsValue) = SitDownIMsg()
   private def mapChatMsg(js: JsValue) = (js \ "msg").asOpt[String] match {
     case None => ErrorIMsg("Cannot parse 'chat' message - no 'msg'")
     case Some(msg) => ChatMessageIMsg(msg)
@@ -59,6 +61,7 @@ object JsonMapper {
   
   def mapMsgToJs(msg: OutboundMessage): JsValue = msg match {
     case TechnicalMessageOMsg(msg) => Json.obj("type"->"technical","msg"->msg)
+    case PlayerPresenceOMsg(userId, present) => Json.obj("type"->"presence","user"->userId,"present"->present)
     case ErrorOMsg(msg) => Json.obj("type"->"error","msg"->msg)
     case ChatMessageOMsg(player, msg) => Json.obj("type"->"chat", "player"->player, "msg"->msg)
     case SitDownSuccessOMsg(playerId) => Json.obj("type"->"sit_ok","player"->mapPlayerId(playerId))

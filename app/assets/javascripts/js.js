@@ -157,10 +157,6 @@ function Board(selector,params) {
 	  var rad2deg = 180/Math.PI;
 	  var diffX = Math.abs(from.x-to.x);
 	  var diffY = Math.abs(from.y-to.y);
-	  console.log(diffX);
-	  console.log(diffY);
-	  console.log(from);
-	  console.log(to);
 	  var len = Math.sqrt(diffX*diffX+diffY*diffY);
 	  var degrees = Math.atan( (to.y-from.y)/(to.x-from.x) ) * rad2deg;
 	  var line = $("<div/>");

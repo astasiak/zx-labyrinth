@@ -9,10 +9,10 @@ import game.Board
 import game.GameParams
 import game.Game
 import game.PlayerId
-import com.google.common.collect.BiMap
 import game.Direction
 import com.google.common.collect.HashBiMap
 import scala.collection.JavaConversions._
+import scala.collection.mutable.Map
 import game.Callbacks
 import game.GameState
 import actors.messages._
@@ -25,12 +25,13 @@ private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
 
 class GameActor(params: GameParams) extends Actor with ActorLogging {
   var game: Game = new Game(params)
-  val playerMap: BiMap[PlayerId, ActorRef] = HashBiMap.create() // TODO maybe not necessary?
+  val playerMap: Map[ActorRef, (Option[PlayerId],String)] = Map()
   
   override def receive = LoggingReceive {
-    case SubscriptionIMsg(playerName) => sitDown(playerName)
+    case SubscriptionIMsg(playerName) => subscribe(playerName)
+    case SitDownIMsg() => sitDown()
     case ChatMessageIMsg(msg) => chat(msg)
-    case Terminated(seat) => standUp(seat)
+    case Terminated(seat) => unsubscribe()
     case InitBoardIMsg(board) => initBoard(board)
     case MakeMoveIMsg(move) => makeMove(move)
     case AskForParamsIMsg() => askForGameState()
@@ -38,24 +39,41 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case other => log.error("unhandled: " + other)
   }
   
-  private def sitDown(playerName: String) = {
-    val playerId = game.sitDown(playerName, new AkkaSeatCallbacks(sender))
+  private def subscribe(playerName: String) = {
+    context watch sender
+    game.subscribe(playerName, new AkkaSeatCallbacks(sender))
+    playerMap += sender->(None,playerName)
+    playerMap.keys foreach {
+      _ ! PlayerPresenceOMsg(playerName,true)
+    }
+  }
+  
+  private def unsubscribe() = {
+    val userId = playerMap(sender)._2
+    game.unsubscribe(userId)
+    playerMap -= sender
+    playerMap.keys foreach {
+      _ ! PlayerPresenceOMsg(userId,false)
+    }
+  }
+  
+  private def sitDown() = {
+    val userId = playerMap(sender)._2
+    val playerId = game.sitDown(userId)
     playerId match {
       case None => sender ! SitDownFailOMsg()
       case Some(playerId) =>
-        playerMap.put(playerId, sender)
+        playerMap.put(sender, (Some(playerId),userId))
         sender ! SitDownSuccessOMsg(playerId)
     }
   }
   
-  private def chat(msg: String) = myPlayerId() match {
-    case None => log.warning("Trying to chat while not sitting")
-    case Some(playerId) => playerMap.values().foreach {
-      _ ! ChatMessageOMsg(game.getPlayerName(playerId).get,msg)
+  private def chat(msg: String) = playerMap.get(sender).map(_._2) match {
+    case None => log.warning("Trying to chat while not being subscribed")
+    case Some(userId) => playerMap.keys.foreach { receiver=>
+      receiver ! ChatMessageOMsg(userId,msg)
     }
   }
-  
-  private def standUp(seat: ActorRef) = ???
   
   private def initBoard(board: Board) = myPlayerId() match {
     case None => log.warning("Trying to init board while not sitting")
@@ -72,7 +90,6 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   private def askForGameState() = sender ! ParamsOMsg(params)
   
   private def myPlayerId(): Option[PlayerId] = {
-    val playerId = playerMap.inverse().get(sender)
-    if(playerId==null) None else Some(playerId)
+    return playerMap.get(sender).flatMap(_._1)
   }
 }

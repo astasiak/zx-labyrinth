@@ -1,6 +1,4 @@
-@import play.api.mvc.RequestHeader 
-
-@(id: String)(implicit request: RequestHeader)
+@(id: String)(implicit request: play.api.mvc.RequestHeader)
 
 <!DOCTYPE html>
 <html>
@@ -34,7 +32,8 @@
 	<div id="chatBox">
 		<div id="chatHistory"></div>
 		<input type="text" id="chatInput"/>
-		<div id="playAgainButton">Play again</div>
+		<div id="playAgainButton">Zagraj ponownie</div>
+		<div id="joinButton">Dołącz do gry</div>
 	</div>
 </body>
 </html>

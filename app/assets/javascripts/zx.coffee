@@ -51,6 +51,9 @@ initButtons = () ->
     wsSend({"type":"move","dir":"e"})
   $("#playAgainButton").click ->
     window.location.href += "/again"
+  $("#joinButton").click ->
+    wsSend({"type":"sit"})
+    $(this).hide()
 
 onBoardSubmit = (params,boardRef) ->
   boardRef.setSubmit ->
@@ -98,10 +101,14 @@ makeBlinking = (element) ->
 printMessageAboutWinner = (winnerId) ->
   $("#playAgainButton").fadeIn(400)
   makeBlinking($("#container"+winnerId))
-  message = if winnerId==window.myPlayerId then "Wygrałeś!" else "Przegrałeś"
-  addChatTechnicalMessage(message)
-  alert(message)
-  return "Grę wygrał "+$("#player"+winnerId).text()
+  defaultMsg = "Grę wygrał "+$("#player"+winnerId).text()
+  if window.myPlayerId
+    message = if winnerId==window.myPlayerId then "Wygrałeś!" else "Przegrałeś"
+    addChatTechnicalMessage(message)
+    alert(message)
+  else
+    addChatTechnicalMessage(defaultMsg)
+  return defaultMsg
 
 translateStatus = (status) ->
   stateString = "Nieznany stan gry"
@@ -150,7 +157,7 @@ askForName = ->
   name = ""
   while not name
     name = prompt("Podaj imię gracza")
-  wsSend({"type":"sit","name":name})
+  wsSend({"type":"subscribe","name":name})
 
 wsKeepAlive = ->
   setInterval ->
@@ -171,6 +178,8 @@ wsHandler = (data) ->
   else if data.type == "update_players"
     $("#playerA").text(data.a)
     $("#playerB").text(data.b)
+    if data.a and data.b
+      $("#joinButton").hide()
   else if data.type == "sit_ok"
     if data.player == "A"
       window.myBoard = boardA
@@ -192,6 +201,12 @@ wsHandler = (data) ->
     if not data.ok
       alert("Niepoprawne rozmieszczenie labiryntu")
       window.myBoard.setEditable(true)
+  else if data.type == "presence"
+    playerName = data.user
+    if data.present
+      addChatTechnicalMessage(playerName+" dołączył do pokoju")
+    else
+      addChatTechnicalMessage(playerName+" opuścił pokój")
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)
