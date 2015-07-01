@@ -1,4 +1,4 @@
-@()
+@(userName: Option[String])
 
 <!DOCTYPE html>
 <html>
@@ -8,20 +8,37 @@
 <script type='text/javascript' src='@routes.Assets.at("javascripts/index.js")'></script>
 </head>
 <body data-game-url="@routes.ZxController.game("")">
-	<div class="container ">
-	    <div>
-	        <form method="post" action="@routes.ZxController.createGame()">
-	            <div><label>Board width:</label><input type="number" name="width"></input></div>
-	            <div><label>Board height:</label><input type="number" name="height"></input></div>
-	            <div><label>Number of walls:</label><input type="number" name="walls"></input></div>
-	            <div><input type="submit" value="Create room"></input></div>
-	        </form>
-	    </div>
-	    <hr/>
-	    <div>
-	        <input type="text" id="join_form_game_id"></input>
-	        <button type="button" id="join_form_button">Join game</button>
-	    </div>
-	</div>
+    <div class="container ">
+    @userName match {
+        case None => {
+        <div>
+            <form method="post" action="@routes.ZxController.login()">
+                <input type="text" name="login_name"></input>
+                <input type="submit" value="Login!"></input>
+            </form>
+        </div>
+        }
+        case Some(name: String) => {
+        <div>
+            <span>Jesteś zalogowany jako @name</span>
+            <a href="@routes.ZxController.logout()">Wyloguj</a>
+        </div>
+        <hr/>
+        <div>
+            <form method="post" action="@routes.ZxController.createGame()">
+                <div><label>Board width:</label><input type="number" name="width"></input></div>
+                <div><label>Board height:</label><input type="number" name="height"></input></div>
+                <div><label>Number of walls:</label><input type="number" name="walls"></input></div>
+                <div><input type="submit" value="Create room"></input></div>
+            </form>
+        </div>
+        <hr/>
+        <div>
+            <input type="text" id="join_form_game_id"></input>
+            <button type="button" id="join_form_button">Join game</button>
+        </div>
+        }
+    }
+    </div>
 </body>
 </html>

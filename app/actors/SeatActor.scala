@@ -6,13 +6,15 @@ import play.api.libs.json._
 import actors.messages.OutboundMessage
 import actors.messages.JsonMapper
 import actors.messages.AskForParamsIMsg
+import actors.messages.SubscriptionIMsg
 
-class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogging {
+class SeatActor(gameActor: ActorRef, user: String, out: ActorRef) extends Actor with ActorLogging {
 
   override def preStart() = {
     context watch out
     out ! Json.obj("type"->"registering")
     gameActor ! AskForParamsIMsg()
+    gameActor ! SubscriptionIMsg(user)
   }
   
   def receive = LoggingReceive {
@@ -27,7 +29,7 @@ class SeatActor(gameActor: ActorRef, out: ActorRef) extends Actor with ActorLogg
 }
 
 object SeatActor {
-  def props(gameActor: ActorRef)(out: ActorRef) = Props(new SeatActor(gameActor, out))
+  def props(gameActor: ActorRef, user: String)(out: ActorRef) = Props(new SeatActor(gameActor, user, out))
 }
 
 

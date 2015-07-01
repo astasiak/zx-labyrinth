@@ -17,8 +17,9 @@ object ZxController extends Controller {
   
   import FormMappings._
   
-  def index = Action {
-    Ok(views.html.index())
+  def index = Action { request =>
+    val userName = request.session.get("user")
+    Ok(views.html.index(userName))
   }
   
   def createGame = Action { request =>
@@ -27,20 +28,34 @@ object ZxController extends Controller {
   }
   
   def game(gameId: String) = Action { implicit request =>
-    Ok(views.html.game(gameId))
-  }
-  
-  def again(gameId: String) = Action {
-    RoomManager.getContinuation(gameId) match {
-      case Some(newGameId) => Redirect(routes.ZxController.game(newGameId))
-      case None => Results.NotFound(views.html.error("Game "+gameId+" not found"))
+    request.session.get("user").map { user =>
+      Ok(views.html.game(gameId))
+    }.getOrElse {
+      Results.NotFound(views.html.error("You need to log in"))
     }
   }
 
-  def gameWs(gameId: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { implicit request =>
-    Future.successful(RoomManager.room(gameId) match {
-      case None => Left(Forbidden)
-      case Some(actorRef) => Right(SeatActor.props(actorRef))
+  def gameWs(gameId: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { request =>
+    Future.successful((RoomManager.room(gameId),request.session.get("user")) match {
+      case (Some(actorRef), Some(user)) => Right(SeatActor.props(actorRef, user))
+      case _ => Left(Forbidden)
     })
+  }
+  
+  def again(gameId: String) = Action {
+    RoomManager.getContinuation(gameId).map { newGameId =>
+      Redirect(routes.ZxController.game(newGameId))
+    }.getOrElse {
+      Results.NotFound(views.html.error("Game "+gameId+" not found"))
+    }
+  }
+  
+  def login() = Action { implicit request =>
+    val login = request.body.asFormUrlEncoded.get("login_name")(0)
+    Redirect(routes.ZxController.index()).withSession("user" -> login)
+  }
+  
+  def logout() = Action { implicit request =>
+    Redirect(routes.ZxController.index()).withSession()
   }
 }

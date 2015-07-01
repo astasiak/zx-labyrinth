@@ -173,12 +173,6 @@ addChatTechnicalMessage = (text) ->
   chatHistory.append(newRow)
   chatHistory.scrollTop(chatHistory.height())
 
-askForName = ->
-  name = ""
-  while not name
-    name = prompt("Podaj imię gracza")
-  wsSend({"type":"subscribe","name":name})
-
 wsKeepAlive = ->
   setInterval ->
     wsSend({"type":"keep_alive"})
@@ -255,5 +249,4 @@ $ ->
       $("#chatInput").val("")
   $("#chatInput").bind("keydown",onChatKeydown)
   wsKeepAlive()
-  askForName()
 
