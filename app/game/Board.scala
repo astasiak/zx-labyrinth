@@ -106,6 +106,7 @@ case class Board(
       builder ++= "+-"
     }
     builder ++= "+"
+    builder.toString
   }
   
   // checks if the move from given position would not exceed the range of the board

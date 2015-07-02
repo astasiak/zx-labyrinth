@@ -12,8 +12,9 @@ import play.api.mvc.AnyContent
 import actors.RoomManager
 import actors.SeatActor
 import play.api.mvc.Results
+import com.typesafe.scalalogging.LazyLogging
 
-object ZxController extends Controller {
+object ZxController extends Controller with LazyLogging {
   
   import FormMappings._
   

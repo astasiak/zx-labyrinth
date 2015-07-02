@@ -16,6 +16,7 @@ import scala.collection.mutable.Map
 import game.Callbacks
 import game.GameState
 import actors.messages._
+import com.typesafe.scalalogging.LazyLogging
 
 private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String]) = seatActor ! UpdatePlayersOMsg(playerA, playerB)

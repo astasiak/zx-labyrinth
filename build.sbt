@@ -16,7 +16,9 @@ libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
   "com.google.guava" % "guava" % "18.0",
-  "com.google.code.findbugs" % "jsr305" % "3.0.0"
+  "com.google.code.findbugs" % "jsr305" % "3.0.0",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+//  "org.slf4j" % "slf4j-simple" % "1.5.6"
 )
 
 

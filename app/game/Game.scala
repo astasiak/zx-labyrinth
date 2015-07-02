@@ -4,6 +4,7 @@ import scala.collection.mutable.Map
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.util.Random
+import com.typesafe.scalalogging.LazyLogging
 
 case class GameParams(size: (Int, Int), walls: Int)
 
@@ -23,18 +24,19 @@ case object PlayerB extends PlayerId { override def theOther = PlayerA }
  * from being initialized with given game parameters to joining game by players,
  * making their moves and verifying the result (winner) of the game.
  */
-class Game(val params: GameParams) {
+class Game(val params: GameParams) extends LazyLogging {
   
-  private val LOGGER: Logger = LoggerFactory.getLogger("Game engine")
   private val players: Map[PlayerId, PlayerData] = Map()
   private val subscribers: Map[String, Callbacks] = Map()
   var gameState: GameState = Awaiting
   
-  //def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.name)
-  
   def subscribe(userId: String, callbacks: Callbacks) = {
-    if(subscribers.contains(userId)) false
+    if(subscribers.contains(userId)) {
+      logger.info(s"User ${userId} failed to subscribe to the game")
+      false
+    }
     else {
+      logger.debug(s"User ${userId} subscribed to the game")
       subscribers += userId->callbacks
       callbacks.updatePlayers(
           players.get(PlayerA).map(_.userId),
@@ -51,15 +53,17 @@ class Game(val params: GameParams) {
   }
   
   def unsubscribe(userId: String) = {
+    logger.debug(s"User ${userId} unsubscribed from the game")
     subscribers -= userId
   }
   
   def sitDown(userId: String): Option[PlayerId] = {
     if(!subscribers.contains(userId)) {
-      LOGGER.warn("Cannot sit down if not subscribed")
+      logger.info(s"User ${userId} cannot sit down if not subscribed")
       return None
     }
     for(playerId <- (Set[PlayerId](PlayerA, PlayerB)--players.keys)) {
+      logger.debug(s"User ${userId} sat down as a ${playerId}")
       players.put(playerId, new PlayerData(userId))
       subscribers.values.foreach {
         _.updatePlayers(
@@ -77,6 +81,7 @@ class Game(val params: GameParams) {
   
   def initBoard(playerId: PlayerId, board: Board): Boolean = (gameState, players.get(playerId)) match {
     case (Awaiting, Some(player)) => if(isBoardAcceptable(board)) {
+      logger.debug(s"Player ${playerId} (${player.userId}) initiated their board\n${board.toFancyString}")
       player.board = Some(board)
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
         val startingPlayer = Random.shuffle(List(PlayerA,PlayerB)).head
@@ -85,13 +90,15 @@ class Game(val params: GameParams) {
       }
       sendBoardToPlayers(playerId)
       return true
-    } else
+    } else {
+      logger.info(s"Player ${playerId} (${player.userId}) declared unacceptable board\n${board.toFancyString}")
       return false
+    }
     case (_, None) =>
-      LOGGER.warn("Cannot init board for empty seat")
+      logger.info(s"Player ${playerId} cannot init board for empty seat")
       return false
     case _ =>
-      LOGGER.warn("Cannot init board when game has started")
+      logger.info(s"Player ${playerId} cannot init board when game has started")
       return false
   }
   
@@ -99,11 +106,13 @@ class Game(val params: GameParams) {
     case Ongoing(currentPlayer) if playerId==currentPlayer => {
       val player = players.get(playerId.theOther).get
       val result = player.board.get.makeMove(direction)
+      logger.debug(s"Player ${playerId} declares move in direction ${direction} with success:${result.success}")
       player.board = Some(result.newBoard)
       gameState =
         if(result.success) Ongoing(playerId)
         else Ongoing(playerId.theOther)
       if(result.newBoard.isFinished) {
+        logger.debug(s"Game has finished and the winner is ${players.get(playerId).get.userId}")
         gameState = Finished(playerId)
         sendUncoveredBoards()
       } else {
@@ -112,9 +121,9 @@ class Game(val params: GameParams) {
       subscribers.values.foreach(_.updateGameState(gameState))
     }
     case Ongoing(currentPlayer) if playerId!=currentPlayer =>
-      LOGGER.warn("Cannot move during the opponent's turn")
+      logger.info("Cannot move during the opponent's turn")
     case _ =>
-      LOGGER.warn("Game has to be ongoing to make move")
+      logger.info("Game has to be ongoing to make move")
   }
   
   private def sendBoardToPlayers(playerId: PlayerId) = {
