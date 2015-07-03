@@ -45,7 +45,9 @@ class Game(val params: GameParams) extends LazyLogging {
       val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
       for((id, playerData) <- players) {
         val board = playerData.board
-        val boardToSend = if(gameFinished) board else board.map(_.privatize)
+        val boardToSend =
+          if(gameFinished || userId==playerData.userId) board
+          else board.map(_.privatize)
         if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
       }
       true
@@ -58,6 +60,11 @@ class Game(val params: GameParams) extends LazyLogging {
   }
   
   def sitDown(userId: String): Option[PlayerId] = {
+    val (playerId,_) = getPlayerData(userId)
+    if(playerId!=None) {
+      logger.info(s"User ${userId} cannot sit down twice")
+      return None
+    }
     if(!subscribers.contains(userId)) {
       logger.info(s"User ${userId} cannot sit down if not subscribed")
       return None
@@ -79,8 +86,15 @@ class Game(val params: GameParams) extends LazyLogging {
     return None
   }
   
-  def initBoard(playerId: PlayerId, board: Board): Boolean = (gameState, players.get(playerId)) match {
-    case (Awaiting, Some(player)) => if(isBoardAcceptable(board)) {
+  def initBoard(playerId: PlayerId, board: Board): Boolean =
+    (gameState, players.get(playerId)) match {
+    case (Awaiting, Some(player)) => if(player.board!=None) {
+      logger.debug(s"Player ${playerId} (${player.userId}) tries to reinitialize their board")
+      return false
+    } else if(!isBoardAcceptable(board)) {
+      logger.info(s"Player ${playerId} (${player.userId}) declared unacceptable board\n${board.toFancyString}")
+      return false
+    } else {
       logger.debug(s"Player ${playerId} (${player.userId}) initiated their board\n${board.toFancyString}")
       player.board = Some(board)
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
@@ -90,9 +104,6 @@ class Game(val params: GameParams) extends LazyLogging {
       }
       sendBoardToPlayers(playerId)
       return true
-    } else {
-      logger.info(s"Player ${playerId} (${player.userId}) declared unacceptable board\n${board.toFancyString}")
-      return false
     }
     case (_, None) =>
       logger.info(s"Player ${playerId} cannot init board for empty seat")
@@ -124,6 +135,11 @@ class Game(val params: GameParams) extends LazyLogging {
       logger.info("Cannot move during the opponent's turn")
     case _ =>
       logger.info("Game has to be ongoing to make move")
+  }
+  
+  def getPlayerData(userId: String): (Option[PlayerId], Option[Board]) = {
+    val playerEntry = players.find { _._2.userId == userId }
+    (playerEntry.map(_._1), playerEntry.flatMap(_._2.board))
   }
   
   private def sendBoardToPlayers(playerId: PlayerId) = {

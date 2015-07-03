@@ -40,14 +40,17 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case other => log.error("unhandled: " + other)
   }
   
-  private def subscribe(playerName: String) = {
-    val success = game.subscribe(playerName, new AkkaSeatCallbacks(sender))
+  private def subscribe(userId: String) = {
+    val success = game.subscribe(userId, new AkkaSeatCallbacks(sender))
     if(success) {
       context watch sender
-      playerMap += sender->(None,playerName)
+      val (playerId, board) = game.getPlayerData(userId)
+      playerMap += sender->(playerId,userId)
       playerMap.keys foreach {
-        _ ! PlayerPresenceOMsg(playerName,true)
+        _ ! PlayerPresenceOMsg(userId,true)
       }
+      playerId.foreach(sender ! SitDownSuccessOMsg(_))
+      board.foreach(_=> sender ! InitBoardResultOMsg(true))
     } else {
       sender ! SitDownFailOMsg()
     }
@@ -68,7 +71,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     playerId match {
       case None => sender ! SitDownFailOMsg()
       case Some(playerId) =>
-        playerMap.put(sender, (Some(playerId),userId))
+        playerMap += sender -> (Some(playerId),userId)
         sender ! SitDownSuccessOMsg(playerId)
     }
   }

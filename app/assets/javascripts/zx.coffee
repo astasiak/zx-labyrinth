@@ -195,6 +195,7 @@ wsHandler = (data) ->
     if data.a and data.b
       $("#joinButton").hide()
   else if data.type == "sit_ok"
+    $("#joinButton").hide()
     if data.player == "A"
       window.myBoard = boardA
       window.myPlayerId = "A"
@@ -217,7 +218,7 @@ wsHandler = (data) ->
   else if data.type == "init_result"
     if not data.ok
       alert("Niepoprawne rozmieszczenie labiryntu")
-      window.myBoard.setEditable(true)
+    window.myBoard.setEditable(not data.ok)
   else if data.type == "presence"
     playerName = data.user
     if data.present
