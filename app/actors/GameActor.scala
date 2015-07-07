@@ -24,8 +24,8 @@ private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
   def updateGameState(gameState: GameState) = seatActor ! UpdateStateOMsg(gameState)
 }
 
-class GameActor(params: GameParams) extends Actor with ActorLogging {
-  var game: Game = new Game(params)
+class GameActor(id: String, params: GameParams) extends Actor with ActorLogging {
+  val game: Game = new Game(params)
   val playerMap: Map[ActorRef, (Option[PlayerId],String)] = Map()
   
   override def receive = LoggingReceive {
@@ -36,6 +36,7 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
     case InitBoardIMsg(board) => initBoard(board)
     case MakeMoveIMsg(move) => makeMove(move)
     case AskForParamsIMsg() => askForGameState()
+    case AskForGameInfoIMsg() => askForGameInfo()
     case KeepAliveIMsg() => log.debug("Connection kept alive")
     case other => log.error("unhandled: " + other)
   }
@@ -96,6 +97,11 @@ class GameActor(params: GameParams) extends Actor with ActorLogging {
   }
   
   private def askForGameState() = sender ! ParamsOMsg(params)
+  
+  private def askForGameInfo() = {
+    val (nameA, nameB) = game.getPlayerNames()
+    sender ! GameInfoOMsg(id, params, nameA, nameB, game.gameState)
+  }
   
   private def myPlayerId(): Option[PlayerId] = {
     return playerMap.get(sender).flatMap(_._1)

@@ -15,6 +15,7 @@ case class InitBoardIMsg(board: Board) extends InboudMessage
 case class MakeMoveIMsg(move: Direction) extends InboudMessage
 case class AskForParamsIMsg() extends InboudMessage
 case class KeepAliveIMsg() extends InboudMessage
+case class AskForGameInfoIMsg() extends InboudMessage
 
 
 
@@ -28,6 +29,7 @@ case class UpdateBoardOMsg(player: PlayerId, board: Board) extends OutboundMessa
 case class UpdatePlayersOMsg(playerA: Option[String], playerB: Option[String]) extends OutboundMessage
 case class UpdateStateOMsg(gameState: GameState) extends OutboundMessage
 case class ParamsOMsg(params: GameParams) extends OutboundMessage
+case class GameInfoOMsg(id: String, params: GameParams, playerA: Option[String], playerB: Option[String], gameState: GameState) extends OutboundMessage
 
 case class TechnicalMessageOMsg(msg: String) extends OutboundMessage
 case class ErrorOMsg(msg: String) extends OutboundMessage

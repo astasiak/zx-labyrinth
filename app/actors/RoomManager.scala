@@ -2,10 +2,20 @@ package actors
 
 import java.util.UUID
 import scala.util.Random
-import akka.actor.ActorRef
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 import play.libs.Akka
+import akka.actor.ActorRef
 import akka.actor.Props
+import akka.pattern.AskableActorRef
+import akka.actor._
+import akka.pattern.ask
+import akka.util.Timeout
 import game.GameParams
+import controllers.RestController.GameRestModel
+import actors.messages.AskForGameInfoIMsg
+import actors.messages.GameInfoOMsg
 
 object RoomManager {
 
@@ -33,10 +43,16 @@ object RoomManager {
 
   def createGame(params: GameParams): String = {
     val id = calculateNewId()
-    val gameActor = Akka.system().actorOf(Props(classOf[GameActor],params))
+    val gameActor = Akka.system().actorOf(Props(classOf[GameActor],id,params))
     rooms += id->(params, gameActor)
     id
   }
   
   def room(id: String) = rooms.get(id).map(_._2)
+  
+  implicit val timeout: Timeout = Timeout(5 seconds)
+  def listRooms() = rooms.values.map({ case (_,actor) =>
+      actor ? AskForGameInfoIMsg()
+  }).map({ Await.result(_, timeout.duration).asInstanceOf[GameInfoOMsg]
+  })
 }

@@ -1,0 +1,35 @@
+@()
+
+<!doctype html>
+<html ng-app="zxApp">
+  <head>
+    <title>ZX labyrinth</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js"></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/main-ng.js")'></script>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/css.css")" media="screen" />
+  </head>
+  <body>
+    <div ng-controller="GamesController">
+      <h3>Lista gier:</h3>
+      <table class="gamesList">
+        <thead>
+         <tr>
+          <th>Id</th>
+          <th>Parametry</th>
+          <th>Gracze</th>
+          <th>Status</th>
+         </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="game in games">
+            <td><a href="@{routes.ZxController.game("")}{{game.id}}">{{game.id}}</a></td>
+            <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
+            <td>{{game.playerA}},{{game.playerB}}</td>
+            <td>{{game.state}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

@@ -42,3 +42,5 @@ table.board { border: none; border-spacing: 0px; }
 #joinButton { background-color: #99f; border-color: #55b; }
 
 .boardArea { position: relative }
+
+.gamesList th, .gamesList td { border-style: solid; border-width: 1px; }

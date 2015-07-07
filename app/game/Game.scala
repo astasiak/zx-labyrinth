@@ -142,6 +142,11 @@ class Game(val params: GameParams) extends LazyLogging {
     (playerEntry.map(_._1), playerEntry.flatMap(_._2.board))
   }
   
+  def getPlayerNames() = {
+    def getPlayerName(playerId: PlayerId) = players.get(playerId).map(_.userId)
+    (getPlayerName(PlayerA),getPlayerName(PlayerB))
+  }
+  
   private def sendBoardToPlayers(playerId: PlayerId) = {
     val player = players(playerId)
     val board = player.board.get

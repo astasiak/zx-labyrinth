@@ -35,6 +35,10 @@ object ZxController extends Controller with LazyLogging {
       Results.NotFound(views.html.error("You need to log in"))
     }
   }
+  
+  def listGames() = Action {
+    Ok(views.html.list())
+  }
 
   def gameWs(gameId: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { request =>
     Future.successful((RoomManager.room(gameId),request.session.get("user")) match {
