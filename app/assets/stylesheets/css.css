@@ -44,3 +44,4 @@ table.board { border: none; border-spacing: 0px; }
 .boardArea { position: relative }
 
 .gamesList th, .gamesList td { border-style: solid; border-width: 1px; }
+.usersList th, .usersList td { border-style: solid; border-width: 1px; }

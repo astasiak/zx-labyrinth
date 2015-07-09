@@ -1,0 +1,21 @@
+@()
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ZX labyrinth</title>
+<script type='text/javascript' src='@routes.Assets.at("lib/jquery/jquery.min.js")'></script>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <form method="post" action="@routes.ZxController.register()">
+                <input type="text" name="login_name" placeholder="Login"></input>
+                <input type="password" name="password1" placeholder="Password"></input>
+                <input type="password" name="password2" placeholder="Password"></input>
+                <input type="submit" value="Register!"></input>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

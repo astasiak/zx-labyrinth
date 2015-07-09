@@ -1,0 +1,29 @@
+@()
+
+<!doctype html>
+<html ng-app="zxApp">
+  <head>
+    <title>ZX labyrinth</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js"></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/main-ng.js")'></script>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/css.css")" media="screen" />
+  </head>
+  <body>
+    <div ng-controller="UsersController">
+      <h3>Lista użytkowników:</h3>
+      <table class="usersList">
+        <thead>
+         <tr>
+          <th>Nazwa</th>
+         </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="user in users">
+            <td>{{user.name}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

@@ -5,12 +5,16 @@ GET     /games/:id/ws            controllers.ZxController.gameWs(id)
 GET     /games/:id               controllers.ZxController.game(id)
 GET     /games/:id/again         controllers.ZxController.again(id)
 
-POST    /login                   controllers.ZxController.login()
-GET     /logout                  controllers.ZxController.logout()
+POST    /login                   controllers.ZxController.login
+GET     /logout                  controllers.ZxController.logout
+POST    /register                controllers.ZxController.register
+GET     /register                controllers.ZxController.showRegister
+GET     /users                   controllers.ZxController.listUsers
 
 # REST resources
 
 GET     /rest/games              controllers.RestController.listGames
+GET     /rest/users              controllers.RestController.listUsers
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file            controllers.Assets.at(path="/public", file)

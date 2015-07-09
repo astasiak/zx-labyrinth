@@ -13,10 +13,17 @@ import actors.RoomManager
 import actors.SeatActor
 import play.api.mvc.Results
 import com.typesafe.scalalogging.LazyLogging
+import dao.UserDao
+import dao.MongoUserDao
+import dao.UserModel
+import scala.util.Success
+import scala.util.Failure
 
 object ZxController extends Controller with LazyLogging {
   
   import FormMappings._
+  
+  val userDao: UserDao = MongoUserDao
   
   def index = Action { request =>
     val userName = request.session.get("user")
@@ -56,11 +63,41 @@ object ZxController extends Controller with LazyLogging {
   }
   
   def login() = Action { implicit request =>
-    val login = request.body.asFormUrlEncoded.get("login_name")(0)
-    Redirect(routes.ZxController.index()).withSession("user" -> login)
+    val body = request.body.asFormUrlEncoded
+    val login = body.get("login_name")(0)
+    val password = body.get("password")(0)
+    userDao.login(UserModel(login,password)) match {
+      case None => Results.NotFound(views.html.error("Wrong credentials"))
+      case Some(loggedLogin) => Redirect(routes.ZxController.index()).withSession("user" -> loggedLogin)
+    }
   }
   
   def logout() = Action { implicit request =>
     Redirect(routes.ZxController.index()).withSession()
+  }
+  
+  def showRegister() = Action {
+    Ok(views.html.register())
+  }
+  
+  def register() = Action { implicit request =>
+    val body = request.body.asFormUrlEncoded
+    val login = body.get("login_name")(0)
+    val password1 = body.get("password1")(0)
+    val password2 = body.get("password2")(0)
+    if(password1!=password2) {
+      Results.NotFound(views.html.error("Password confirmation mismatch"))
+    } else {
+      val result = userDao.register(UserModel(login,password1))
+      result match {
+        case Success(_) => Redirect(routes.ZxController.index())
+        case Failure(_) => Results.NotFound(views.html.error("Cannot register as ["+login+"]"))
+      }
+      
+    }
+  }
+  
+  def listUsers() = Action {
+    Ok(views.html.listUsers())
   }
 }

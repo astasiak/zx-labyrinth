@@ -175,7 +175,7 @@ private class PlayerData(val userId: String) {
 
 /** trait for implementing callback handler on the client side */
 trait Callbacks {
-  def updatePlayers(playerA: Option[String], playerB: Option[String])
+  def updatePlayers(playerA: Option[String], playerB: Option[String]): Unit
   def updateBoard(player: PlayerId, board: Board)
   def updateGameState(gameState: GameState)
   //def onError(error: GameError) // ?
