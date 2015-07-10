@@ -16,11 +16,15 @@
         <thead>
          <tr>
           <th>Nazwa</th>
+          <th>Ostatnio widziany</th>
+          <th>Rejestracja</th>
          </tr>
         </thead>
         <tbody>
           <tr ng-repeat="user in users">
             <td>{{user.name}}</td>
+            <td>{{user.lastSeen}}</td>
+            <td>{{user.registered}}</td>
           </tr>
         </tbody>
       </table>

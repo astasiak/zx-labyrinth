@@ -1,7 +1,9 @@
 package actors
 
 import org.scalatest.FunSuite
-import actors.messages.JsonMapper
+
+import com.exampleactors.messages.JsonMapper;
+
 import play.api.libs.json.Json
 import game._
 import actors.messages._

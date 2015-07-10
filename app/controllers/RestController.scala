@@ -4,19 +4,23 @@ import com.typesafe.scalalogging.LazyLogging
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.libs.json.Json
+import play.api.libs.json.Writes
+import play.api.libs.json.JsString
+import play.api.libs.json.JsValue
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
 import game.GameParams
 import actors.RoomManager
 import actors.messages.GameInfoOMsg
 import dao.MongoUserDao
 import dao.UserDao
+import dao.UserModel
+import rest.User._
+import rest.Game._
 
 object RestController extends Controller with LazyLogging {
-  
-  case class GameRestModel(id: String, width: Int, height: Int, walls: Int, playerA: Option[String], playerB: Option[String], state: String)
-  implicit val gamesWrites = Json.writes[GameRestModel]
-  
-  case class UserRestModel(name: String)
-  implicit val usersWrites = Json.writes[UserRestModel]
   
   val userDao: UserDao = MongoUserDao
   
@@ -32,7 +36,8 @@ object RestController extends Controller with LazyLogging {
   def listUsers = Action { request =>
     val users = userDao.listUsers
     val jsonUsers = users.map({user=>
-      UserRestModel(user.name)
+      val UserModel(name, _, lastSeen, registered) = user
+      UserRestModel(name, lastSeen, registered)
     })
     Ok(Json.toJson(jsonUsers))
   }

@@ -5,6 +5,11 @@ import game._
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 
+import com.example.game.East;
+import com.example.game.North;
+import com.example.game.South;
+import com.example.game.West;
+
 class BoardTest extends FunSuite with BeforeAndAfter {
   
   var board: Board = _

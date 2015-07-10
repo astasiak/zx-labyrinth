@@ -5,18 +5,19 @@ import akka.actor.Terminated
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.ActorLogging
+import com.google.common.collect.HashBiMap
+import scala.collection.JavaConversions._
+import scala.collection.mutable.Map
+import com.typesafe.scalalogging.LazyLogging
+
 import game.Board
 import game.GameParams
 import game.Game
 import game.PlayerId
 import game.Direction
-import com.google.common.collect.HashBiMap
-import scala.collection.JavaConversions._
-import scala.collection.mutable.Map
 import game.Callbacks
 import game.GameState
 import actors.messages._
-import com.typesafe.scalalogging.LazyLogging
 
 private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String]) = seatActor ! UpdatePlayersOMsg(playerA, playerB)

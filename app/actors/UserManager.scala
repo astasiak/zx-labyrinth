@@ -1,5 +1,0 @@
-package actors
-
-object UserManager {
-
-}

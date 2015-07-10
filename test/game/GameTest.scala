@@ -3,13 +3,15 @@ package actors
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
+
+import com.example.game.Awaiting;
+import com.example.game.Board;
+import com.example.game.PlayerA;
+import com.example.game.PlayerB;
+
 import game.Callbacks
 import game.Game
 import game.GameParams
-import game.Awaiting
-import game.PlayerA
-import game.PlayerB
-import game.Board
 import game.Ongoing
 import game.GameState
 

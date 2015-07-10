@@ -12,8 +12,8 @@ import akka.pattern.AskableActorRef
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+
 import game.GameParams
-import controllers.RestController.GameRestModel
 import actors.messages.AskForGameInfoIMsg
 import actors.messages.GameInfoOMsg
 

@@ -4,7 +4,9 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.4"
+
+scalacOptions += "-target:jvm-1.8"
 
 libraryDependencies ++= Seq(
   ws, // Play's web services module
@@ -21,7 +23,6 @@ libraryDependencies ++= Seq(
   "org.mongodb" %% "casbah" % "2.8.1"
 //  "org.slf4j" % "slf4j-simple" % "1.5.6"
 )
-
 
 //fork in run := true
 

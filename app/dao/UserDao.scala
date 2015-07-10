@@ -1,31 +1,49 @@
 package dao
 
 import com.mongodb.casbah.Imports._
-import util.Properties
 import scala.util._
+import java.time.LocalDateTime
+import org.bson.BSON
+import util.DateTimeConversions._
+import java.util.Date
 
 object MongoUserDao extends UserDao {
+  
   val uri = Properties.envOrElse("MONGOLAB_URI", "mongodb://localhost:27017/")
   println("Using Mongo URI: ["+uri+"]")
   val mongoUri = MongoClientURI(uri)
   val db = MongoClient(mongoUri)(mongoUri.database.getOrElse("test"))
   val userCollection = db("users")
   
-  override def register(user: UserModel): Try[String] = {
-    val userObj = UserMongoMapper.mapToMongo(user)
-    Try(userCollection.insert(userObj)).map(x=>user.name)
+  override def register(login: String, password: String): Try[String] = {
+    val userToInsert = UserModel(login,password, LocalDateTime.now, LocalDateTime.now)
+    val userObj = UserMongoMapper.mapToMongo(userToInsert)
+    Try(userCollection.insert(userObj)).map(x=>login)
   }
-  override def login(user: UserModel): Option[String] = {
-    val userObj = UserMongoMapper.mapToMongo(user)
-    val foundObj = userCollection.findOne(userObj)
-    foundObj.flatMap(UserMongoMapper.mapFromMongo(_)).map(_.name)
+  override def login(login: String, password: String): Option[String] = {
+    val query = MongoDBObject("_id"->login, "password"->password)
+    userCollection.findOne(query) match {
+      case None => None
+      case Some(_) => {
+        touchUser(login)
+        Some(login)
+      }
+    }
   }
+  
+  override def touchUser(login: String) = {
+    userCollection.update(MongoDBObject("_id"->login), $set("lastSeen"->LocalDateTime.now.toDate))
+  }
+  
   override def remove(name: String): Unit = {
     userCollection -= MongoDBObject("name"->name)
   }
   override def listUsers(): List[UserModel] = {
     val cursor = userCollection.find()
     UserMongoMapper.mapFromMongo(cursor).toList
+  }
+  override def dropAllUsers(): Unit = {
+    userCollection.drop
   }
 }
 
@@ -41,23 +59,30 @@ object UserMongoMapper extends MongoMapper[UserModel] {
   override def mapToMongo(entity: UserModel): MongoDBObject = { 
     MongoDBObject(
         "_id"->entity.name,
-        "password"->entity.password)
+        "password"->entity.password,
+        "lastSeen"->entity.lastSeen.toDate,
+        "registered"->entity.registered.toDate)
   }
   override def mapFromMongo(obj: MongoDBObject): Option[UserModel] = {
     val name = obj.getAs[String]("_id")
     val password = obj.getAs[String]("password") 
-    (name, password) match {
-      case (Some(n),Some(p)) => Some(UserModel(n,p))
+    val lastSeen = obj.getAs[Date]("lastSeen")
+    val registered = obj.getAs[Date]("registered")
+    (name, password, lastSeen, registered) match {
+      case (Some(n),Some(p),Some(ls),Some(cr)) => Some(UserModel(n,p,ls.toLocalDateTime,cr.toLocalDateTime)) // TODO: ?
+      case (Some(n),Some(p),_,_) => Some(UserModel(n,p,LocalDateTime.now,LocalDateTime.now))
       case _ => None
     }
   }
 }
 
 trait UserDao {
-  def register(user: UserModel): Try[String]
-  def login(user: UserModel): Option[String]
+  def register(login: String, password: String): Try[String]
+  def login(login: String, password: String): Option[String]
+  def touchUser(login: String): Unit
   def remove(id: String): Unit
   def listUsers(): List[UserModel]
+  def dropAllUsers: Unit
 }
 
-case class UserModel(name: String, password: String)
+case class UserModel(name: String, password: String, lastSeen: LocalDateTime, registered: LocalDateTime)
