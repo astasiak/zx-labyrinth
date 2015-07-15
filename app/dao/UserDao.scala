@@ -5,6 +5,7 @@ import scala.util._
 import java.time.LocalDateTime
 import org.bson.BSON
 import util.DateTimeConversions._
+import util.PasswordHasher
 import java.util.Date
 
 object MongoUserDao extends UserDao {
@@ -16,19 +17,17 @@ object MongoUserDao extends UserDao {
   val userCollection = db("users")
   
   override def register(login: String, password: String): Try[String] = {
-    val userToInsert = UserModel(login,password, LocalDateTime.now, LocalDateTime.now)
+    val hash = PasswordHasher.hash(password)
+    val userToInsert = UserModel(login, hash, LocalDateTime.now, LocalDateTime.now)
     val userObj = UserMongoMapper.mapToMongo(userToInsert)
     Try(userCollection.insert(userObj)).map(x=>login)
   }
   override def login(login: String, password: String): Option[String] = {
-    val query = MongoDBObject("_id"->login, "password"->password)
-    userCollection.findOne(query) match {
-      case None => None
-      case Some(_) => {
-        touchUser(login)
-        Some(login)
-      }
-    }
+    val isOk = userCollection.findOneByID(login)
+      .flatMap(mongoObj=> mongoObj.getAs[String]("password"))
+      .map(hash=> PasswordHasher.check(password,hash))
+      .getOrElse(false)
+    if(isOk) Some(login) else None
   }
   
   override def touchUser(login: String) = {
