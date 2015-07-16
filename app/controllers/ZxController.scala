@@ -5,33 +5,48 @@ import scala.Right
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
-
 import actors.RoomManager
 import actors.SeatActor
 import dao.MongoUserDao
 import dao.UserDao
 import com.typesafe.scalalogging.LazyLogging
-import controllers.FormMappings._
-
 import play.api.Play.current
 import play.api.libs.json.JsValue
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
 import play.api.mvc.WebSocket
+import game.GameParams
+import game.Coord2D
+import scala.util.Try
 
 object ZxController extends Controller with LazyLogging {
 
   val userDao: UserDao = MongoUserDao
 
+  private def getParam(name: String)(implicit request: Request[AnyContent]) =
+    request.body.asFormUrlEncoded.get(name)(0)
+  
   def index = Action { request =>
     val userName = request.session.get("user")
     Ok(views.html.index(userName))
   }
 
-  def createGame = Action { request =>
-    val gameId = RoomManager.createGame(request)
-    Redirect(routes.ZxController.game(gameId))
+  def createGame = Action { implicit request =>
+    val width = Try(getParam("width").toInt)
+    val height = Try(getParam("height").toInt)
+    val numberOfWalls = Try(getParam("walls").toInt)
+    def ok(size: Int) = size>=1 && size<=12
+    (width, height, numberOfWalls) match {
+      case (Success(w), Success(h), Success(n)) if(ok(w) && ok(h)) =>
+        val params = GameParams(Coord2D(h, w), n)
+        val gameId = RoomManager.createGame(params)
+        Redirect(routes.ZxController.game(gameId))
+      case _ =>
+        Results.NotFound(views.html.error("Bad game parameters"))
+    }
   }
 
   def game(gameId: String) = Action { implicit request =>
@@ -62,9 +77,8 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def login() = Action { implicit request =>
-    val body = request.body.asFormUrlEncoded
-    val login = body.get("login_name")(0)
-    val password = body.get("password")(0)
+    val login = getParam("login_name")
+    val password = getParam("password")
     userDao.login(login, password) match {
       case None              => Results.NotFound(views.html.error("Wrong credentials"))
       case Some(loggedLogin) => Redirect(routes.ZxController.index()).withSession("user" -> loggedLogin)
@@ -80,10 +94,9 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def register() = Action { implicit request =>
-    val body = request.body.asFormUrlEncoded
-    val login = body.get("login_name")(0)
-    val password1 = body.get("password1")(0)
-    val password2 = body.get("password2")(0)
+    val login = getParam("login_name")
+    val password1 = getParam("password1")
+    val password2 = getParam("password2")
     if (password1 != password2) {
       Results.NotFound(views.html.error("Password confirmation mismatch"))
     } else {

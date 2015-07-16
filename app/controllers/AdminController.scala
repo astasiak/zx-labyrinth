@@ -10,7 +10,6 @@ import actors.SeatActor
 import dao.MongoUserDao
 import dao.UserDao
 import com.typesafe.scalalogging.LazyLogging
-import controllers.FormMappings._
 import play.api.Play.current
 import play.api.libs.json.JsValue
 import play.api.mvc.Action
