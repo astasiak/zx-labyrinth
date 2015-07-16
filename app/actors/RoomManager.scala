@@ -49,6 +49,8 @@ object RoomManager extends LazyLogging {
     val memoryGame = rooms.get(id).map(_._2)
     memoryGame orElse loadGame(id)
   }
+  
+  def memoryGames: Set[String] = rooms.keySet.toSet
 
   def getContinuation(oldId: String): Option[String] =
     continuations get oldId match {
@@ -62,13 +64,6 @@ object RoomManager extends LazyLogging {
         }
       }
     }
-  
-  def listRooms() = {
-    implicit val timeout: Timeout = Timeout(5 seconds)
-    rooms.values.map({ case (_,actor) =>
-      actor ? AskForGameInfoIMsg()
-    }).map(Await.result(_, timeout.duration).asInstanceOf[GameInfoOMsg])
-  }
   
   private def calculateNewId(): String = {
     val newValue = rand.nextInt(1000000).toString

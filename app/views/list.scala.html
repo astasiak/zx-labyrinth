@@ -14,12 +14,13 @@
       <h3>Lista gier:</h3>
       <table class="gamesList">
         <thead>
-         <tr>
-          <th>Id</th>
-          <th>Parametry</th>
-          <th>Gracze</th>
-          <th>Status</th>
-         </tr>
+          <tr>
+            <th>Id</th>
+            <th>Parametry</th>
+            <th>Gracze</th>
+            <th>Status</th>
+            <th>Załadowana</th>
+          </tr>
         </thead>
         <tbody>
           <tr ng-repeat="game in games">
@@ -27,6 +28,7 @@
             <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
             <td>{{game.playerA}},{{game.playerB}}</td>
             <td>{{game.state}}</td>
+            <td>{{game.inMemory}}</td>
           </tr>
         </tbody>
       </table>

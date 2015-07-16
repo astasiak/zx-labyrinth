@@ -28,19 +28,12 @@ object RestController extends Controller with LazyLogging {
   val gameDao: GameDao = MongoGameDao
   
   def listGames = Action { request =>
-    val rooms = RoomManager.listRooms()
-    val jsonRooms = rooms.map({room=>
-      val GameInfoOMsg(id,GameParams(Coord2D(h,w),walls),playerA,playerB,state) = room
-      GameRestModel(id, w, h, walls, playerA, playerB, state.toString)
-    })
-    Ok(Json.toJson(jsonRooms))
-  }
-  
-  def listGames2 = Action { request =>
     val games = gameDao.listGames
-    val jsonGames = games.map({user=>
-      val GameModel(id,GameParams(Coord2D(h,w),walls), state, playerA, playerB) = user
-      GameRestModel(id, w, h, walls, playerA.map(_.id), playerB.map(_.id), state.toString)
+    val memoryGames = RoomManager.memoryGames
+    val jsonGames = games.map({game=>
+      val GameModel(id,GameParams(Coord2D(h,w),walls), state, playerA, playerB) = game
+      val inMemory = memoryGames.contains(id)
+      GameRestModel(id, w, h, walls, playerA.map(_.id), playerB.map(_.id), state.toString, inMemory)
     })
     Ok(Json.toJson(jsonGames))
   }
