@@ -1,16 +1,17 @@
 package dao
 
 import com.mongodb.casbah.Imports._
+import com.typesafe.scalalogging.LazyLogging
 import scala.util._
-import java.time.LocalDateTime
 import org.bson.BSON
 import util.DateTimeConversions._
 import java.util.Date
+import java.time.LocalDateTime
 
-object MongoUserDao extends UserDao {
+object MongoUserDao extends UserDao with LazyLogging {
   
   val uri = Properties.envOrElse("MONGOLAB_URI", "mongodb://localhost:27017/")
-  println("Using Mongo URI: ["+uri+"]")
+  logger.debug("Using Mongo URI: ["+uri+"]")
   val mongoUri = MongoClientURI(uri)
   val db = MongoClient(mongoUri)(mongoUri.database.getOrElse("test"))
   val userCollection = db("users")
@@ -35,8 +36,8 @@ object MongoUserDao extends UserDao {
     userCollection.update(MongoDBObject("_id"->login), $set("lastSeen"->LocalDateTime.now.toDate))
   }
   
-  override def remove(name: String): Unit = {
-    userCollection -= MongoDBObject("name"->name)
+  override def remove(login: String): Unit = {
+    userCollection -= MongoDBObject("_id"->login)
   }
   override def listUsers(): List[UserModel] = {
     val cursor = userCollection.find()
@@ -47,42 +48,11 @@ object MongoUserDao extends UserDao {
   }
 }
 
-trait MongoMapper[T] {
-  def mapToMongo(entity: T): MongoDBObject
-  def mapFromMongo(obj: MongoDBObject): Option[T]
-  def mapFromMongo(cursor: MongoCursor): Iterator[T] =
-    for { x <- cursor;t = mapFromMongo(x) if t!=None }
-      yield t.get
-}
-
-object UserMongoMapper extends MongoMapper[UserModel] {
-  override def mapToMongo(entity: UserModel): MongoDBObject = { 
-    MongoDBObject(
-        "_id"->entity.name,
-        "password"->entity.password,
-        "lastSeen"->entity.lastSeen.toDate,
-        "registered"->entity.registered.toDate)
-  }
-  override def mapFromMongo(obj: MongoDBObject): Option[UserModel] = {
-    val name = obj.getAs[String]("_id")
-    val password = obj.getAs[String]("password") 
-    val lastSeen = obj.getAs[Date]("lastSeen")
-    val registered = obj.getAs[Date]("registered")
-    (name, password, lastSeen, registered) match {
-      case (Some(n),Some(p),Some(ls),Some(cr)) => Some(UserModel(n,p,ls.toLocalDateTime,cr.toLocalDateTime)) // TODO: ?
-      case (Some(n),Some(p),_,_) => Some(UserModel(n,p,LocalDateTime.now,LocalDateTime.now))
-      case _ => None
-    }
-  }
-}
-
 trait UserDao {
   def register(login: String, password: String): Try[String]
   def login(login: String, password: String): Option[String]
   def touchUser(login: String): Unit
-  def remove(id: String): Unit
+  def remove(login: String): Unit
   def listUsers(): List[UserModel]
   def dropAllUsers: Unit
 }
-
-case class UserModel(name: String, password: String, lastSeen: LocalDateTime, registered: LocalDateTime)

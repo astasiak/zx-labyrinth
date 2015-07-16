@@ -18,12 +18,12 @@ case class MoveResult(newBoard: Board, success: Boolean)
  * information about discovered and undiscovered borders and history of moves.
  */
 case class Board(
-    size: (Int, Int),
-    position: (Int, Int),
-    start: (Int, Int),
-    meta: (Int, Int),
+    size: Coord2D,
+    position: Coord2D,
+    start: Coord2D,
+    meta: Coord2D,
     borders: Borders,
-    history: List[(Int, Int)]) {
+    history: List[Coord2D]) {
   
   /** Creates copy of the board with the undiscovered borders hidden */
   def privatize = {
@@ -38,17 +38,17 @@ case class Board(
   
   /** Verifies if the given board represents valid labyrinth */
   def isValid: Boolean = {
-    def fieldWithinSize(field: (Int, Int)) =
-      Range(0,size._1).contains(field._1) &&
-      Range(0,size._2).contains(field._2)
+    def fieldWithinSize(field: Coord2D) =
+      Range(0,size.x).contains(field.x) &&
+      Range(0,size.y).contains(field.y)
     def isMetaReachableFromStart = {
-      def neighbours(pos:(Int,Int)) = {
+      def neighbours(pos:Coord2D) = {
         val directions = Set(North, East, South, West)
         directions
           .filter(d=>inRange(pos,d)&&canMove(pos,d))
           .map(move(pos,_))
       }
-      var visitedFields: Set[(Int, Int)] = Set()
+      var visitedFields: Set[Coord2D] = Set()
       var newFields = Set(start)
       while(!newFields.isEmpty) {
         visitedFields ++= newFields
@@ -84,15 +84,15 @@ case class Board(
   /** Returns String containing quite pretty ASCII representation of the board */
   def toFancyString = {
     val builder = new StringBuilder
-    for(row <- 0 until size._1) {
-      for(col <- 0 until size._2) {
+    for(row <- 0 until size.x) {
+      for(col <- 0 until size.y) {
         builder ++= "+"
         builder ++= (if (row==0 || borders.horizontal(row-1)(col).wall) "-" else " ")
       }
       builder ++= "+\n"
-      for(col <- 0 until size._2) {
+      for(col <- 0 until size.y) {
         builder ++= (if (col==0 || borders.vertical(row)(col-1).wall) "|" else " ")
-        val thisField = (row,col)
+        val thisField = Coord2D(row,col)
         builder ++= (if(thisField==start && thisField==position) "S"
           else if(thisField==meta && thisField==position) "M"
           else if(thisField==start) "s"
@@ -102,7 +102,7 @@ case class Board(
       }
       builder ++= "|\n"
     }
-    for(col <- 0 until size._2) {
+    for(col <- 0 until size.y) {
       builder ++= "+-"
     }
     builder ++= "+"
@@ -110,36 +110,36 @@ case class Board(
   }
   
   // checks if the move from given position would not exceed the range of the board
-  private def inRange(position: (Int, Int), dir: Direction): Boolean = (dir, position) match {
-    case (North, (x, y)) => x > 0
-    case (South, (x, y)) => x+1 < size._1
-    case (West, (x, y)) => y > 0
-    case (East, (x, y)) => y+1 < size._2
+  private def inRange(position: Coord2D, dir: Direction): Boolean = (dir, position) match {
+    case (North, Coord2D(x, y)) => x > 0
+    case (South, Coord2D(x, y)) => x+1 < size.x
+    case (West, Coord2D(x, y)) => y > 0
+    case (East, Coord2D(x, y)) => y+1 < size.y
   }
   // checks if the move does not cross any border
-  private def canMove(position: (Int, Int), dir: Direction): Boolean = (dir, position) match {
-    case (North, (x, y)) => !borders.horizontal(x-1)(y).wall
-    case (South, (x, y)) => !borders.horizontal(x)(y).wall
-    case (West, (x, y)) => !borders.vertical(x)(y-1).wall
-    case (East, (x, y)) => !borders.vertical(x)(y).wall
+  private def canMove(position: Coord2D, dir: Direction): Boolean = (dir, position) match {
+    case (North, Coord2D(x, y)) => !borders.horizontal(x-1)(y).wall
+    case (South, Coord2D(x, y)) => !borders.horizontal(x)(y).wall
+    case (West, Coord2D(x, y)) => !borders.vertical(x)(y-1).wall
+    case (East, Coord2D(x, y)) => !borders.vertical(x)(y).wall
   }
   // for given position returns new one, after the move in the given direction
-  private def move(position: (Int, Int), dir: Direction): (Int, Int) = (dir, position) match {
-    case (North, (x, y)) => (x-1,y)
-    case (South, (x, y)) => (x+1,y)
-    case (West, (x, y)) => (x,y-1)
-    case (East, (x, y)) => (x,y+1)
+  private def move(position: Coord2D, dir: Direction): Coord2D = (dir, position) match {
+    case (North, Coord2D(x, y)) => Coord2D(x-1,y)
+    case (South, Coord2D(x, y)) => Coord2D(x+1,y)
+    case (West, Coord2D(x, y)) => Coord2D(x,y-1)
+    case (East, Coord2D(x, y)) => Coord2D(x,y+1)
   }
 }
 object Board {
   /**
    * Alternative (to Board parameters) way to construct a board in new initial state.
    */
-  def create(size: (Int, Int), start: (Int, Int), meta: (Int, Int), borders: List[ProtoBorder]): Board = {
+  def create(size: Coord2D, start: Coord2D, meta: Coord2D, borders: List[ProtoBorder]): Board = {
     val newBorder = Border(false, false)
     val newWall = Border(true, false)
-    val vBorders = Vector.fill(size._1){MutableList.fill(size._2-1){newBorder}}
-    val hBorders = Vector.fill(size._1-1){MutableList.fill(size._2){newBorder}}
+    val vBorders = Vector.fill(size.x){MutableList.fill(size.y-1){newBorder}}
+    val hBorders = Vector.fill(size.x-1){MutableList.fill(size.y){newBorder}}
     for(border <- borders.filter(_.vertical)) {
       vBorders(border.y)(border.x) = newWall
     }
@@ -162,10 +162,10 @@ case class Borders(vertical: Vector[Vector[Border]], horizontal: Vector[Vector[B
     val newBorder = Border(border.wall, true)
     return set.updated(x, set(x).updated(y, newBorder))
   }
-  private[game] def discoverBorder(position: (Int, Int), dir: Direction) = (dir, position) match {
-      case (North, (x, y)) => Borders(vertical, updatedBorders(horizontal,x-1,y))
-      case (South, (x, y)) => Borders(vertical, updatedBorders(horizontal,x,y))
-      case (West, (x, y)) => Borders(updatedBorders(vertical,x,y-1), horizontal)
-      case (East, (x, y)) => Borders(updatedBorders(vertical,x,y), horizontal)
+  private[game] def discoverBorder(position: Coord2D, dir: Direction) = (dir, position) match {
+      case (North, Coord2D(x, y)) => Borders(vertical, updatedBorders(horizontal,x-1,y))
+      case (South, Coord2D(x, y)) => Borders(vertical, updatedBorders(horizontal,x,y))
+      case (West, Coord2D(x, y)) => Borders(updatedBorders(vertical,x,y-1), horizontal)
+      case (East, Coord2D(x, y)) => Borders(updatedBorders(vertical,x,y), horizontal)
     }
 }

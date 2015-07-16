@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory
 import scala.util.Random
 import com.typesafe.scalalogging.LazyLogging
 
-case class GameParams(size: (Int, Int), walls: Int)
+case class Coord2D(x: Int, y: Int)
+case class GameParams(size: Coord2D, walls: Int)
 
 /** representation of states in which game can be: */
 sealed trait GameState
@@ -27,17 +28,29 @@ case object PlayerB extends PlayerId { override def theOther = PlayerA }
 class Game(val params: GameParams) extends LazyLogging {
   
   private val players: Map[PlayerId, PlayerData] = Map()
-  private val subscribers: Map[String, Callbacks] = Map()
+  private val subscribers: Map[String, CallbackEntry] = Map()
   var gameState: GameState = Awaiting
   
-  def subscribe(userId: String, callbacks: Callbacks) = {
+  type PlayerInfo = Option[(String,Option[Board])]
+  def putPlayers(playerA: PlayerInfo, playerB: PlayerInfo): Unit = {
+    def putPlayer(playerId: PlayerId, playerInfo: PlayerInfo) =
+      playerInfo map { case (userId, board)=>
+        val playerData = new PlayerData(userId)
+        playerData.board = board
+        players.put(playerId, playerData)
+      }
+    putPlayer(PlayerA, playerA)
+    putPlayer(PlayerB, playerB)
+  }
+  
+  def subscribe(userId: String, callbacks: Callbacks, admin: Boolean = false) = {
     if(subscribers.contains(userId)) {
       logger.info(s"User ${userId} failed to subscribe to the game")
       false
     }
     else {
       logger.debug(s"User ${userId} subscribed to the game")
-      subscribers += userId->callbacks
+      subscribers += userId->CallbackEntry(callbacks,admin)
       callbacks.updatePlayers(
           players.get(PlayerA).map(_.userId),
           players.get(PlayerB).map(_.userId))
@@ -46,7 +59,7 @@ class Game(val params: GameParams) extends LazyLogging {
       for((id, playerData) <- players) {
         val board = playerData.board
         val boardToSend =
-          if(gameFinished || userId==playerData.userId) board
+          if(gameFinished || admin || userId==playerData.userId) board
           else board.map(_.privatize)
         if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
       }
@@ -54,7 +67,7 @@ class Game(val params: GameParams) extends LazyLogging {
     }
   }
   
-  def unsubscribe(userId: String) = {
+  def unsubscribe(userId: String): Unit = {
     logger.debug(s"User ${userId} unsubscribed from the game")
     subscribers -= userId
   }
@@ -73,13 +86,13 @@ class Game(val params: GameParams) extends LazyLogging {
       logger.debug(s"User ${userId} sat down as a ${playerId}")
       players.put(playerId, new PlayerData(userId))
       subscribers.values.foreach {
-        _.updatePlayers(
+        _.callback.updatePlayers(
             players.get(PlayerA).map(_.userId),
             players.get(PlayerB).map(_.userId))
       }
       val opponentBoard = players.get(playerId.theOther).flatMap(_.board)
       opponentBoard.foreach(board=>{
-        subscribers(userId).updateBoard(playerId.theOther, board.privatize)
+        subscribers(userId).callback.updateBoard(playerId.theOther, board.privatize)
       })
       return Some(playerId)
     }
@@ -100,7 +113,7 @@ class Game(val params: GameParams) extends LazyLogging {
       if(players.get(playerId.theOther).flatMap(_.board)!=None) {
         val startingPlayer = Random.shuffle(List(PlayerA,PlayerB)).head
         gameState = Ongoing(startingPlayer)
-        subscribers.values.foreach(_.updateGameState(gameState))
+        subscribers.values.foreach(_.callback.updateGameState(gameState))
       }
       sendBoardToPlayers(playerId)
       return true
@@ -129,7 +142,7 @@ class Game(val params: GameParams) extends LazyLogging {
       } else {
         sendBoardToPlayers(playerId.theOther)
       }
-      subscribers.values.foreach(_.updateGameState(gameState))
+      subscribers.values.foreach(_.callback.updateGameState(gameState))
     }
     case Ongoing(currentPlayer) if playerId!=currentPlayer =>
       logger.info("Cannot move during the opponent's turn")
@@ -150,15 +163,15 @@ class Game(val params: GameParams) extends LazyLogging {
   private def sendBoardToPlayers(playerId: PlayerId) = {
     val player = players(playerId)
     val board = player.board.get
-    subscribers.foreach { case (userId,callback)=>
-      val boardToSend = if(userId==player.userId) board else board.privatize
+    subscribers.foreach { case (userId,CallbackEntry(callback,admin))=>
+      val boardToSend = if(userId==player.userId || admin) board else board.privatize
       callback.updateBoard(playerId, boardToSend)
     }
   }
   
   private def sendUncoveredBoards() = players.foreach(boardOwner=>{
     subscribers.values.foreach(receiver=>{
-      receiver.updateBoard(boardOwner._1, boardOwner._2.board.get)
+      receiver.callback.updateBoard(boardOwner._1, boardOwner._2.board.get)
     })
   })
   
@@ -180,3 +193,5 @@ trait Callbacks {
   def updateGameState(gameState: GameState)
   //def onError(error: GameError) // ?
 }
+
+private case class CallbackEntry(callback: Callbacks, admin: Boolean)

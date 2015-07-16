@@ -32,9 +32,9 @@ object JsonMapper {
     val wallsH = (js \ "wallsH").asOpt[String]
     val wallsV = (js \ "wallsV").asOpt[String]
     (size, start, end, wallsH, wallsV) match {
-      case (Some((width,height)), Some(start), Some(end), Some(wallsH), Some(wallsV)) => {
+      case (Some((width,height)), Some((startY,startX)), Some((endY,endX)), Some(wallsH), Some(wallsV)) => {
         val wallsList = (mapBorders(wallsH,false,width)++mapBorders(wallsV,true,width-1)).toList
-        val board = Board.create((height,width),start.swap,end.swap,wallsList)
+        val board = Board.create(Coord2D(height,width), Coord2D(startX,startY), Coord2D(endX,endY), wallsList)
         InitBoardIMsg(board)
       }
       case _ => ErrorIMsg("Cannot parse 'init' message")
@@ -70,14 +70,15 @@ object JsonMapper {
     case UpdateBoardOMsg(playerId, board) => Json.obj("type"->"update_board","player"->mapPlayerId(playerId),"board"->mapBoard(board))
     case UpdatePlayersOMsg(playerA, playerB) => Json.obj("type"->"update_players","a"->mapPlayer(playerA),"b"->mapPlayer(playerB))
     case UpdateStateOMsg(gameState) => Json.obj("type"->"update_state","state"->mapState(gameState))
-    case ParamsOMsg(GameParams((y,x),walls)) => Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls)
+    case ParamsOMsg(GameParams(Coord2D(y,x),walls)) => Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls)
     case InitBoardResultOMsg(success) => Json.obj("type"->"init_result","ok"->success)
     case other => Json.obj("type"->"unknown")
   }
   private def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"
   private def mapBoard(board: Board) = {
     implicit def mapPairToJsArr(a: (Int,Int)): JsValueWrapper = Json.arr(a._1, a._2)
-    Json.obj("size"->board.size.swap, "start"->board.start.swap, "end"->board.meta.swap, "pos"->board.position.swap,
+    implicit def mapCoordToJsArr(a: Coord2D): JsValueWrapper = Json.arr(a.y, a.x)
+    Json.obj("size"->board.size, "start"->board.start, "end"->board.meta, "pos"->board.position,
         "wallsH"->mapBorders(board.borders.horizontal), "wallsV"->mapBorders(board.borders.vertical),
         "history"->mapHistory(board.history))
   }
@@ -89,5 +90,5 @@ object JsonMapper {
   }).mkString
   private def mapPlayer(player: Option[String]) = player.map(JsString(_)).getOrElse(JsNull)
   private def mapState(gameState: GameState) = gameState.toString
-  private def mapHistory(history: List[(Int, Int)]) = history.map({case(x,y)=>Json.arr(y,x)})
+  private def mapHistory(history: List[Coord2D]) = history.map({case Coord2D(x,y)=>Json.arr(y,x)})
 }

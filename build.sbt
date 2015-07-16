@@ -20,7 +20,9 @@ libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "18.0",
   "com.google.code.findbugs" % "jsr305" % "3.0.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-  "org.mongodb" %% "casbah" % "2.8.1"
+  "org.mongodb" %% "casbah" % "2.8.1",
+  "com.novus" % "salat_2.11" % "1.9.9"
+//  "org.json4s" %% "json4s-core" % "3.3.0.RC3"
 //  "org.slf4j" % "slf4j-simple" % "1.5.6"
 )
 

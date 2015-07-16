@@ -27,4 +27,16 @@ object ws2 {
                                                   //| ayerId{def theOther: Product with Serializable with game.PlayerId}] = Set(Pl
                                                   //| ayerA, PlayerB)
   val sss = ss--w                                 //> sss  : scala.collection.immutable.Set[game.PlayerId] = Set(PlayerB)
+  
+  val str = "ABC|CBA|AAA"                         //> str  : String = ABC|CBA|AAA
+  
+  str.split('|')                                  //> res2: Array[String] = Array(ABC, CBA, AAA)
+  str.split('|').map { row=>
+    row.map (_ match {
+      case 'A' => 1
+      case 'B' => 2
+      case 'C' => 3
+    })
+  }                                               //> res3: Array[scala.collection.immutable.IndexedSeq[Int]] = Array(Vector(1, 2,
+                                                  //|  3), Vector(3, 2, 1), Vector(1, 1, 1))
 }
