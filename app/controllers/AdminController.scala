@@ -18,16 +18,17 @@ import play.api.mvc.Controller
 import play.api.mvc.Results
 import play.api.mvc.WebSocket
 import play.Play
+import util.PasswordHasher
 
 object AdminController extends Controller with LazyLogging {
 
   val userDao: UserDao = MongoUserDao
 
-  val secretAdminKey = Play.application().configuration().getString("secretAdminKey")
+  val secretAdminKeyHash = Play.application().configuration().getString("secretAdminKeyHash")
   
   def dropUsers() = Action { request =>
     request.headers.get("secret") match {
-      case Some(requestSecret) if requestSecret==secretAdminKey => {
+      case Some(requestSecret) if PasswordHasher.check(requestSecret, secretAdminKeyHash) => {
         userDao.dropAllUsers
         Ok("OK")
       }
