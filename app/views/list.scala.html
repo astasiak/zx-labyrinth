@@ -19,7 +19,9 @@
             <th>Parametry</th>
             <th>Gracze</th>
             <th>Status</th>
-            <th>Załadowana</th>
+            <th>Utworzona</th>
+            <th>Aktywna</th>
+            <th>W pamięci</th>
           </tr>
         </thead>
         <tbody>
@@ -28,6 +30,8 @@
             <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
             <td>{{game.playerA}},{{game.playerB}}</td>
             <td>{{game.state}}</td>
+            <td>{{game.created}}</td>
+            <td>{{game.lastActive}}</td>
             <td>{{game.inMemory}}</td>
           </tr>
         </tbody>

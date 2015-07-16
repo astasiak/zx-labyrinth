@@ -10,4 +10,5 @@ case class UserModel(name: String, password: String, lastSeen: LocalDateTime, re
 case class GamePlayerModel(id: String, board: Option[Board])
 case class GameModel(
     id: String, params: GameParams, state: GameState,
-    playerA: Option[GamePlayerModel], playerB: Option[GamePlayerModel])
+    playerA: Option[GamePlayerModel], playerB: Option[GamePlayerModel],
+    lastActive: LocalDateTime, created: LocalDateTime)

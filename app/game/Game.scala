@@ -43,7 +43,7 @@ class Game(val params: GameParams) extends LazyLogging {
     putPlayer(PlayerB, playerB)
   }
   
-  def subscribe(userId: String, callbacks: Callbacks, admin: Boolean = false) = {
+  def subscribe(userId: String, callbacks: Callbacks, admin: Boolean = false, initCallbacks: Boolean = true) = {
     if(subscribers.contains(userId)) {
       logger.info(s"User ${userId} failed to subscribe to the game")
       false
@@ -51,17 +51,19 @@ class Game(val params: GameParams) extends LazyLogging {
     else {
       logger.debug(s"User ${userId} subscribed to the game")
       subscribers += userId->CallbackEntry(callbacks,admin)
-      callbacks.updatePlayers(
-          players.get(PlayerA).map(_.userId),
-          players.get(PlayerB).map(_.userId))
-      callbacks.updateGameState(gameState)
-      val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
-      for((id, playerData) <- players) {
-        val board = playerData.board
-        val boardToSend =
-          if(gameFinished || admin || userId==playerData.userId) board
-          else board.map(_.privatize)
-        if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
+      if(initCallbacks) {
+        callbacks.updatePlayers(
+            players.get(PlayerA).map(_.userId),
+            players.get(PlayerB).map(_.userId))
+        callbacks.updateGameState(gameState)
+        val gameFinished = gameState match {case Finished(_)=> true; case _=>false}
+        for((id, playerData) <- players) {
+          val board = playerData.board
+          val boardToSend =
+            if(gameFinished || admin || userId==playerData.userId) board
+            else board.map(_.privatize)
+          if(boardToSend!=None) callbacks.updateBoard(id, boardToSend.get)
+        }
       }
       true
     }

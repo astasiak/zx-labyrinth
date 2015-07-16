@@ -10,10 +10,6 @@ import play.api.libs.json.JsString
 object User {
   case class UserRestModel(name: String, lastSeen: LocalDateTime, registered: LocalDateTime)
   
+  import util.DateTimeConversions.java8DateWrites
   implicit val usersWrites = Json.writes[UserRestModel]
-  
-  implicit def java8DateWrites: Writes[LocalDateTime] = new Writes[LocalDateTime] {
-    val df = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-    def writes(d: LocalDateTime): JsValue = JsString(d.format(df))
-  }
 }

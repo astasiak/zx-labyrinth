@@ -240,7 +240,7 @@ $ ->
   window.gameWs.onmessage = (msg) ->
     wsHandler(msg.data)
   window.gameWs.onclose = () ->
-    console.log("Websocket closed!");
+    addChatTechnicalMessage("Zamknięte połączenie z serwerem")
   initButtons()
   bindArrowKeys()
   translateStatus("INIT_PSEUDOSTATE")

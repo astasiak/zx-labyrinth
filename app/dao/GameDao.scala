@@ -8,6 +8,7 @@ import util.DateTimeConversions._
 import java.util.Date
 import java.time.LocalDateTime
 import game._
+import util.DateTimeConversions._
 
 object MongoGameDao extends GameDao with LazyLogging {
   
@@ -27,23 +28,23 @@ object MongoGameDao extends GameDao with LazyLogging {
   }
   override def listGames(): List[GameModel] = {
     val cursor = gameCollection.find(MongoDBObject(),
-        MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1))
+        MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1,"created"->1,"lastActive"->1))
     GameMongoMapper.mapFromMongo(cursor).toList
   }
   override def dropAllGames(): Unit = {
     gameCollection.drop
   }
   override def updateGameState(id: String, gameState: GameState) = {
-    gameCollection.update(MongoDBObject("_id"->id), $set("state"->gameState.toString))
+    gameCollection.update(MongoDBObject("_id"->id), $set("state"->gameState.toString, "lastActive"->LocalDateTime.now.toDate))
   }
   override def updatePlayers(id: String, playerA: Option[String], playerB: Option[String]) = {
-    gameCollection.update(MongoDBObject("_id"->id), $set("playerA"->playerA, "playerB"->playerB))
+    gameCollection.update(MongoDBObject("_id"->id), $set("playerA"->playerA, "playerB"->playerB, "lastActive"->LocalDateTime.now.toDate))
   }
   override def updateBoard(id: String, playerId: PlayerId, board: Board) = {
     val mongoBoard = GameMongoMapper.mapBoardToMongo(board)
     val updater = playerId match {
-      case PlayerA => $set("boardA"->mongoBoard)
-      case PlayerB => $set("boardB"->mongoBoard)
+      case PlayerA => $set("boardA"->mongoBoard, "lastActive"->LocalDateTime.now.toDate)
+      case PlayerB => $set("boardB"->mongoBoard, "lastActive"->LocalDateTime.now.toDate)
     }
     gameCollection.update(MongoDBObject("_id"->id), updater)
   }

@@ -68,7 +68,9 @@ object GameMongoMapper extends MongoMapper[GameModel] {
         "state"->entity.state.toString,
         "playerA"->entity.playerA.map(_.id),
         "playerB"->entity.playerB.map(_.id),
-        "params"->params)
+        "params"->params,
+        "lastActive"->entity.lastActive.toDate,
+        "created"->entity.created.toDate)
   }
   
   override def mapFromMongo(obj: MongoDBObject): Option[GameModel] = {
@@ -83,12 +85,15 @@ object GameMongoMapper extends MongoMapper[GameModel] {
     val boardA = obj.getAs[DBObject]("boardA").map(mapBoardFromMongo(_))
     val boardB = obj.getAs[DBObject]("boardB").map(mapBoardFromMongo(_))
     val params = obj.getAs[DBObject]("params")
-    (id, params, state, playerA, playerB, boardA, boardB) match {
-      case (Some(id), Some(params), Some(state), playerA, playerB, boardA, boardB) =>
+    val created = obj.getAs[Date]("created").map(_.toLocalDateTime).getOrElse(LocalDateTime.now)
+    val lastActive = obj.getAs[Date]("lastActive").map(_.toLocalDateTime).getOrElse(LocalDateTime.now)
+    (id, params, state) match {
+      case (Some(id), Some(params), Some(state)) =>
         Some(
             GameModel(id, grater[GameParams].asObject(params), state,
                 playerA.map(GamePlayerModel(_, boardA)),
-                playerB.map(GamePlayerModel(_, boardB))))
+                playerB.map(GamePlayerModel(_, boardB)),
+                lastActive, created))
       case _ => None
     }
   }

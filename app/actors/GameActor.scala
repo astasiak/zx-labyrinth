@@ -20,16 +20,18 @@ import actors.messages._
 import dao.MongoGameDao
 import dao.GameModel
 import dao.GameDao
+import java.time.LocalDateTime
 
 class GameActor(id: String, game: Game) extends Actor with ActorLogging {
   val gameDao = MongoGameDao
   val playerMap: Map[ActorRef, (Option[PlayerId],String)] = Map()
   
-  game.subscribe("_MONGO", new DaoCallbacks(gameDao), true)
+  game.subscribe("_MONGO", new DaoCallbacks(gameDao), admin=true, initCallbacks=false)
   
   def this(id: String, params: GameParams) {
     this(id,new Game(params))
-    gameDao.saveGame(GameModel(id, game.params, game.gameState, None, None))
+    val currentTime = LocalDateTime.now()
+    gameDao.saveGame(GameModel(id, game.params, game.gameState, None, None, currentTime, currentTime))
   }
   
   override def receive = LoggingReceive {
