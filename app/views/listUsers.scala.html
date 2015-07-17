@@ -13,7 +13,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="user in users | orderBy:predicate:reverse">
-            <td>{{user.name}}</td>
+            <td><a href="@{routes.ZxController.getUser("")}{{user.name}}">{{user.name}}</a></td>
             <td>{{user.lastSeen}}</td>
             <td>{{user.registered}}</td>
           </tr>

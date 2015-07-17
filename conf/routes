@@ -10,6 +10,7 @@ GET     /logout                  controllers.ZxController.logout
 POST    /register                controllers.ZxController.register
 GET     /register                controllers.ZxController.showRegister
 GET     /users                   controllers.ZxController.listUsers
+GET     /users/:name             controllers.ZxController.getUser(name)
 
 # REST resources
 

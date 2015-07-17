@@ -21,10 +21,17 @@ import play.api.mvc.WebSocket
 import game.GameParams
 import game.Coord2D
 import scala.util.Try
+import dao.MongoGameDao
+import dao.GameDao
+import java.time.LocalDateTime
+import java.time.ZoneId
+import game._
+import util.DateTimeConversions.ldtOrdering
 
 object ZxController extends Controller with LazyLogging {
 
   val userDao: UserDao = MongoUserDao
+  val gameDao: GameDao = MongoGameDao
 
   private def getParam(name: String)(implicit request: Request[AnyContent]) =
     request.body.asFormUrlEncoded.get(name)(0)
@@ -120,4 +127,51 @@ object ZxController extends Controller with LazyLogging {
     val userName = request.session.get("user")
     Ok(views.html.listGames(userName))
   }
+
+  def getUser(name: String) = Action { implicit request =>
+    val userGames = gameDao.listGamesByUser(name).map { game=>
+      val (myPlayerId, opponentData) =
+        if(game.playerA.map(_.id)==Some(name)) (PlayerA, game.playerB)
+        else (PlayerB, game.playerA)
+      val opponent = opponentData.map(_.id).getOrElse("Nobody yet")
+      val state = game.state match {
+        case Finished(id) if id==myPlayerId => "Won"
+        case Finished(id) if id!=myPlayerId => "Lost"
+        case _                              => "Ongoing"
+      }
+      (opponent, state, game.lastActive)
+    }.groupBy(_._1)
+    val opponents = userGames.map { case (userId, list) =>
+      val all = list.size
+      val won = list.count(_._2=="Won")
+      val lost = list.count(_._2=="Lost")
+      val ongoing = list.count(_._2=="Ongoing")
+      val lastGame = list.map(_._3).max
+      OpponentEntry(userId, all, won, lost, ongoing, Some(lastGame))
+    }.toList.sortBy(-_.allGames)
+    val total = {
+      val all = opponents.map(_.allGames).sum
+      val won = opponents.map(_.wonGames).sum
+      val lost = opponents.map(_.lostGames).sum
+      val ongoing = opponents.map(_.ongoingGames).sum
+      val lastGame = opponents.map(_.lastGame.get).reduceOption(List(_,_).max)
+      OpponentEntry("total", all, won, lost, ongoing, lastGame)
+    }
+    val userData = UserData(name,total,opponents)
+    
+    val watcher = request.session.get("user")
+    Ok(views.html.user(userData)(watcher))
+  }
 }
+
+case class OpponentEntry(
+    name: String,
+    allGames: Int,
+    wonGames: Int,
+    lostGames: Int,
+    ongoingGames: Int,
+    lastGame: Option[LocalDateTime])
+case class UserData(
+    name: String,
+    total: OpponentEntry,
+    opponents: List[OpponentEntry])

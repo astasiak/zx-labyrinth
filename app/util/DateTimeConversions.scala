@@ -9,6 +9,8 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.JsString
 
 object DateTimeConversions {
+  val TIMEZONE = ZoneId.of("Europe/Warsaw")
+  
   class Java8DateWrapper(date: LocalDateTime) {
     def toDate() = Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
   }
@@ -20,9 +22,16 @@ object DateTimeConversions {
   }
   implicit def wrapOldJavaDate(date: Date) = new OldJavaDateWrapper(date)
   
+  def formatDate(dt: LocalDateTime) = {
+    val zonedDateTime = dt.atZone(TIMEZONE)
+    val df = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
+    zonedDateTime.format(df)
+  }
   
   implicit def java8DateWrites: Writes[LocalDateTime] = new Writes[LocalDateTime] {
-    val df = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-    def writes(d: LocalDateTime): JsValue = JsString(d.format(df))
+    def writes(d: LocalDateTime): JsValue = JsString(formatDate(d))
   }
+  
+  implicit val ldtOrdering: Ordering[LocalDateTime] =
+    Ordering.by(_.atZone(ZoneId.systemDefault).toEpochSecond)
 }
