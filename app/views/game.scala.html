@@ -1,39 +1,30 @@
-@(id: String)(implicit request: play.api.mvc.RequestHeader)
+@(id: String)(implicit userName: Option[String], request: play.api.mvc.RequestHeader)
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>ZX labyrinth</title>
-  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
-  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
-  <script type='text/javascript' src='@routes.Assets.at("javascripts/js.js")'></script>
-  <script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
-  <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/css.css")" media="screen" />
-</head>
-<body data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()">
-	<div class="container ">
-		<div id="gameState"></div>
-		<div>
-			<div id="move_up" class="moveButton">Up</div>
-			<div id="move_down" class="moveButton">Down</div>
-			<div id="move_left" class="moveButton">Left</div>
-			<div id="move_right" class="moveButton">Right</div>
-			<div class="moveComment">(możesz też grać strzałkami na klawiaturze)</div>
-		</div>
-	</div>
-	<div id="containerA" class="boardContainer">
-		<div id="playerA" class="playerName">???</div>
-		<div id="boardA" class="boardArea"></div>
-	</div>
-	<div id="containerB" class="boardContainer">
-		<div id="playerB" class="playerName">???</div>
-		<div id="boardB" class="boardArea"></div>
-	</div>
-	<div id="chatBox">
-		<div id="chatHistory"></div>
-		<input type="text" id="chatInput"/>
-		<div id="playAgainButton">Zagraj ponownie</div>
-		<div id="joinButton">Dołącz do gry</div>
-	</div>
-</body>
-</html>
+@layout {
+  <div id="labyrinthGame" data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()">
+    <div>
+        <div id="gameState"></div>
+        <div>
+            <div id="move_up" class="moveButton">Up</div>
+            <div id="move_down" class="moveButton">Down</div>
+            <div id="move_left" class="moveButton">Left</div>
+            <div id="move_right" class="moveButton">Right</div>
+            <div class="moveComment">(możesz też grać strzałkami na klawiaturze)</div>
+        </div>
+    </div>
+    <div id="containerA" class="boardContainer">
+        <div id="playerA" class="playerName">???</div>
+        <div id="boardA" class="boardArea"></div>
+    </div>
+    <div id="containerB" class="boardContainer">
+        <div id="playerB" class="playerName">???</div>
+        <div id="boardB" class="boardArea"></div>
+    </div>
+    <div id="chatBox">
+        <div id="chatHistory"></div>
+        <input type="text" id="chatInput"/>
+        <div id="playAgainButton">Zagraj ponownie</div>
+        <div id="joinButton">Dołącz do gry</div>
+    </div>
+  </div>
+}

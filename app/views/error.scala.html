@@ -1,11 +1,5 @@
-@(errorMessage: String)
+@(errorMessage: String)(implicit userName: Option[String])
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>ZX labyrinth</title>
-</head>
-<body>
+@layout{
 	<div class="error">@errorMessage</div>
-</body>
-</html>
+}

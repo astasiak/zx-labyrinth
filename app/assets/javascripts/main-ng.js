@@ -8,6 +8,12 @@ zxApp.controller('GamesController', ['$scope', 'GamesResource', function($scope,
         $scope.games = data;
       });
     };
+    $scope.predicate = 'id';
+    $scope.reverse = false;
+    $scope.order = function(predicate) {
+      $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+      $scope.predicate = predicate;
+    };
     var init = function(){
       $scope.loadGames();
     }();
@@ -24,6 +30,12 @@ zxApp.controller('UsersController', ['$scope', 'UsersResource', function($scope,
     	UsersResource.query(function(data) {
         $scope.users = data;
       });
+    };
+    $scope.predicate = 'name';
+    $scope.reverse = false;
+    $scope.order = function(predicate) {
+      $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+      $scope.predicate = predicate;
     };
     var init = function(){
       $scope.loadUsers();

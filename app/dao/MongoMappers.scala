@@ -45,12 +45,12 @@ object UserMongoMapper extends MongoMapper[UserModel] {
 
   override def mapFromMongo(obj: MongoDBObject): Option[UserModel] = {
     val name = obj.getAs[String]("_id")
-    val password = obj.getAs[String]("password") 
-    val lastSeen = obj.getAs[Date]("lastSeen")
-    val registered = obj.getAs[Date]("registered")
-    (name, password, lastSeen, registered) match {
-      case (Some(n),Some(p),Some(ls),Some(cr)) => Some(UserModel(n,p,ls.toLocalDateTime,cr.toLocalDateTime)) // TODO: ?
-      case (Some(n),Some(p),_,_) => Some(UserModel(n,p,LocalDateTime.now,LocalDateTime.now))
+    val password = obj.getAs[String]("password")
+    val defaultDate = LocalDateTime.of(2001,1,1,0,0)
+    val lastSeen = obj.getAs[Date]("lastSeen").map(_.toLocalDateTime).getOrElse(defaultDate)
+    val registered = obj.getAs[Date]("registered").map(_.toLocalDateTime).getOrElse(defaultDate)
+    (name, password) match {
+      case (Some(n),Some(p)) => Some(UserModel(n, p, lastSeen, registered))
       case _ => None
     }
   }
@@ -85,8 +85,9 @@ object GameMongoMapper extends MongoMapper[GameModel] {
     val boardA = obj.getAs[DBObject]("boardA").map(mapBoardFromMongo(_))
     val boardB = obj.getAs[DBObject]("boardB").map(mapBoardFromMongo(_))
     val params = obj.getAs[DBObject]("params")
-    val created = obj.getAs[Date]("created").map(_.toLocalDateTime).getOrElse(LocalDateTime.now)
-    val lastActive = obj.getAs[Date]("lastActive").map(_.toLocalDateTime).getOrElse(LocalDateTime.now)
+    val defaultDate = LocalDateTime.of(2001,1,1,0,0)
+    val created = obj.getAs[Date]("created").map(_.toLocalDateTime).getOrElse(defaultDate)
+    val lastActive = obj.getAs[Date]("lastActive").map(_.toLocalDateTime).getOrElse(defaultDate)
     (id, params, state) match {
       case (Some(id), Some(params), Some(state)) =>
         Some(

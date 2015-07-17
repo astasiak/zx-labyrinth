@@ -1,0 +1,56 @@
+@(content: Html)(implicit userName: Option[String])
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ZX labyrinth</title>
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-resource.min.js"></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/index.js")'></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/js.js")'></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/zx.js")'></script>
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/main-ng.js")'></script>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/css.css")" media="screen" />
+</head>
+<body data-game-url="@routes.ZxController.game("")" ng-app="zxApp">
+  <div class="header">
+     <div id="menuButton">Menu</div>
+     <div class="gameTitle">ZX-labyrinth</div>
+     <div class="loginInfo">
+        @userName match {
+          case None => {
+          <div>
+            <a href="@routes.ZxController.showRegister()">Zarejestruj</a>
+            <form method="post" action="@routes.ZxController.login()">
+                <input type="text" name="login_name" placeholder="Login"></input>
+                <input type="password" name="password" placeholder="Password"></input>
+                <input type="submit" value="Login!"></input>
+            </form>
+          </div>
+          }
+          case Some(name: String) => {
+          <div>
+            <span>Jesteś zalogowany jako @name</span>
+            <a href="@routes.ZxController.logout()">Wyloguj</a>
+          </div>
+          }
+        }
+     </div>
+  </div>
+  <div id="menu">
+    <ul>
+      <li><a href="https://github.com/astasiak/zx-labyrinth">Github</a></li>
+      <li>Jak grać?</li>
+      <br/>
+      <li><a href="@routes.ZxController.listGames()">Lista gier</a></li>
+      <li><a href="@routes.ZxController.listUsers()">Lista graczy</a></li>
+      <li><a href="@routes.ZxController.index()">Załóż nową grę</a></li>
+    </ul>
+  </div>
+  <div class="contentContainer">
+      @content
+  </div>
+</body>
+</html>

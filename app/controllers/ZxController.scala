@@ -35,6 +35,7 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def createGame = Action { implicit request =>
+    implicit val userName = request.session.get("user")
     val width = Try(getParam("width").toInt)
     val height = Try(getParam("height").toInt)
     val numberOfWalls = Try(getParam("walls").toInt)
@@ -50,15 +51,12 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def game(gameId: String) = Action { implicit request =>
+    implicit val userName = request.session.get("user")
     request.session.get("user").map { user =>
       Ok(views.html.game(gameId))
     }.getOrElse {
       Results.NotFound(views.html.error("You need to log in"))
     }
-  }
-
-  def listGames() = Action {
-    Ok(views.html.list())
   }
 
   def gameWs(gameId: String) = WebSocket.tryAcceptWithActor[JsValue, JsValue] { request =>
@@ -68,7 +66,8 @@ object ZxController extends Controller with LazyLogging {
     })
   }
 
-  def again(gameId: String) = Action {
+  def again(gameId: String) = Action { request =>
+    implicit val userName = request.session.get("user")
     RoomManager.getContinuation(gameId).map { newGameId =>
       Redirect(routes.ZxController.game(newGameId))
     }.getOrElse {
@@ -77,6 +76,7 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def login() = Action { implicit request =>
+    implicit val userName = request.session.get("user")
     val login = getParam("login_name")
     val password = getParam("password")
     userDao.login(login, password) match {
@@ -89,11 +89,13 @@ object ZxController extends Controller with LazyLogging {
     Redirect(routes.ZxController.index()).withSession()
   }
 
-  def showRegister() = Action {
-    Ok(views.html.register())
+  def showRegister() = Action { implicit request =>
+    val userName = request.session.get("user")
+    Ok(views.html.register(userName))
   }
 
   def register() = Action { implicit request =>
+    implicit val userName = request.session.get("user")
     val login = getParam("login_name")
     val password1 = getParam("password1")
     val password2 = getParam("password2")
@@ -109,7 +111,13 @@ object ZxController extends Controller with LazyLogging {
     }
   }
 
-  def listUsers() = Action {
-    Ok(views.html.listUsers())
+  def listUsers() = Action { implicit request =>
+    val userName = request.session.get("user")
+    Ok(views.html.listUsers(userName))
+  }
+
+  def listGames() = Action { implicit request =>
+    val userName = request.session.get("user")
+    Ok(views.html.listGames(userName))
   }
 }

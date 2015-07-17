@@ -28,7 +28,7 @@ object MongoGameDao extends GameDao with LazyLogging {
   }
   override def listGames(): List[GameModel] = {
     val cursor = gameCollection.find(MongoDBObject(),
-        MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1,"created"->1,"lastActive"->1))
+        MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1, "created"->1, "lastActive"->1))
     GameMongoMapper.mapFromMongo(cursor).toList
   }
   override def dropAllGames(): Unit = {
@@ -54,8 +54,8 @@ object MongoGameDao extends GameDao with LazyLogging {
     gameModel.map { model =>
       val game = new Game(model.params)
       game.gameState = model.state
-      val dataA = model.playerA.map(data=>(data.id,data.board))
-      val dataB = model.playerB.map(data=>(data.id,data.board))
+      val dataA = model.playerA.map(data=>(data.id, data.board))
+      val dataB = model.playerB.map(data=>(data.id, data.board))
       game.putPlayers(dataA, dataB)
       game
     }

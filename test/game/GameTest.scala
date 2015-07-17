@@ -4,24 +4,25 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 
-import com.example.game.Awaiting;
-import com.example.game.Board;
-import com.example.game.PlayerA;
-import com.example.game.PlayerB;
+import game.Awaiting;
+import game.Board;
+import game.PlayerA;
+import game.PlayerB;
 
 import game.Callbacks
 import game.Game
 import game.GameParams
 import game.Ongoing
 import game.GameState
+import game.Coord2D
 
 class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
   var game: Game = _
   
-  val someBoard = Board.create((3,3), (0,0), (2,1), List())
+  val someBoard = Board.create(Coord2D(3,3), Coord2D(0,0), Coord2D(2,1), List())
   
   before {
-    game = new Game(GameParams((3,3),5))
+    game = new Game(GameParams(Coord2D(3,3),5))
   }
   
   test("sitting down") {

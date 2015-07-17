@@ -2,7 +2,7 @@ package actors
 
 import org.scalatest.FunSuite
 
-import com.exampleactors.messages.JsonMapper;
+import actors.messages.JsonMapper;
 
 import play.api.libs.json.Json
 import game._
@@ -20,7 +20,7 @@ class JsonMapperTest extends FunSuite {
   
   test("mapping board") {
     val initBoard = TestUtils
-      .withHistory(List((0,1))).mkBoard(
+      .withHistory(List(Coord2D(0,1))).mkBoard(
         "  S  \n"+
         " +-+ \n"+
         "    m\n"+
@@ -39,7 +39,7 @@ class JsonMapperTest extends FunSuite {
   
   test("mapping board back") {
     val board = TestUtils
-      .withHistory(List((0,1),(0,0),(1,0))).mkBoard(
+      .withHistory(List(Coord2D(0,1),Coord2D(0,0),Coord2D(1,0))).mkBoard(
         "  s  \n"+
         " +-+ \n"+
         "!   m\n"+

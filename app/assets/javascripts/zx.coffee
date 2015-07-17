@@ -231,9 +231,9 @@ wsSend = (obj) ->
   console.log("WS< "+message)
   window.gameWs.send(message)
 
-$ ->
+handleWholeGame =  ->
   dealWithFocus()
-  wsUrl = $("body").data("ws-url")
+  wsUrl = $("#labyrinthGame").data("ws-url")
   if location.protocol=="https:"
     wsUrl = wsUrl.replace("ws:","wss:")
   window.gameWs = new WebSocket(wsUrl)
@@ -251,3 +251,7 @@ $ ->
   $("#chatInput").bind("keydown",onChatKeydown)
   wsKeepAlive()
 
+
+$ ->
+  if $("#labyrinthGame").size() > 0
+    handleWholeGame()

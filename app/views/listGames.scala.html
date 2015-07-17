@@ -1,0 +1,31 @@
+@(implicit userName: Option[String])
+
+@layout{
+    <div ng-controller="GamesController">
+      <h3>Lista gier:</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th><a href="" ng-click="order('id')">Id</a></th>
+            <th>Parametry</th>
+            <th>Gracze</th>
+            <th><a href="" ng-click="order('state')">Status</a></th>
+            <th><a href="" ng-click="order('created')">Utworzona</a></th>
+            <th><a href="" ng-click="order('lastActive')">Aktywna</th>
+            <th><a href="" ng-click="order('inMemory')">W pamięci</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="game in games | orderBy:predicate:reverse">
+            <td><a href="@{routes.ZxController.game("")}{{game.id}}">{{game.id}}</a></td>
+            <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
+            <td>{{game.playerA}},{{game.playerB}}</td>
+            <td>{{game.state}}</td>
+            <td>{{game.created}}</td>
+            <td>{{game.lastActive}}</td>
+            <td>{{game.inMemory}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+}

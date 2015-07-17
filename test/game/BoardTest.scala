@@ -5,10 +5,10 @@ import game._
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 
-import com.example.game.East;
-import com.example.game.North;
-import com.example.game.South;
-import com.example.game.West;
+import game.East;
+import game.North;
+import game.South;
+import game.West;
 
 class BoardTest extends FunSuite with BeforeAndAfter {
   
@@ -44,7 +44,7 @@ class BoardTest extends FunSuite with BeforeAndAfter {
         (South, true, true))
     for((dir, expectedSuccess, expectedFinished) <- moves) {
       val result = board.makeMove(dir)
-      val (x, y) = board.position
+      val Coord2D(x, y) = board.position
       val borderPassed = ()=>(if(List(South,North).contains(dir)) board.borders.horizontal else board.borders.vertical)(x)(y)
       assert(false === borderPassed().discovered, "Prematurely discovered border")
       board = result.newBoard
