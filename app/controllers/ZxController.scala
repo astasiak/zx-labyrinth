@@ -137,7 +137,7 @@ object ZxController extends Controller with LazyLogging {
       val (myPlayerId, opponentData) =
         if(game.playerA.map(_.id)==Some(name)) (PlayerA, game.playerB)
         else (PlayerB, game.playerA)
-      val opponent = opponentData.map(_.id).getOrElse("Nobody yet")
+      val opponent = opponentData.map(_.id)
       val state = game.state match {
         case Finished(id) if id==myPlayerId => "Won"
         case Finished(id) if id!=myPlayerId => "Lost"
@@ -159,7 +159,7 @@ object ZxController extends Controller with LazyLogging {
       val lost = opponents.map(_.lostGames).sum
       val ongoing = opponents.map(_.ongoingGames).sum
       val lastGame = opponents.map(_.lastGame.get).reduceOption(List(_,_).max)
-      OpponentEntry("total", all, won, lost, ongoing, lastGame)
+      OpponentEntry(None, all, won, lost, ongoing, lastGame)
     }
     val userData = UserData(name,total,opponents)
     
@@ -169,7 +169,7 @@ object ZxController extends Controller with LazyLogging {
 }
 
 case class OpponentEntry(
-    name: String,
+    name: Option[String],
     allGames: Int,
     wonGames: Int,
     lostGames: Int,

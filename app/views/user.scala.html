@@ -25,7 +25,14 @@
       <tbody>
         @for(opponent <- userStats.opponents) {
           <tr>
-            <td><a href="@{routes.ZxController.getUser(opponent.name)}">@opponent.name</a></td>
+            <td>
+            @opponent.name match {
+              case None => { Nobody yet }
+              case Some(name: String) => {
+              	<a href="@{routes.ZxController.getUser(name)}">@name</a>
+              }
+            }
+            </td>
             <td>@opponent.allGames</td>
             <td>@opponent.lastGame.map(util.DateTimeUtil.formatDate(_))</td>
             <td>@opponent.wonGames</td>
