@@ -9,6 +9,8 @@
           <th><a href="" ng-click="order('name')">Nazwa</a></th>
           <th><a href="" ng-click="order('lastSeen')">Ostatnio widziany</a></th>
           <th><a href="" ng-click="order('registered')">Rejestracja</a></th>
+          <th><a href="" ng-click="order('allGames')">Wszystkie gry</a></th>
+          <th><a href="" ng-click="order('finishedGames')">Zakończone</a></th>
          </tr>
         </thead>
         <tbody>
@@ -16,6 +18,8 @@
             <td><a href="@{routes.ZxController.getUser("")}{{user.name}}">{{user.name}}</a></td>
             <td>{{user.lastSeen}}</td>
             <td>{{user.registered}}</td>
+            <td>{{user.allGames}}</td>
+            <td>{{user.finishedGames}}</td>
           </tr>
         </tbody>
       </table>

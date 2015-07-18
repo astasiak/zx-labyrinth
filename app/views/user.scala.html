@@ -5,7 +5,7 @@
     <h3>@userStats.name</h3>
     <table class="table">
       <tr><td>Wszystkich gier:</td><td>@userStats.total.allGames</td></tr>
-      <tr><td>Ostatnia gra:</td><td>@userStats.total.lastGame.map(util.DateTimeConversions.formatDate(_))</td></tr>
+      <tr><td>Ostatnia gra:</td><td>@userStats.total.lastGame.map(util.DateTimeUtil.formatDate(_))</td></tr>
       <tr><td>Wygranych:</td><td>@userStats.total.wonGames</td></tr>
       <tr><td>Przegranych:</td><td>@userStats.total.lostGames</td></tr>
       <tr><td>Trwających:</td><td>@userStats.total.ongoingGames</td></tr>
@@ -25,9 +25,9 @@
       <tbody>
         @for(opponent <- userStats.opponents) {
           <tr>
-            <td>@opponent.name</td>
+            <td><a href="@{routes.ZxController.getUser(opponent.name)}">@opponent.name</a></td>
             <td>@opponent.allGames</td>
-            <td>@opponent.lastGame.map(util.DateTimeConversions.formatDate(_))</td>
+            <td>@opponent.lastGame.map(util.DateTimeUtil.formatDate(_))</td>
             <td>@opponent.wonGames</td>
             <td>@opponent.lostGames</td>
             <td>@opponent.ongoingGames</td>

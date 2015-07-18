@@ -157,21 +157,22 @@ translateStatus = (status) ->
     for color in ["#ff0","#00f","#000"]
       $("#gameState").animate({backgroundColor:color},200)
 
+addToChat = (content) ->
+  chatHistoryInner = $("#chatHistoryInner")
+  chatHistoryInner.append(content)
+  $("#chatHistory").scrollTop(chatHistoryInner.height())
+
 addNewMessage = (player,text) ->
   newRow = '<div class="chatRow"><span class="messageSender">'
   newRow += player
   newRow += '</span><span class="messageText">'
   newRow += text
   newRow += '</span></div>'
-  chatHistory = $("#chatHistory")
-  chatHistory.append(newRow)
-  chatHistory.scrollTop(chatHistory.height())
+  addToChat(newRow)
 
 addChatTechnicalMessage = (text) ->
   newRow = '<div class="technical">'+text+'</div>'
-  chatHistory = $("#chatHistory")
-  chatHistory.append(newRow)
-  chatHistory.scrollTop(chatHistory.height())
+  addToChat(newRow)
 
 wsKeepAlive = ->
   setInterval ->
@@ -190,8 +191,16 @@ wsHandler = (data) ->
   else if data.type == "update_state"
     translateStatus(data.state)
   else if data.type == "update_players"
-    $("#playerA").text(data.a)
-    $("#playerB").text(data.b)
+    setName = (selector, name) ->
+      obj = $(selector)
+      if name==null
+        obj.removeClass("sitting")
+        obj.text("( nikt )")
+      else
+        obj.addClass("sitting")
+        obj.text(name)
+    setName("#playerA", data.a)
+    setName("#playerB", data.b)
     if data.a and data.b
       $("#joinButton").hide()
   else if data.type == "sit_ok"

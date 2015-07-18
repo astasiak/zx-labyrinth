@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 import play.api.libs.json.JsValue
 import play.api.libs.json.JsString
 
-object DateTimeConversions {
+object DateTimeUtil {
   val TIMEZONE = ZoneId.of("Europe/Warsaw")
   
   class Java8DateWrapper(date: LocalDateTime) {
@@ -34,4 +34,6 @@ object DateTimeConversions {
   
   implicit val ldtOrdering: Ordering[LocalDateTime] =
     Ordering.by(_.atZone(ZoneId.systemDefault).toEpochSecond)
+  
+  def now = LocalDateTime.now(TIMEZONE)
 }

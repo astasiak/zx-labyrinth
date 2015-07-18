@@ -1,4 +1,4 @@
-html { font-family: "Courier New",Courier,monospace; }
+	html { font-family: "Courier New",Courier,monospace; }
 
 .start, .meta { width: 20px; height: 20px; padding: 0.5em; margin: 5px ; background-color: yellow; text-align: center; z-index: 1 }
 .creatingLabyrinth .start, .creatingLabyrinth .meta { cursor: move; }
@@ -22,7 +22,8 @@ table.board { border: none; border-spacing: 0px; }
 .creatingLabyrinth .borderV.selected:hover, .creatingLabyrinth .borderH.selected:hover {background-color: #888; }
 
 #gameState { font-size: larger; padding: 15px; margin: 15px; background-color: #000; color: #fff;}
-.playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #500; color: #fff; }
+.playerName { font-size: larger; padding: 10px; margin: 10px; background-color: #333; color: #fff; }
+.playerName.sitting { background-color: #500; }
 .boardContainer { float: left; padding: 10px; margin: 10px; background-color: #844; }
 .boardContainer.my { background-color: #f44; }
 .boardArea { padding: 10px; margin: 10px; background-color: #fff;}
@@ -50,13 +51,13 @@ table.board { border: none; border-spacing: 0px; }
 .table .sortorder:after { content: '\25b2'; }
 .table .sortorder.reverse:after { content: '\25bc'; }
 
-.header {position: fixed; top: 0px; left: 0px; width: 100%; height: 30px; padding: 10px;
-  background-color: #ddd; border-bottom: thick dotted #000;}
+.header { position: fixed; top: 0px; left: 0px; width: 100%; height: 30px; z-index:10;
+  padding: 10px; background-color: #ddd; border-bottom: thick dotted #000;}
 .gameTitle { float: left; font-size: 30px; }
 #menuButton { float: left; margin-right: 30px; padding: 5px 10px; background-color: #ffa; cursor: pointer; }
 #menuButton:hover { background-color: #dd5; border: 1px solid #000; padding: 4px 9px; }
 .loginInfo { float: right; margin-right: 30px; }
 .loginInfo form { display: inline; }
-#menu { position: fixed; top: 40px; left: 10px; z-index: 1; background-color: #ddd; border: 1px solid #000; padding-right: 20px; display: none; }
+#menu { position: fixed; top: 40px; left: 10px; z-index: 10; background-color: #ddd; border: 1px solid #000; padding-right: 20px; display: none; }
 .contentContainer { margin-top: 70px; }
 

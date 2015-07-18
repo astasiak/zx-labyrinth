@@ -8,8 +8,13 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.JsString
 
 object User {
-  case class UserRestModel(name: String, lastSeen: LocalDateTime, registered: LocalDateTime)
+  case class UserRestModel(
+      name: String,
+      lastSeen: LocalDateTime,
+      registered: LocalDateTime,
+      finishedGames: Int,
+      allGames: Int)
   
-  import util.DateTimeConversions.java8DateWrites
+  import util.DateTimeUtil.java8DateWrites
   implicit val usersWrites = Json.writes[UserRestModel]
 }

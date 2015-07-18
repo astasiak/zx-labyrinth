@@ -24,8 +24,8 @@ import game.Ongoing
 import game.PlayerA
 import game.PlayerB
 import play.api.Play
-import util.DateTimeConversions.wrapJava8Date
-import util.DateTimeConversions.wrapOldJavaDate
+import util.DateTimeUtil.wrapJava8Date
+import util.DateTimeUtil.wrapOldJavaDate
 
 trait MongoMapper[T] {
   def mapToMongo(entity: T): MongoDBObject

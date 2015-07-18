@@ -20,8 +20,8 @@ import rest.Game._
 import dao.MongoGameDao
 import dao.GameDao
 import dao.GameModel
-import game.Coord2D
-
+import game._
+import dao.GamePlayerModel
 object RestController extends Controller with LazyLogging {
   
   val userDao: UserDao = MongoUserDao
@@ -40,9 +40,16 @@ object RestController extends Controller with LazyLogging {
   
   def listUsers = Action { request =>
     val users = userDao.listUsers
+    val games = gameDao.listGames
+    def getPlayers(games: List[GameModel]) = games
+      .flatMap(game=>List(game.playerA.map(_.id), game.playerB.map(_.id)))
+      .groupBy(identity).mapValues(_.size)
+      .withDefaultValue(0)
+    val guser = getPlayers(games)
+    val fusers = getPlayers(games.filter(_.state.isInstanceOf[Finished]))
     val jsonUsers = users.map({user=>
       val UserModel(name, _, lastSeen, registered) = user
-      UserRestModel(name, lastSeen, registered)
+      UserRestModel(name, lastSeen, registered, fusers(Some(name)), guser(Some(name)))
     })
     Ok(Json.toJson(jsonUsers))
   }

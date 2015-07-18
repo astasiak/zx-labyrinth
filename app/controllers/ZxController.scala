@@ -26,7 +26,7 @@ import dao.GameDao
 import java.time.LocalDateTime
 import java.time.ZoneId
 import game._
-import util.DateTimeConversions.ldtOrdering
+import util.DateTimeUtil.ldtOrdering
 
 object ZxController extends Controller with LazyLogging {
 
@@ -102,12 +102,16 @@ object ZxController extends Controller with LazyLogging {
   }
 
   def register() = Action { implicit request =>
+    def isLoginValid(login: String) = "\\S+".r.pattern.matcher(login).matches
     implicit val userName = request.session.get("user")
+    
     val login = getParam("login_name")
     val password1 = getParam("password1")
     val password2 = getParam("password2")
-    if (password1 != password2) {
-      Results.NotFound(views.html.error("Password confirmation mismatch"))
+    if(!isLoginValid(login)) {
+      Results.BadRequest(views.html.error("Login cannot contain whitespaces"))
+    } else if (password1 != password2) {
+      Results.BadRequest(views.html.error("Password confirmation mismatch"))
     } else {
       val result = userDao.register(login, password1)
       result match {

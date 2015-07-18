@@ -17,6 +17,6 @@ object Game {
       created: LocalDateTime,
       inMemory: Boolean)
 
-  import util.DateTimeConversions.java8DateWrites
+  import util.DateTimeUtil.java8DateWrites
   implicit val gamesWrites = Json.writes[GameRestModel]
 }

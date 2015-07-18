@@ -4,10 +4,9 @@ import com.mongodb.casbah.Imports._
 import com.typesafe.scalalogging.LazyLogging
 import scala.util._
 import org.bson.BSON
-import util.DateTimeConversions._
+import util.DateTimeUtil._
 import util.PasswordHasher
 import java.util.Date
-import java.time.LocalDateTime
 
 object MongoUserDao extends UserDao with LazyLogging {
   
@@ -19,7 +18,7 @@ object MongoUserDao extends UserDao with LazyLogging {
   
   override def register(login: String, password: String): Try[String] = {
     val hash = PasswordHasher.hash(password)
-    val userToInsert = UserModel(login, hash, LocalDateTime.now, LocalDateTime.now)
+    val userToInsert = UserModel(login, hash, now, now)
     val userObj = UserMongoMapper.mapToMongo(userToInsert)
     Try(userCollection.insert(userObj)).map(x=>login)
   }
@@ -32,7 +31,7 @@ object MongoUserDao extends UserDao with LazyLogging {
   }
   
   override def touchUser(login: String) = {
-    userCollection.update(MongoDBObject("_id"->login), $set("lastSeen"->LocalDateTime.now.toDate))
+    userCollection.update(MongoDBObject("_id"->login), $set("lastSeen"->now.toDate))
   }
   
   override def remove(login: String): Unit = {
