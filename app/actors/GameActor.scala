@@ -21,6 +21,7 @@ import dao.MongoGameDao
 import dao.GameModel
 import dao.GameDao
 import java.time.LocalDateTime
+import util.DateTimeUtil
 
 class GameActor(id: String, game: Game) extends Actor with ActorLogging {
   val gameDao = MongoGameDao
@@ -30,7 +31,7 @@ class GameActor(id: String, game: Game) extends Actor with ActorLogging {
   
   def this(id: String, params: GameParams) {
     this(id,new Game(params))
-    val currentTime = LocalDateTime.now()
+    val currentTime = DateTimeUtil.now
     gameDao.saveGame(GameModel(id, game.params, game.gameState, None, None, currentTime, currentTime))
   }
   
