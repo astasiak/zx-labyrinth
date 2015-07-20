@@ -40,7 +40,9 @@ object JsonMapper {
       case _ => ErrorIMsg("Cannot parse 'init' message")
     }
   }
-  private def mapBorders(string: String, vertical: Boolean, rowLength: Int) = string.grouped(rowLength).zipWithIndex.flatMap {
+  private def mapBorders(string: String, vertical: Boolean, rowLength: Int): Iterator[ProtoBorder] =
+    if(rowLength==0) List[ProtoBorder]().iterator
+    else string.grouped(rowLength).zipWithIndex.flatMap {
     case(w,r) => w.zipWithIndex.flatMap {
       case ('-',c) => Some(ProtoBorder(r,c,vertical))
       case _ => None

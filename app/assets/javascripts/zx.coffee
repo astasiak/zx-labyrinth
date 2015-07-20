@@ -23,15 +23,17 @@ mapBoardToMsg = (board, params) ->
   if not board.start or not board.meta
     return undefined
   wallsH = ""
-  for j in [1..params.height-1]
-    for i in [0..params.width-1]
-      symbol = if board.borders[j][i].h then '-' else ' '
-      wallsH = wallsH + symbol
+  if params.height>1
+    for j in [1..params.height-1]
+      for i in [0..params.width-1]
+        symbol = if board.borders[j][i].h then '-' else ' '
+        wallsH = wallsH + symbol
   wallsV = ""
-  for j in [0..params.height-1]
-    for i in [1..params.width-1]
-      symbol = if board.borders[j][i].v then '-' else ' '
-      wallsV = wallsV + symbol
+  if params.width>1
+    for j in [0..params.height-1]
+      for i in [1..params.width-1]
+        symbol = if board.borders[j][i].v then '-' else ' '
+        wallsV = wallsV + symbol
   msg =
     size: [params.width,params.height]
     start: parseInt(i) for i in board.start
@@ -104,9 +106,9 @@ printMessageAboutWinner = (winnerId) ->
   makeBlinking($("#container"+winnerId))
   defaultMsg = "{{i18n['playerWon']}} "+$("#player"+winnerId).text()
   if window.myPlayerId
-    message = if winnerId==window.myPlayerId then "{{i18n['youWon']}}" else "{{i18n['youLost']}}"
-    addChatTechnicalMessage(message)
-    alert(message)
+    i18nWinningId = if winnerId==window.myPlayerId then 'youWon' else 'youLost'
+    addChatTechnicalMessage("{{i18n['"+i18nWinningId+"']}}")
+    alert(i18nGet(i18nWinningId))
   else
     addChatTechnicalMessage(defaultMsg)
   return defaultMsg
