@@ -58,8 +58,9 @@ initButtons = () ->
 onBoardSubmit = (params,boardRef) ->
   boardRef.setSubmit ->
     board = mapBoardToMsg(boardRef.getBoard(),params)
+    console.log(board)
     if not board
-      alert("Umieść start i metę")
+      alert(i18nGet('placeStartAndMeta'))
       return
     board.type = "init"
     boardRef.setEditable(false)
@@ -69,8 +70,8 @@ createBoards = (params) ->
   if window.boardAlreadyCreated
     return
   window.boardAlreadyCreated = true
-  window.boardA = new Board("#boardA", params)
-  window.boardB = new Board("#boardB", params)
+  window.boardA = new Board("#boardA", params, true)
+  window.boardB = new Board("#boardB", params, true)
   onBoardSubmit(params,window.boardA)
   onBoardSubmit(params,window.boardB)
 
@@ -101,9 +102,9 @@ makeBlinking = (element) ->
 printMessageAboutWinner = (winnerId) ->
   $("#playAgainButton").fadeIn(400)
   makeBlinking($("#container"+winnerId))
-  defaultMsg = "Grę wygrał "+$("#player"+winnerId).text()
+  defaultMsg = "{{i18n['playerWon']}} "+$("#player"+winnerId).text()
   if window.myPlayerId
-    message = if winnerId==window.myPlayerId then "Wygrałeś!" else "Przegrałeś"
+    message = if winnerId==window.myPlayerId then "{{i18n['youWon']}}" else "{{i18n['youLost']}}"
     addChatTechnicalMessage(message)
     alert(message)
   else
@@ -130,17 +131,17 @@ dealWithFocus = ->
     window.isFocused = false
 
 translateStatus = (status) ->
-  stateString = "Nieznany stan gry"
+  stateString = '{{i18n["unknownGameState"]}}'
   playAnimation = true
   showYourTurn(status == "Ongoing(Player"+window.myPlayerId+")")
   if status=="Awaiting"
-    stateString = "Oczekiwanie na rozpoczęcie gry"
+    stateString = '{{i18n["awaitingState"]}}'
   else if status=="Ongoing(PlayerA)"
-    stateString = "Ruch wykonuje "+$("#playerA").text()
+    stateString = "{{i18n['turnOfState']}} "+$("#playerA").text()
     $("#containerB").addClass("current")
     $("#containerA").removeClass("current")
   else if status=="Ongoing(PlayerB)"
-    stateString = "Ruch wykonuje "+$("#playerB").text()
+    stateString = "{{i18n['turnOfState']}} "+$("#playerB").text()
     $("#containerA").addClass("current")
     $("#containerB").removeClass("current")
   else if status=="Finished(PlayerA)"
@@ -148,11 +149,14 @@ translateStatus = (status) ->
   else if status=="Finished(PlayerB)"
     stateString = printMessageAboutWinner("B")
   else if status=="INIT_PSEUDOSTATE"
-    stateString = "Oczekiwanie na rozpoczęcie gry"
+    stateString = '{{i18n["awaitingState"]}}'
     playAnimation = false
   if $("#gameState").text()==stateString
     playAnimation = false 
-  $("#gameState").text(stateString)
+  i18nCreate '<span>'+stateString+'</span>'
+  , (elem)->
+    $("#gameState").html(elem)
+  
   if playAnimation
     for color in ["#ff0","#00f","#000"]
       $("#gameState").animate({backgroundColor:color},200)
@@ -171,8 +175,7 @@ addNewMessage = (player,text) ->
   addToChat(newRow)
 
 addChatTechnicalMessage = (text) ->
-  newRow = '<div class="technical">'+text+'</div>'
-  addToChat(newRow)
+  i18nCreate('<div class="technical">'+text+'</div>', addToChat)
 
 wsKeepAlive = ->
   setInterval ->
@@ -195,7 +198,8 @@ wsHandler = (data) ->
       obj = $(selector)
       if name==null
         obj.removeClass("sitting")
-        obj.text("( nikt )")
+        i18nCreate('<div>( {{i18n["nobody"]}} )</div>'
+        , (msg)-> obj.html(msg))
       else
         obj.addClass("sitting")
         obj.text(name)
@@ -215,7 +219,7 @@ wsHandler = (data) ->
       $("#containerB").addClass("my")
     window.myBoard.setEditable(true)
   else if data.type == "sit_fail"
-    alert("Nie można usiąść")
+    alert(i18nGet('cannotSitDown'))
   else if data.type == "update_board"
     board = if data.player=="A" then window.boardA else window.boardB
     board.setBoard(mapMsgToBoard(data.board))
@@ -226,14 +230,14 @@ wsHandler = (data) ->
     addNewMessage(data.player,data.msg)
   else if data.type == "init_result"
     if not data.ok
-      alert("Niepoprawne rozmieszczenie labiryntu")
+      alert(i18nGet('incorrectLabyrinth'))
     window.myBoard.setEditable(not data.ok)
   else if data.type == "presence"
     playerName = data.user
     if data.present
-      addChatTechnicalMessage(playerName+" dołączył do pokoju")
+      addChatTechnicalMessage(playerName+' {{i18n["playerEnteredRoom"]}}')
     else
-      addChatTechnicalMessage(playerName+" opuścił pokój")
+      addChatTechnicalMessage(playerName+' {{i18n["playerLeftRoom"]}}')
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)
@@ -249,7 +253,7 @@ handleWholeGame =  ->
   window.gameWs.onmessage = (msg) ->
     wsHandler(msg.data)
   window.gameWs.onclose = () ->
-    addChatTechnicalMessage("Zamknięte połączenie z serwerem")
+    addChatTechnicalMessage('{{i18n["connectionClosed"]}}')
   initButtons()
   bindArrowKeys()
   translateStatus("INIT_PSEUDOSTATE")

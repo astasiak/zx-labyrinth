@@ -5,11 +5,11 @@
     <div>
         <div id="gameState"></div>
         <div>
-            <div id="move_up" class="moveButton">Up</div>
-            <div id="move_down" class="moveButton">Down</div>
-            <div id="move_left" class="moveButton">Left</div>
-            <div id="move_right" class="moveButton">Right</div>
-            <div class="moveComment">(możesz też grać strzałkami na klawiaturze)</div>
+            <div id="move_up" class="moveButton">{{i18n['up']}}</div>
+            <div id="move_down" class="moveButton">{{i18n['down']}}</div>
+            <div id="move_left" class="moveButton">{{i18n['left']}}</div>
+            <div id="move_right" class="moveButton">{{i18n['right']}}</div>
+            <div class="moveComment">({{i18n['moveComment']}})</div>
         </div>
     </div>
     <div id="containerA" class="boardContainer">
@@ -25,8 +25,8 @@
             <div id="chatHistoryInner"></div>
         </div>
         <input type="text" id="chatInput"/>
-        <div id="playAgainButton">Zagraj ponownie</div>
-        <div id="joinButton">Dołącz do gry</div>
+        <div id="playAgainButton">{{i18n['playAgainButton']}}</div>
+        <div id="joinButton">{{i18n['joinButton']}}</div>
     </div>
   </div>
 }

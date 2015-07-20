@@ -1,13 +1,13 @@
 @(implicit userName: Option[String])
 
 @layout{
-	<h3>Nowa gra</h3>
+	<h3>{{i18n['newGame']}}</h3>
     <form method="post" action="@routes.ZxController.createGame()">
         <table class="table">
-            <tr><td><label>Board width:</label></td><td><input type="number" name="width"></input></td></tr>
-            <tr><td><label>Board height:</label></td><td><input type="number" name="height"></input></td></tr>
-            <tr><td><label>Number of walls:</label></td><td><input type="number" name="walls"></input></td></tr>
-            <tr><td><input class="button" type="submit" value="Utwórz grę"></input></td></tr>
+            <tr><td><label>{{i18n['boardWidth']}}:</label></td><td><input type="number" name="width"></input></td></tr>
+            <tr><td><label>{{i18n['boardHeight']}}:</label></td><td><input type="number" name="height"></input></td></tr>
+            <tr><td><label>{{i18n['numberOfWalls']}}:</label></td><td><input type="number" name="walls"></input></td></tr>
+            <tr><td><input class="button" type="submit" value="{{i18n['createGame']}}"></input></td></tr>
         </table>
     </form>
 }

@@ -1,5 +1,5 @@
 @(errorMessage: String)(implicit userName: Option[String])
 
 @layout{
-	<div class="error">@errorMessage</div>
+	<div class="error">{{i18n['@errorMessage']}}</div>
 }

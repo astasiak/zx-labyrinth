@@ -4,22 +4,22 @@
   <div>
     <h3>@userStats.name</h3>
     <table class="table">
-      <tr><td>Wszystkich gier:</td><td>@userStats.total.allGames</td></tr>
-      <tr><td>Ostatnia gra:</td><td>@userStats.total.lastGame.map(util.DateTimeUtil.formatDate(_))</td></tr>
-      <tr><td>Wygranych:</td><td>@userStats.total.wonGames</td></tr>
-      <tr><td>Przegranych:</td><td>@userStats.total.lostGames</td></tr>
-      <tr><td>Trwających:</td><td>@userStats.total.ongoingGames</td></tr>
+      <tr><td>{{i18n['user.allGames']}}:</td><td>@userStats.total.allGames</td></tr>
+      <tr><td>{{i18n['user.lastGame']}}:</td><td>@userStats.total.lastGame.map(util.DateTimeUtil.formatDate(_))</td></tr>
+      <tr><td>{{i18n['user.wonGames']}}:</td><td>@userStats.total.wonGames</td></tr>
+      <tr><td>{{i18n['user.lostGames']}}:</td><td>@userStats.total.lostGames</td></tr>
+      <tr><td>{{i18n['user.ongoingGames']}}:</td><td>@userStats.total.ongoingGames</td></tr>
     </table>
-    <h4>Przeciwnicy</h4>
+    <h4>{{i18n['user.opponents']}}</h4>
     <table class="table">
       <thead>
         <tr>
-          <th>Nazwa</th>
-          <th>Gier</th>
-          <th>Ostatnia</th>
-          <th>Wygranych</th>
-          <th>Przegranych</th>
-          <th>Trwających</th>
+          <th>{{i18n['user.opponentName']}}</th>
+          <th>{{i18n['user.opponentGames']}}</th>
+          <th>{{i18n['user.opponentLastGame']}}</th>
+          <th>{{i18n['user.wonGames']}}</th>
+          <th>{{i18n['user.lostGames']}}</th>
+          <th>{{i18n['user.ongoingGames']}}</th>
         </tr>
       </thead>
       <tbody>
@@ -27,7 +27,7 @@
           <tr>
             <td>
             @opponent.name match {
-              case None => { Nobody yet }
+              case None => { {{i18n['user.nobodyYet']}} }
               case Some(name: String) => {
               	<a href="@{routes.ZxController.getUser(name)}">@name</a>
               }

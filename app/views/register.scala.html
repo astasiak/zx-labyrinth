@@ -1,12 +1,13 @@
 @(implicit userName: Option[String])
 
 @layout{
+    <h3>{{i18n['register.header']}}:</h3>
     <form method="post" action="@routes.ZxController.register()">
         <table class="table">
-            <tr><td><input type="text" name="login_name" placeholder="Login"></input></td></tr>
-            <tr><td><input type="password" name="password1" placeholder="Password"></input></td></tr>
-            <tr><td><input type="password" name="password2" placeholder="Password"></input></td></tr>
-            <tr><td><input class="button" type="submit" value="Register!"></input></td></tr>
+            <tr><td><input type="text" name="login_name" placeholder="{{i18n['register.login']}}"></input></td></tr>
+            <tr><td><input type="password" name="password1" placeholder="{{i18n['register.password1']}}"></input></td></tr>
+            <tr><td><input type="password" name="password2" placeholder="{{i18n['register.password2']}}"></input></td></tr>
+            <tr><td><input class="button" type="submit" value="{{i18n['register.register']}}"></input></td></tr>
         </table>
     </form>
 }

@@ -24,7 +24,7 @@ function Game(params) {
 // setBoard(board) - set the data presented
 // getBoard() - get presented data
 // setSubmit(callback) - adds callback on clicking button
-function Board(selector,params) {
+function Board(selector,params, useI18N) {
   var thisView = this;
   this.selector = selector;
   this.editable = false;
@@ -252,13 +252,20 @@ function Board(selector,params) {
       this.find( ".start, .meta" ).draggable('disable');
     }
   }
+  this.makeI18N = function() {
+    i18nCreate('<span>{{i18n["usedWalls"]}}</span>',
+      function(content){$(thisView.selector).find(".usedWallsLabel").html(content);});
+    i18nCreate('<span>{{i18n["commit"]}}</span>',
+        function(content){$(thisView.selector).find(".submit-button").html(content);});
+  }
   this.initLayout = function() {
 	  $(this.selector).html("<div class='start-meta'><div class='start-box'><div class='start'>S</div></div>"+
      "<div class='meta-box'><div class='meta'>M</div></div></div><div class='submit-button'>Zatwierdź</div>"+
      "<div class='board'></div>"+
-     "<p>Użyte ściany: <span class='used-walls'>0</span>/<span class='max-walls'>0</span></p>");
+     "<p><span class='usedWallsLabel'>Użyte ściany</span>: <span class='used-walls'>0</span>/<span class='max-walls'>0</span></p>");
   }
   this.initLayout();
+  if(useI18N) this.makeI18N();
   this.initParams(params);
   this.createDraggableStartAndMeta();
   this.createClickableBorders();

@@ -2,17 +2,17 @@
 
 @layout{
     <div ng-controller="GamesController">
-      <h3>Lista gier:</h3>
+      <h3>{{i18n['listGames.header']}}:</h3>
       <table class="table">
         <thead>
           <tr>
-            <th><a href="" ng-click="order('id')">Id</a></th>
-            <th>Parametry</th>
-            <th>Gracze</th>
-            <th><a href="" ng-click="order('state')">Status</a></th>
-            <th><a href="" ng-click="order('created')">Utworzona</a></th>
-            <th><a href="" ng-click="order('lastActive')">Aktywna</th>
-            <th><a href="" ng-click="order('inMemory')">W pamięci</th>
+            <th><a href="" ng-click="order('id')">{{i18n['listGames.id']}}</a></th>
+            <th>{{i18n['listGames.parameters']}}</th>
+            <th>{{i18n['listGames.players']}}</th>
+            <th><a href="" ng-click="order('state')">{{i18n['listGames.state']}}</a></th>
+            <th><a href="" ng-click="order('created')">{{i18n['listGames.created']}}</a></th>
+            <th><a href="" ng-click="order('lastActive')">{{i18n['listGames.lastActive']}}</th>
+            <th><a href="" ng-click="order('inMemory')">{{i18n['listGames.inMemory']}}</th>
           </tr>
         </thead>
         <tbody>

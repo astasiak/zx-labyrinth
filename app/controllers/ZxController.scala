@@ -53,7 +53,7 @@ object ZxController extends Controller with LazyLogging {
         val gameId = RoomManager.createGame(params)
         Redirect(routes.ZxController.game(gameId))
       case _ =>
-        Results.NotFound(views.html.error("Bad game parameters"))
+        Results.NotFound(views.html.error("errors.badParameters"))
     }
   }
 
@@ -62,7 +62,7 @@ object ZxController extends Controller with LazyLogging {
     request.session.get("user").map { user =>
       Ok(views.html.game(gameId))
     }.getOrElse {
-      Results.NotFound(views.html.error("You need to log in"))
+      Results.NotFound(views.html.error("errors.needLogIn"))
     }
   }
 
@@ -78,7 +78,7 @@ object ZxController extends Controller with LazyLogging {
     RoomManager.getContinuation(gameId).map { newGameId =>
       Redirect(routes.ZxController.game(newGameId))
     }.getOrElse {
-      Results.NotFound(views.html.error("Game " + gameId + " not found"))
+      Results.NotFound(views.html.error("errors.gameNotFound"))
     }
   }
 
@@ -87,7 +87,7 @@ object ZxController extends Controller with LazyLogging {
     val login = getParam("login_name")
     val password = getParam("password")
     userDao.login(login, password) match {
-      case None              => Results.NotFound(views.html.error("Wrong credentials"))
+      case None              => Results.NotFound(views.html.error("errors.wrongCredentials"))
       case Some(loggedLogin) => Redirect(routes.ZxController.index()).withSession("user" -> loggedLogin)
     }
   }
@@ -109,14 +109,14 @@ object ZxController extends Controller with LazyLogging {
     val password1 = getParam("password1")
     val password2 = getParam("password2")
     if(!isLoginValid(login)) {
-      Results.BadRequest(views.html.error("Login cannot contain whitespaces"))
+      Results.BadRequest(views.html.error("errors.whitespacesLogin"))
     } else if (password1 != password2) {
-      Results.BadRequest(views.html.error("Password confirmation mismatch"))
+      Results.BadRequest(views.html.error("errors.passwordMismatch"))
     } else {
       val result = userDao.register(login, password1)
       result match {
         case Success(_) => Redirect(routes.ZxController.index())
-        case Failure(_) => Results.NotFound(views.html.error("Cannot register as [" + login + "]"))
+        case Failure(_) => Results.NotFound(views.html.error("errors.cannotRegister"))
       }
 
     }

@@ -2,15 +2,15 @@
 
 @layout{
     <div ng-controller="UsersController">
-      <h3>Lista użytkowników:</h3>
+      <h3>{{i18n['listUsers.header']}}:</h3>
       <table class="table">
         <thead>
          <tr>
-          <th><a href="" ng-click="order('name')">Nazwa</a></th>
-          <th><a href="" ng-click="order('lastSeen')">Ostatnio widziany</a></th>
-          <th><a href="" ng-click="order('registered')">Rejestracja</a></th>
-          <th><a href="" ng-click="order('allGames')">Wszystkie gry</a></th>
-          <th><a href="" ng-click="order('finishedGames')">Zakończone</a></th>
+          <th><a href="" ng-click="order('name')">{{i18n['listUsers.name']}}</a></th>
+          <th><a href="" ng-click="order('lastSeen')">{{i18n['listUsers.lastSeen']}}</a></th>
+          <th><a href="" ng-click="order('registered')">{{i18n['listUsers.registered']}}</a></th>
+          <th><a href="" ng-click="order('allGames')">{{i18n['listUsers.allGames']}}</a></th>
+          <th><a href="" ng-click="order('finishedGames')">{{i18n['listUsers.finishedGames']}}</a></th>
          </tr>
         </thead>
         <tbody>
