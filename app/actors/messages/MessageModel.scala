@@ -30,6 +30,7 @@ case class UpdatePlayersOMsg(playerA: Option[String], playerB: Option[String]) e
 case class UpdateStateOMsg(gameState: GameState) extends OutboundMessage
 case class ParamsOMsg(params: GameParams) extends OutboundMessage
 case class GameInfoOMsg(id: String, params: GameParams, playerA: Option[String], playerB: Option[String], gameState: GameState) extends OutboundMessage
+case class RankingUpdatedOMsg(playerRatingChanges: List[(String,Int)]) extends OutboundMessage
 
 case class TechnicalMessageOMsg(msg: String) extends OutboundMessage
 case class ErrorOMsg(msg: String) extends OutboundMessage

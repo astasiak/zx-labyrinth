@@ -45,6 +45,7 @@ class GameActor(id: String, game: Game) extends Actor with ActorLogging {
     case AskForParamsIMsg() => askForGameState()
     case AskForGameInfoIMsg() => askForGameInfo()
     case KeepAliveIMsg() => log.debug("Connection kept alive")
+    case RankingUpdatedOMsg(playerRatingChanges) => updateRating(playerRatingChanges) // from RatingActor
     case other => log.error("unhandled: " + other)
   }
   
@@ -91,14 +92,14 @@ class GameActor(id: String, game: Game) extends Actor with ActorLogging {
     }
   }
   
-  private def initBoard(board: Board) = myPlayerId() match {
+  private def initBoard(board: Board) = myPlayerId match {
     case None => log.warning("Trying to init board while not sitting")
     case Some(playerId) =>
       val success = game.initBoard(playerId, board)
       sender ! InitBoardResultOMsg(success)
   }
   
-  private def makeMove(move: Direction) = myPlayerId() match {
+  private def makeMove(move: Direction) = myPlayerId match {
     case None => log.warning("Trying to make move while not sitting")
     case Some(playerId) => game.declareMove(playerId, move)
   }
@@ -110,14 +111,17 @@ class GameActor(id: String, game: Game) extends Actor with ActorLogging {
     sender ! GameInfoOMsg(id, game.params, nameA, nameB, game.gameState)
   }
   
-  private def myPlayerId(): Option[PlayerId] = {
-    return playerMap.get(sender).flatMap(_._1)
+  private def updateRating(playerRatingChanges: List[(String,Int)]) = playerMap.keys.foreach { receiver=>
+    receiver ! RankingUpdatedOMsg(playerRatingChanges)
   }
+  
+  private def myPlayerId: Option[PlayerId] = playerMap.get(sender).flatMap(_._1)
 
   private class DaoCallbacks(gameDao: GameDao) extends Callbacks {
     def updatePlayers(playerA: Option[String], playerB: Option[String]) = gameDao.updatePlayers(id, playerA, playerB)
     def updateBoard(playerId: PlayerId, board: Board) = gameDao.updateBoard(id, playerId, board)
     def updateGameState(gameState: GameState) = gameDao.updateGameState(id, gameState)
+    def onFinish(winner: String, loser: String) = RatingActor.instance ! RatingActor.ProcessVictory(winner, loser)
   }
 }
 
@@ -125,4 +129,5 @@ private class AkkaSeatCallbacks(seatActor: ActorRef) extends Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String]) = seatActor ! UpdatePlayersOMsg(playerA, playerB)
   def updateBoard(playerId: PlayerId, board: Board) = seatActor ! UpdateBoardOMsg(playerId, board)
   def updateGameState(gameState: GameState) = seatActor ! UpdateStateOMsg(gameState)
+  def onFinish(winner: String, loser: String) = {} // TODO maybe send something here instead of updateGame state (popups)
 }

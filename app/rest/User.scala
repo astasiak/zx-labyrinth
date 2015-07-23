@@ -13,7 +13,8 @@ object User {
       lastSeen: LocalDateTime,
       registered: LocalDateTime,
       finishedGames: Int,
-      allGames: Int)
+      allGames: Int,
+      rating: Int)
   
   import util.DateTimeUtil.java8DateWrites
   implicit val usersWrites = Json.writes[UserRestModel]

@@ -10,6 +10,8 @@ import java.util.Date
 
 object MongoUserDao extends UserDao with LazyLogging {
   
+  val INIT_RATING = 1200
+  
   val uri = Properties.envOrElse("MONGOLAB_URI", "mongodb://localhost:27017/")
   logger.debug("Using Mongo URI: ["+uri+"]")
   val mongoUri = MongoClientURI(uri)
@@ -18,7 +20,7 @@ object MongoUserDao extends UserDao with LazyLogging {
   
   override def register(login: String, password: String): Try[String] = {
     val hash = PasswordHasher.hash(password)
-    val userToInsert = UserModel(login, hash, now, now)
+    val userToInsert = UserModel(login, hash, now, now, INIT_RATING)
     val userObj = UserMongoMapper.mapToMongo(userToInsert)
     Try(userCollection.insert(userObj)).map(x=>login)
   }
@@ -34,15 +36,30 @@ object MongoUserDao extends UserDao with LazyLogging {
     userCollection.update(MongoDBObject("_id"->login), $set("lastSeen"->now.toDate))
   }
   
+  override def getUser(login: String) = {
+    val obj = userCollection.findOneByID(login)
+    obj.flatMap(UserMongoMapper.mapFromMongo(_))
+  }
+  
   override def remove(login: String): Unit = {
     userCollection -= MongoDBObject("_id"->login)
   }
+  
   override def listUsers(): List[UserModel] = {
     val cursor = userCollection.find()
     UserMongoMapper.mapFromMongo(cursor).toList
   }
+  
   override def dropAllUsers(): Unit = {
     userCollection.drop
+  }
+  
+  override def alterRating(login: String, ratingChange: Int): Unit = {
+    userCollection.update(MongoDBObject("_id"->login),$inc("rating"->ratingChange))
+  }
+  
+  override def setRating(login: String, rating: Int): Unit = {
+    userCollection.update(MongoDBObject("_id"->login),$set("rating"->rating))
   }
 }
 
@@ -50,7 +67,10 @@ trait UserDao {
   def register(login: String, password: String): Try[String]
   def login(login: String, password: String): Option[String]
   def touchUser(login: String): Unit
+  def getUser(login: String): Option[UserModel]
   def remove(login: String): Unit
   def listUsers(): List[UserModel]
   def dropAllUsers: Unit
+  def alterRating(login: String, ratingChange: Int): Unit
+  def setRating(login: String, rating: Int): Unit
 }

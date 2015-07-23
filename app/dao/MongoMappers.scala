@@ -49,8 +49,9 @@ object UserMongoMapper extends MongoMapper[UserModel] {
     val defaultDate = LocalDateTime.of(2001,1,1,0,0)
     val lastSeen = obj.getAs[Date]("lastSeen").map(_.toLocalDateTime).getOrElse(defaultDate)
     val registered = obj.getAs[Date]("registered").map(_.toLocalDateTime).getOrElse(defaultDate)
+    val rating = obj.getAs[Number]("rating").map(_.intValue).getOrElse(1200)
     (name, password) match {
-      case (Some(n),Some(p)) => Some(UserModel(n, p, lastSeen, registered))
+      case (Some(n),Some(p)) => Some(UserModel(n, p, lastSeen, registered, rating))
       case _ => None
     }
   }

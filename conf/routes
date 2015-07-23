@@ -21,3 +21,4 @@ GET     /rest/users              controllers.RestController.listUsers
 GET     /assets/*file            controllers.Assets.at(path="/public", file)
 
 POST    /admin/dropUsers         controllers.AdminController.dropUsers
+POST    /admin/recalculateRatings controllers.AdminController.recalculateRatings

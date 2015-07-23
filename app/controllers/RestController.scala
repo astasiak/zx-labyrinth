@@ -48,8 +48,8 @@ object RestController extends Controller with LazyLogging {
     val guser = getPlayers(games)
     val fusers = getPlayers(games.filter(_.state.isInstanceOf[Finished]))
     val jsonUsers = users.map({user=>
-      val UserModel(name, _, lastSeen, registered) = user
-      UserRestModel(name, lastSeen, registered, fusers(Some(name)), guser(Some(name)))
+      val UserModel(name, _, lastSeen, registered, rating) = user
+      UserRestModel(name, lastSeen, registered, fusers(Some(name)), guser(Some(name)), user.rating)
     })
     Ok(Json.toJson(jsonUsers))
   }

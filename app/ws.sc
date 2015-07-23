@@ -41,4 +41,7 @@ object ws {
                                                   //| =+.
                                                   //|   m
   string.split("\n")                              //> res0: Array[String] = Array(S|!, =+., "  m")
+  import org.mindrot.jbcrypt.BCrypt
+  val h = BCrypt.hashpw("admin123admin123", BCrypt.gensalt())
+                                                  //> h  : String = $2a$10$OlpnAD8ovgccrmmgyCTcBuyVWej41m1pLdGlyQ5MesjTrvEoS2lb2
 }

@@ -1,3 +1,4 @@
 $ ->
   $("#menuButton").click ->
     $("#menu").slideToggle()
+

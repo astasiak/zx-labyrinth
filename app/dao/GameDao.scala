@@ -24,19 +24,25 @@ object MongoGameDao extends GameDao with LazyLogging {
   override def remove(id: String): Unit = {
     gameCollection -= MongoDBObject("_id"->id)
   }
+  
   override def listGames() =
     find(MongoDBObject())
+    
   override def listGamesByUser(userId: String) =
     find($or(List(MongoDBObject("playerA"->userId), MongoDBObject("playerB"->userId))))
+    
   override def dropAllGames(): Unit = {
     gameCollection.drop
   }
+  
   override def updateGameState(id: String, gameState: GameState) = {
     gameCollection.update(MongoDBObject("_id"->id), $set("state"->gameState.toString, "lastActive"->now.toDate))
   }
+  
   override def updatePlayers(id: String, playerA: Option[String], playerB: Option[String]) = {
     gameCollection.update(MongoDBObject("_id"->id), $set("playerA"->playerA, "playerB"->playerB, "lastActive"->now.toDate))
   }
+  
   override def updateBoard(id: String, playerId: PlayerId, board: Board) = {
     val mongoBoard = GameMongoMapper.mapBoardToMongo(board)
     val updater = playerId match {
@@ -45,6 +51,7 @@ object MongoGameDao extends GameDao with LazyLogging {
     }
     gameCollection.update(MongoDBObject("_id"->id), updater)
   }
+  
   override def loadGame(id: String) = {
     val gameModelDB = gameCollection.findOneByID(id)
     val gameModel = gameModelDB.flatMap(GameMongoMapper.mapFromMongo(_))

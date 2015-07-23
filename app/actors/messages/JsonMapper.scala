@@ -74,6 +74,7 @@ object JsonMapper {
     case UpdateStateOMsg(gameState) => Json.obj("type"->"update_state","state"->mapState(gameState))
     case ParamsOMsg(GameParams(Coord2D(y,x),walls)) => Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls)
     case InitBoardResultOMsg(success) => Json.obj("type"->"init_result","ok"->success)
+    case RankingUpdatedOMsg(rankings) => Json.obj("type"->"rankings","list"->rankings.map({case (who,diff)=>Json.obj("who"->who,"diff"->diff)}))
     case other => Json.obj("type"->"unknown")
   }
   private def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"

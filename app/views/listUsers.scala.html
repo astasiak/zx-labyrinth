@@ -11,6 +11,7 @@
           <th><a href="" ng-click="order('registered')">{{i18n['listUsers.registered']}}</a></th>
           <th><a href="" ng-click="order('allGames')">{{i18n['listUsers.allGames']}}</a></th>
           <th><a href="" ng-click="order('finishedGames')">{{i18n['listUsers.finishedGames']}}</a></th>
+          <th><a href="" ng-click="order('rating')">{{i18n['listUsers.rating']}}</a></th>
          </tr>
         </thead>
         <tbody>
@@ -20,6 +21,7 @@
             <td>{{user.registered}}</td>
             <td>{{user.allGames}}</td>
             <td>{{user.finishedGames}}</td>
+            <td>{{user.rating}}</td>
           </tr>
         </tbody>
       </table>

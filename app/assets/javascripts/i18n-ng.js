@@ -22,6 +22,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'connectionClosed': 'Zamknięte połączenie z serwerem',
       'playerWon': 'Grę wygrał',
       'youWon': 'Wygrałeś!',
+      'rankingChange': 'Zmiana rankingu gracza',
       'youLost': 'Przegrałeś',
       'incorrectLabyrinth': 'Niepoprawne rozmieszczenie labiryntu',
       'cannotSitDown': 'Nie można usiąść',
@@ -65,6 +66,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'listUsers.registered':'Rejestracja',
       'listUsers.allGames':'Wszystkie gry',
       'listUsers.finishedGames':'Zakończone',
+      'listUsers.rating':'Ranking',
       
       //register
       'register.header':'Rejestracja',
@@ -117,6 +119,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'playerWon': 'The winner is',
       'youWon': 'You won!',
       'youLost': 'You lost',
+      'rankingChange': 'Change of the ranking of',
       'incorrectLabyrinth': 'Incorrect labyrinth shape',
       'cannotSitDown': 'Cannot sit down',
       'placeStartAndMeta': 'Place start and meta',
@@ -159,6 +162,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'listUsers.registered':'Registered',
       'listUsers.allGames':'All games',
       'listUsers.finishedGames':'Finished',
+      'listUsers.rating':'Ranking',
       
       //register
       'register.header':'Registration',

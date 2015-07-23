@@ -138,6 +138,9 @@ class Game(val params: GameParams) extends LazyLogging {
         if(result.success) Ongoing(playerId)
         else Ongoing(playerId.theOther)
       if(result.newBoard.isFinished) {
+        val winnerId = players.get(playerId).get.userId
+        val loserId = players.get(playerId.theOther).get.userId
+        subscribers.values.foreach(_.callback.onFinish(winnerId, loserId))
         logger.debug(s"Game has finished and the winner is ${players.get(playerId).get.userId}")
         gameState = Finished(playerId)
         sendUncoveredBoards()
@@ -191,9 +194,9 @@ private class PlayerData(val userId: String) {
 /** trait for implementing callback handler on the client side */
 trait Callbacks {
   def updatePlayers(playerA: Option[String], playerB: Option[String]): Unit
-  def updateBoard(player: PlayerId, board: Board)
-  def updateGameState(gameState: GameState)
-  //def onError(error: GameError) // ?
+  def updateBoard(player: PlayerId, board: Board): Unit
+  def updateGameState(gameState: GameState): Unit
+  def onFinish(winner: String, loser: String): Unit
 }
 
 private case class CallbackEntry(callback: Callbacks, admin: Boolean)

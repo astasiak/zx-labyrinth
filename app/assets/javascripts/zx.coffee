@@ -240,6 +240,10 @@ wsHandler = (data) ->
       addChatTechnicalMessage(playerName+' {{i18n["playerEnteredRoom"]}}')
     else
       addChatTechnicalMessage(playerName+' {{i18n["playerLeftRoom"]}}')
+  else if data.type == "rankings"
+    for ranking in data.list
+      addChatTechnicalMessage('{{i18n["rankingChange"]}} '+ranking.who+': '+ranking.diff)
+    
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)
