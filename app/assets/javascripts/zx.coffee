@@ -135,6 +135,9 @@ dealWithFocus = ->
 translateStatus = (status) ->
   stateString = '{{i18n["unknownGameState"]}}'
   playAnimation = true
+  if status==arguments.callee.prevStatus
+    playAnimation = false
+  arguments.callee.prevStatus = status
   showYourTurn(status == "Ongoing(Player"+window.myPlayerId+")")
   if status=="Awaiting"
     stateString = '{{i18n["awaitingState"]}}'
@@ -153,8 +156,6 @@ translateStatus = (status) ->
   else if status=="INIT_PSEUDOSTATE"
     stateString = '{{i18n["awaitingState"]}}'
     playAnimation = false
-  if $("#gameState").text()==stateString
-    playAnimation = false 
   i18nCreate '<span>'+stateString+'</span>'
   , (elem)->
     $("#gameState").html(elem)
@@ -243,7 +244,7 @@ wsHandler = (data) ->
   else if data.type == "rankings"
     for ranking in data.list
       addChatTechnicalMessage('{{i18n["rankingChange"]}} '+ranking.who+': '+ranking.diff)
-    
+
 
 wsSend = (obj) ->
   message = JSON.stringify(obj)
