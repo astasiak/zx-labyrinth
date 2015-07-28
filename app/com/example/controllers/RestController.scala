@@ -1,33 +1,26 @@
-package controllers
+package com.example.controllers
 
+import com.example.controllers.rest.Game.GameRestModel
+import com.example.controllers.rest.Game.gamesWrites
+import com.example.controllers.rest.User.UserRestModel
+import com.example.controllers.rest.User.usersWrites
+import com.example.dao.DataAccessLayer
+import com.example.dao.GameModel
+import com.example.dao.UserModel
+import com.example.game.Coord2D
+import com.example.game.Finished
+import com.example.game.GameParams
+import com.example.services.ServicesLayer
 import com.typesafe.scalalogging.LazyLogging
+
+import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import play.api.libs.json.Json
-import play.api.libs.json.JsString
-import play.api.libs.json.JsValue
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import game.GameParams
-import actors.RoomManager
-import actors.messages.GameInfoOMsg
-import dao.MongoUserDao
-import dao.UserDao
-import dao.UserModel
-import rest.User._
-import rest.Game._
-import dao.MongoGameDao
-import dao.GameDao
-import dao.GameModel
-import game._
-import dao.GamePlayerModel
-object RestController extends Controller with LazyLogging {
+
+trait RestController extends Controller with LazyLogging {
+  this: DataAccessLayer with ServicesLayer =>
   
-  val userDao: UserDao = MongoUserDao
-  val gameDao: GameDao = MongoGameDao
-  
-  def listGames = Action { request =>
+  def restGames = Action { request =>
     val games = gameDao.listGames
     val memoryGames = RoomManager.memoryGames
     val jsonGames = games.map({game=>
@@ -38,7 +31,7 @@ object RestController extends Controller with LazyLogging {
     Ok(Json.toJson(jsonGames))
   }
   
-  def listUsers = Action { request =>
+  def restUsers = Action { request =>
     val users = userDao.listUsers
     val games = gameDao.listGames
     def getPlayers(games: List[GameModel]) = games

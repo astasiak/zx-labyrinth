@@ -1,11 +1,11 @@
-@(userStats: UserData)(implicit userName: Option[String])
+@(userStats: com.example.controllers.UserData)(implicit userName: Option[String])
 
 @layout{
   <div>
     <h3>@userStats.name</h3>
     <table class="table">
       <tr><td>{{i18n['user.allGames']}}:</td><td>@userStats.total.allGames</td></tr>
-      <tr><td>{{i18n['user.lastGame']}}:</td><td>@userStats.total.lastGame.map(util.DateTimeUtil.formatDate(_))</td></tr>
+      <tr><td>{{i18n['user.lastGame']}}:</td><td>@userStats.total.lastGame.map(com.example.util.DateTimeUtil.formatDate(_))</td></tr>
       <tr><td>{{i18n['user.wonGames']}}:</td><td>@userStats.total.wonGames</td></tr>
       <tr><td>{{i18n['user.lostGames']}}:</td><td>@userStats.total.lostGames</td></tr>
       <tr><td>{{i18n['user.ongoingGames']}}:</td><td>@userStats.total.ongoingGames</td></tr>
@@ -29,12 +29,12 @@
             @opponent.name match {
               case None => { {{i18n['user.nobodyYet']}} }
               case Some(name: String) => {
-              	<a href="@{routes.ZxController.getUser(name)}">@name</a>
+              	<a href="@{routes.Application.getUser(name)}">@name</a>
               }
             }
             </td>
             <td>@opponent.allGames</td>
-            <td>@opponent.lastGame.map(util.DateTimeUtil.formatDate(_))</td>
+            <td>@opponent.lastGame.map(com.example.util.DateTimeUtil.formatDate(_))</td>
             <td>@opponent.wonGames</td>
             <td>@opponent.lostGames</td>
             <td>@opponent.ongoingGames</td>

@@ -1,9 +1,9 @@
-package dao
+package com.example.dao
 
 import java.time.LocalDateTime
-import game.Board
-import game.GameState
-import game.GameParams
+import com.example.game.Board
+import com.example.game.GameState
+import com.example.game.GameParams
 
 case class UserModel(
     name: String,

@@ -1,4 +1,4 @@
-package rest
+package com.example.controllers.rest
 
 import play.api.libs.json.Json
 import java.time.LocalDateTime
@@ -16,6 +16,6 @@ object User {
       allGames: Int,
       rating: Int)
   
-  import util.DateTimeUtil.java8DateWrites
+  import com.example.util.DateTimeUtil.java8DateWrites
   implicit val usersWrites = Json.writes[UserRestModel]
 }

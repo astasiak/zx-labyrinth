@@ -1,21 +1,15 @@
-package dao
+package com.example.dao
 
 import com.mongodb.casbah.Imports._
 import com.typesafe.scalalogging.LazyLogging
 import scala.util._
 import org.bson.BSON
-import util.DateTimeUtil._
-import util.PasswordHasher
 import java.util.Date
+import com.example.util.DateTimeUtil._
+import com.example.util.PasswordHasher
 
-object MongoUserDao extends UserDao with LazyLogging {
+class MongoUserDao(db: MongoDB) extends UserDao with LazyLogging {
   
-  val INIT_RATING = 1200
-  
-  val uri = Properties.envOrElse("MONGOLAB_URI", "mongodb://localhost:27017/")
-  logger.debug("Using Mongo URI: ["+uri+"]")
-  val mongoUri = MongoClientURI(uri)
-  val db = MongoClient(mongoUri)(mongoUri.database.getOrElse("test"))
   val userCollection = db("users")
   
   override def register(login: String, password: String): Try[String] = {
@@ -64,6 +58,8 @@ object MongoUserDao extends UserDao with LazyLogging {
 }
 
 trait UserDao {
+  val INIT_RATING = 1200
+  
   def register(login: String, password: String): Try[String]
   def login(login: String, password: String): Option[String]
   def touchUser(login: String): Unit

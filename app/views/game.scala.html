@@ -1,7 +1,7 @@
 @(id: String)(implicit userName: Option[String], request: play.api.mvc.RequestHeader)
 
 @layout {
-  <div id="labyrinthGame" data-ws-url="@routes.ZxController.gameWs(id).webSocketURL()">
+  <div id="labyrinthGame" data-ws-url="@routes.Application.gameWs(id).webSocketURL()">
     <div>
         <div id="gameState"></div>
         <div>

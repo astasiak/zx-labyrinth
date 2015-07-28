@@ -1,37 +1,36 @@
-package controllers
+package com.example.controllers
+
+import java.time.LocalDateTime
 
 import scala.Left
 import scala.Right
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
-import actors.RoomManager
-import actors.SeatActor
-import dao.MongoUserDao
-import dao.UserDao
+import scala.util.Try
+
+import com.example.dao.DataAccessLayer
+import com.example.game.Coord2D
+import com.example.game.Finished
+import com.example.game.GameParams
+import com.example.game.PlayerA
+import com.example.game.PlayerB
+import com.example.services.ServicesLayer
+import com.example.util.DateTimeUtil.ldtOrdering
 import com.typesafe.scalalogging.LazyLogging
+import controllers.routes
+
 import play.api.Play.current
 import play.api.libs.json.JsValue
 import play.api.mvc.Action
-import play.api.mvc.Controller
-import play.api.mvc.Results
-import play.api.mvc.Request
 import play.api.mvc.AnyContent
+import play.api.mvc.Controller
+import play.api.mvc.Request
+import play.api.mvc.Results
 import play.api.mvc.WebSocket
-import game.GameParams
-import game.Coord2D
-import scala.util.Try
-import dao.MongoGameDao
-import dao.GameDao
-import java.time.LocalDateTime
-import java.time.ZoneId
-import game._
-import util.DateTimeUtil.ldtOrdering
 
-object ZxController extends Controller with LazyLogging {
-
-  val userDao: UserDao = MongoUserDao
-  val gameDao: GameDao = MongoGameDao
+trait ZxController extends Controller with LazyLogging {
+  this: DataAccessLayer with ServicesLayer =>
 
   private def getParam(name: String)(implicit request: Request[AnyContent]) =
     request.body.asFormUrlEncoded.get(name)(0)
@@ -51,7 +50,7 @@ object ZxController extends Controller with LazyLogging {
       case (Success(w), Success(h), Success(n)) if(ok(w) && ok(h)) =>
         val params = GameParams(Coord2D(h, w), n)
         val gameId = RoomManager.createGame(params)
-        Redirect(routes.ZxController.game(gameId))
+        Redirect(routes.Application.game(gameId))
       case _ =>
         Results.NotFound(views.html.error("errors.badParameters"))
     }
@@ -76,7 +75,7 @@ object ZxController extends Controller with LazyLogging {
   def again(gameId: String) = Action { request =>
     implicit val userName = request.session.get("user")
     RoomManager.getContinuation(gameId).map { newGameId =>
-      Redirect(routes.ZxController.game(newGameId))
+      Redirect(routes.Application.game(newGameId))
     }.getOrElse {
       Results.NotFound(views.html.error("errors.gameNotFound"))
     }
@@ -88,12 +87,12 @@ object ZxController extends Controller with LazyLogging {
     val password = getParam("password")
     userDao.login(login, password) match {
       case None              => Results.NotFound(views.html.error("errors.wrongCredentials"))
-      case Some(loggedLogin) => Redirect(routes.ZxController.index()).withSession("user" -> loggedLogin)
+      case Some(loggedLogin) => Redirect(routes.Application.index()).withSession("user" -> loggedLogin)
     }
   }
 
   def logout() = Action { implicit request =>
-    Redirect(routes.ZxController.index()).withSession()
+    Redirect(routes.Application.index()).withSession()
   }
 
   def showRegister() = Action { implicit request =>
@@ -115,7 +114,7 @@ object ZxController extends Controller with LazyLogging {
     } else {
       val result = userDao.register(login, password1)
       result match {
-        case Success(_) => Redirect(routes.ZxController.index())
+        case Success(_) => Redirect(routes.Application.index())
         case Failure(_) => Results.NotFound(views.html.error("errors.cannotRegister"))
       }
 

@@ -1,9 +1,9 @@
-package actors.messages
+package com.example.services.messages
 
 import play.api.libs.json._
 import play.api.libs.json.Json.JsValueWrapper
 
-import game._
+import com.example.game._
 
 object JsonMapper {
   def mapJsToMsg(js: JsValue): InboudMessage = (js \ "type").asOpt[String] match {

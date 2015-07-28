@@ -1,4 +1,4 @@
-package util
+package com.example.util
 
 import java.time.LocalDateTime
 import java.util.Date

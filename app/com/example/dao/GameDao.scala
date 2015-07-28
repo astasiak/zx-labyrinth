@@ -1,19 +1,15 @@
-package dao
+package com.example.dao
 
 import com.mongodb.casbah.Imports._
 import com.typesafe.scalalogging.LazyLogging
 import scala.util._
 import org.bson.BSON
 import java.util.Date
-import game._
-import util.DateTimeUtil._
+import com.example.game._
+import com.example.util.DateTimeUtil._
 
-object MongoGameDao extends GameDao with LazyLogging {
+class MongoGameDao(db: MongoDB) extends GameDao with LazyLogging {
   
-  val uri = Properties.envOrElse("MONGOLAB_URI", "mongodb://localhost:27017/")
-  logger.debug("Using Mongo URI: ["+uri+"]")
-  val mongoUri = MongoClientURI(uri)
-  val db = MongoClient(mongoUri)(mongoUri.database.getOrElse("test"))
   val gameCollection = db("games")
   
   override def saveGame(game: GameModel): Unit = {

@@ -17,7 +17,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="game in games | orderBy:predicate:reverse">
-            <td><a href="@{routes.ZxController.game("")}{{game.id}}">{{game.id}}</a></td>
+            <td><a href="@{routes.Application.game("")}{{game.id}}">{{game.id}}</a></td>
             <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
             <td>{{game.playerA}},{{game.playerB}}</td>
             <td>{{game.state}}</td>

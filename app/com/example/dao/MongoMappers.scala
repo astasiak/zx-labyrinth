@@ -1,4 +1,4 @@
-package dao
+package com.example.dao
 
 import java.time.LocalDateTime
 import java.util.Date
@@ -12,20 +12,10 @@ import com.mongodb.casbah.Imports.wrapDBObj
 import com.novus.salat.Context
 import com.novus.salat.grater
 
-import game.Awaiting
-import game.Board
-import game.Border
-import game.Borders
-import game.Coord2D
-import game.Finished
-import game.GameParams
-import game.GameState
-import game.Ongoing
-import game.PlayerA
-import game.PlayerB
+import com.example.game._
 import play.api.Play
-import util.DateTimeUtil.wrapJava8Date
-import util.DateTimeUtil.wrapOldJavaDate
+import com.example.util.DateTimeUtil.wrapJava8Date
+import com.example.util.DateTimeUtil.wrapOldJavaDate
 
 trait MongoMapper[T] {
   def mapToMongo(entity: T): MongoDBObject

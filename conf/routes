@@ -1,24 +1,24 @@
-GET     /                        controllers.ZxController.index
-GET     /games                   controllers.ZxController.listGames
-POST    /games                   controllers.ZxController.createGame
-GET     /games/:id/ws            controllers.ZxController.gameWs(id)
-GET     /games/:id               controllers.ZxController.game(id)
-GET     /games/:id/again         controllers.ZxController.again(id)
+GET     /                        controllers.Application.index
+GET     /games                   controllers.Application.listGames
+POST    /games                   controllers.Application.createGame
+GET     /games/:id/ws            controllers.Application.gameWs(id)
+GET     /games/:id               controllers.Application.game(id)
+GET     /games/:id/again         controllers.Application.again(id)
 
-POST    /login                   controllers.ZxController.login
-GET     /logout                  controllers.ZxController.logout
-POST    /register                controllers.ZxController.register
-GET     /register                controllers.ZxController.showRegister
-GET     /users                   controllers.ZxController.listUsers
-GET     /users/:name             controllers.ZxController.getUser(name)
+POST    /login                   controllers.Application.login
+GET     /logout                  controllers.Application.logout
+POST    /register                controllers.Application.register
+GET     /register                controllers.Application.showRegister
+GET     /users                   controllers.Application.listUsers
+GET     /users/:name             controllers.Application.getUser(name)
 
 # REST resources
 
-GET     /rest/games              controllers.RestController.listGames
-GET     /rest/users              controllers.RestController.listUsers
+GET     /rest/games              controllers.Application.restGames
+GET     /rest/users              controllers.Application.restUsers
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file            controllers.Assets.at(path="/public", file)
 
-POST    /admin/dropUsers         controllers.AdminController.dropUsers
-POST    /admin/recalculateRatings controllers.AdminController.recalculateRatings
+POST    /admin/dropUsers         controllers.Application.adminDropUsers
+POST    /admin/recalculateRatings controllers.Application.adminRecalculateRatings

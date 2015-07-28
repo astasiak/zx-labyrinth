@@ -1,4 +1,4 @@
-package game
+package com.example.game
 
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.Set
@@ -11,6 +11,8 @@ case object West extends Direction
 case object East extends Direction
 
 case class MoveResult(newBoard: Board, success: Boolean)
+
+case class Coord2D(x: Int, y: Int)
 
 /**
  * Board objects are immutable and represent the state of the player's labyrinth

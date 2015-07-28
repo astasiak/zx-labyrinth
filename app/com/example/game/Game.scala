@@ -1,4 +1,4 @@
-package game
+package com.example.game
 
 import scala.collection.mutable.Map
 import org.slf4j.Logger
@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory
 import scala.util.Random
 import com.typesafe.scalalogging.LazyLogging
 
-case class Coord2D(x: Int, y: Int)
 case class GameParams(size: Coord2D, walls: Int)
 
 /** representation of states in which game can be: */

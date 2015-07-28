@@ -1,6 +1,6 @@
-package actors.messages
+package com.example.services.messages
 
-import game._
+import com.example.game._
 
 case class Position(x: Int, y: Int)
 case class MoveResult(newBoard: Board, keepGoing: Boolean)
