@@ -1,4 +1,4 @@
-package game
+package com.example.game
 
 object TestUtils {
   class BoardBuilder(history: List[Coord2D]) {

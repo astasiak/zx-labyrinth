@@ -1,14 +1,9 @@
-package actors
+package com.example.game
 
-import game._
+import com.example.game._
 
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
-
-import game.East;
-import game.North;
-import game.South;
-import game.West;
 
 class BoardTest extends FunSuite with BeforeAndAfter {
   

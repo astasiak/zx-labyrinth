@@ -1,20 +1,10 @@
-package actors
+package com.example.game
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
 
-import game.Awaiting;
-import game.Board;
-import game.PlayerA;
-import game.PlayerB;
-
-import game.Callbacks
-import game.Game
-import game.GameParams
-import game.Ongoing
-import game.GameState
-import game.Coord2D
+import com.example.game._;
 
 class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
   var game: Game = _

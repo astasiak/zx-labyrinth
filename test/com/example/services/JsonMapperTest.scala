@@ -1,12 +1,10 @@
-package actors
+package com.example.services
 
 import org.scalatest.FunSuite
-
-import actors.messages.JsonMapper;
-
 import play.api.libs.json.Json
-import game._
-import actors.messages._
+import com.example.game._
+import com.example.services.messages._
+import com.example.util.TestUtils
 
 class JsonMapperTest extends FunSuite {
 
