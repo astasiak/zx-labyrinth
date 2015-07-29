@@ -6,12 +6,13 @@ import org.slf4j.LoggerFactory
 import scala.util.Random
 import com.typesafe.scalalogging.LazyLogging
 
-case class GameParams(size: Coord2D, walls: Int)
+case class GameParams(size: Coord2D, walls: Int, afterFinish: Boolean, ranking: Boolean)
 
 /** representation of states in which game can be: */
 sealed trait GameState
 case object Awaiting extends GameState
 case class Ongoing(current: PlayerId) extends GameState
+case class Finishing(winner: PlayerId) extends GameState
 case class Finished(winner: PlayerId) extends GameState
 
 /** model of player identifiers */
@@ -128,30 +129,41 @@ class Game(val params: GameParams) extends LazyLogging {
   }
   
   def declareMove(playerId: PlayerId, direction: Direction) = gameState match {
-    case Ongoing(currentPlayer) if playerId==currentPlayer => {
-      val player = players.get(playerId.theOther).get
-      val result = player.board.get.makeMove(direction)
-      logger.debug(s"Player ${playerId} declares move in direction ${direction} with success:${result.success}")
-      player.board = Some(result.newBoard)
-      gameState =
-        if(result.success) Ongoing(playerId)
-        else Ongoing(playerId.theOther)
-      if(result.newBoard.isFinished) {
+    case Ongoing(currentPlayer) if playerId==currentPlayer =>
+      processMove(playerId, direction, false)
+    case Finishing(winner) if playerId==winner.theOther =>
+      processMove(playerId, direction, true)
+    case _ =>
+      logger.info("Player cannot move now")
+  }
+  
+  // FIXME too imperative
+  private def processMove(playerId: PlayerId, direction: Direction, afterGame: Boolean) = {
+    val player = players.get(playerId.theOther).get
+    val result = player.board.get.makeMove(direction)
+    logger.debug(s"Player ${playerId} declares move in direction ${direction} with success:${result.success}")
+    player.board = Some(result.newBoard)
+    gameState =
+      if(afterGame) Finishing(playerId.theOther)
+      else if(result.success) Ongoing(playerId)
+      else Ongoing(playerId.theOther)
+    if(result.newBoard.isFinished) {
+      if(afterGame) {
+        gameState = Finished(playerId.theOther)
+      } else {
         val winnerId = players.get(playerId).get.userId
         val loserId = players.get(playerId.theOther).get.userId
         subscribers.values.foreach(_.callback.onFinish(winnerId, loserId))
         logger.debug(s"Game has finished and the winner is ${players.get(playerId).get.userId}")
-        gameState = Finished(playerId)
-        sendUncoveredBoards()
-      } else {
-        sendBoardToPlayers(playerId.theOther)
+        gameState = if(params.afterFinish) Finishing(playerId) else Finished(playerId)
       }
-      subscribers.values.foreach(_.callback.updateGameState(gameState))
     }
-    case Ongoing(currentPlayer) if playerId!=currentPlayer =>
-      logger.info("Cannot move during the opponent's turn")
-    case _ =>
-      logger.info("Game has to be ongoing to make move")
+    if(gameState.isInstanceOf[Finished]) {
+      sendUncoveredBoards()
+    } else {
+      sendBoardToPlayers(playerId.theOther)
+    }
+    subscribers.values.foreach(_.callback.updateGameState(gameState))
   }
   
   def getPlayerData(userId: String): (Option[PlayerId], Option[Board]) = {

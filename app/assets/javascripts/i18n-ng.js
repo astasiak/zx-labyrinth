@@ -11,6 +11,8 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'boardWidth': 'Szerokość planszy',
       'boardHeight': 'Wysokość planszy',
       'numberOfWalls': 'Liczba ścian',
+      'afterPlay': 'Z dogrywką',
+      'rankingGame': 'Gra rankingowa',
       'createGame': 'Utwórz grę',
       
       // zx.coffee
@@ -53,6 +55,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'listGames.header':'Lista gier',
       'listGames.id':'Id',
       'listGames.parameters':'Parametry',
+      'listGames.ranking':'Ranking',
       'listGames.players':'Gracze',
       'listGames.state':'Status',
       'listGames.created':'Utworzona',
@@ -94,7 +97,12 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'errors.wrongCredentials':'Błędne dane logowania',
       'errors.whitespacesLogin':'Login nie może zawierać białych znaków',
       'errors.passwordMismatch':'Niepasujące potwierdzenie hasła',
-      'errors.cannotRegister':'Nie można zarejestrować pod tym loginem'
+      'errors.cannotRegister':'Nie można zarejestrować pod tym loginem',
+      
+      'param.afterFinish':'Gra z dogrywką',
+      'param.notAfterFinish':'Gra bez dogrywki',
+      'param.ranking':'rankingowa',
+      'param.notRanking':'towarzyska'
       }
   
   $scope.i18n_en = {'NAME':'EN',
@@ -107,6 +115,8 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'boardWidth': 'Board width',
       'boardHeight': 'Board height',
       'numberOfWalls': 'Number of walls',
+      'afterPlay': 'With after-play',
+      'rankingGame': 'Ranking game',
       'createGame': 'Create game',
 
       // zx.coffee
@@ -149,6 +159,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'listGames.header':'List of games',
       'listGames.id':'Id',
       'listGames.parameters':'Parameters',
+      'listGames.ranking':'Ranking',
       'listGames.players':'Players',
       'listGames.state':'State',
       'listGames.created':'Created',
@@ -191,6 +202,11 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'errors.whitespacesLogin':'Login cannot contain whitespaces',
       'errors.passwordMismatch':'Password confirmation mismatch',
       'errors.cannotRegister':'Cannot register with given login',
+      
+      'param.afterFinish':'Game with after-play',
+      'param.notAfterFinish':'Game without after-play',
+      'param.ranking':'with ranking',
+      'param.notRanking':'without ranking'
   }
   
   $scope.i18n_options = [$scope.i18n_pl, $scope.i18n_en]

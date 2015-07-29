@@ -45,10 +45,12 @@ trait ZxController extends Controller with LazyLogging {
     val width = Try(getParam("width").toInt)
     val height = Try(getParam("height").toInt)
     val numberOfWalls = Try(getParam("walls").toInt)
+    val afterPlay = Try(getParam("afterPlay")).map(_=="on").getOrElse(false)
+    val ranking = Try(getParam("rankingGame")).map(_=="on").getOrElse(false)
     def ok(size: Int) = size>=1 && size<=12
     (width, height, numberOfWalls) match {
       case (Success(w), Success(h), Success(n)) if(ok(w) && ok(h)) =>
-        val params = GameParams(Coord2D(h, w), n)
+        val params = GameParams(Coord2D(h, w), n, afterPlay, ranking)
         val gameId = RoomManager.createGame(params)
         Redirect(routes.Application.game(gameId))
       case _ =>

@@ -63,18 +63,30 @@ object JsonMapper {
   private def mapAskMsg(js: JsValue) = AskForParamsIMsg()
   
   def mapMsgToJs(msg: OutboundMessage): JsValue = msg match {
-    case TechnicalMessageOMsg(msg) => Json.obj("type"->"technical","msg"->msg)
-    case PlayerPresenceOMsg(userId, present) => Json.obj("type"->"presence","user"->userId,"present"->present)
-    case ErrorOMsg(msg) => Json.obj("type"->"error","msg"->msg)
-    case ChatMessageOMsg(player, msg) => Json.obj("type"->"chat", "player"->player, "msg"->msg)
-    case SitDownSuccessOMsg(playerId) => Json.obj("type"->"sit_ok","player"->mapPlayerId(playerId))
-    case SitDownFailOMsg() => Json.obj("type"->"sit_fail")
-    case UpdateBoardOMsg(playerId, board) => Json.obj("type"->"update_board","player"->mapPlayerId(playerId),"board"->mapBoard(board))
-    case UpdatePlayersOMsg(playerA, playerB) => Json.obj("type"->"update_players","a"->mapPlayer(playerA),"b"->mapPlayer(playerB))
-    case UpdateStateOMsg(gameState) => Json.obj("type"->"update_state","state"->mapState(gameState))
-    case ParamsOMsg(GameParams(Coord2D(y,x),walls)) => Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls)
-    case InitBoardResultOMsg(success) => Json.obj("type"->"init_result","ok"->success)
-    case RankingUpdatedOMsg(rankings) => Json.obj("type"->"rankings","list"->rankings.map({case (who,diff)=>Json.obj("who"->who,"diff"->diff)}))
+    case TechnicalMessageOMsg(msg) =>
+      Json.obj("type"->"technical","msg"->msg)
+    case PlayerPresenceOMsg(userId, present) =>
+      Json.obj("type"->"presence","user"->userId,"present"->present)
+    case ErrorOMsg(msg) =>
+      Json.obj("type"->"error","msg"->msg)
+    case ChatMessageOMsg(player, msg) =>
+      Json.obj("type"->"chat", "player"->player, "msg"->msg)
+    case SitDownSuccessOMsg(playerId) =>
+      Json.obj("type"->"sit_ok","player"->mapPlayerId(playerId))
+    case SitDownFailOMsg() =>
+      Json.obj("type"->"sit_fail")
+    case UpdateBoardOMsg(playerId, board) =>
+      Json.obj("type"->"update_board","player"->mapPlayerId(playerId),"board"->mapBoard(board))
+    case UpdatePlayersOMsg(playerA, playerB) =>
+      Json.obj("type"->"update_players","a"->mapPlayer(playerA),"b"->mapPlayer(playerB))
+    case UpdateStateOMsg(gameState) =>
+      Json.obj("type"->"update_state","state"->mapState(gameState))
+    case ParamsOMsg(GameParams(Coord2D(y,x),walls, afterFinish, ranking)) =>
+      Json.obj("type"->"params","x"->x,"y"->y,"walls"->walls, "afterFinish"->afterFinish, "ranking"->ranking)
+    case InitBoardResultOMsg(success) =>
+      Json.obj("type"->"init_result","ok"->success)
+    case RankingUpdatedOMsg(rankings) =>
+      Json.obj("type"->"rankings","list"->rankings.map({case (who,diff)=>Json.obj("who"->who,"diff"->diff)}))
     case other => Json.obj("type"->"unknown")
   }
   private def mapPlayerId(playerId: PlayerId) = if(playerId==PlayerA) "A" else "B"

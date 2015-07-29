@@ -102,6 +102,9 @@ makeBlinking = (element) ->
   , 400
 
 printMessageAboutWinner = (winnerId) ->
+  if arguments.callee.messageAlreadyPrinted
+    return
+  arguments.callee.messageAlreadyPrinted = true
   $("#playAgainButton").fadeIn(400)
   makeBlinking($("#container"+winnerId))
   defaultMsg = "{{i18n['playerWon']}} "+$("#player"+winnerId).text()
@@ -149,9 +152,9 @@ translateStatus = (status) ->
     stateString = "{{i18n['turnOfState']}} "+$("#playerB").text()
     $("#containerA").addClass("current")
     $("#containerB").removeClass("current")
-  else if status=="Finished(PlayerA)"
+  else if status=="Finished(PlayerA)" or status=="Finishing(PlayerA)"
     stateString = printMessageAboutWinner("A")
-  else if status=="Finished(PlayerB)"
+  else if status=="Finished(PlayerB)" or status=="Finishing(PlayerB)"
     stateString = printMessageAboutWinner("B")
   else if status=="INIT_PSEUDOSTATE"
     stateString = '{{i18n["awaitingState"]}}'
@@ -194,6 +197,15 @@ wsHandler = (data) ->
       height: data.y
       borders: data.walls
     createBoards(params)
+    finishMsg = if data.afterFinish then 'param.afterFinish' else 'param.notAfterFinish'
+    rankingMsg = if data.ranking then 'param.ranking' else 'param.notRanking'
+    console.log(finishMsg)
+    console.log(rankingMsg)
+    gameParamsDiv = $("#gameParams")
+    i18nCreate('<span>{{i18n["'+finishMsg+'"]}} </span>'
+    , (msg)-> gameParamsDiv.append(msg))
+    i18nCreate('<span>{{i18n["'+rankingMsg+'"]}} </span>'
+    , (msg)-> gameParamsDiv.append(msg))
   else if data.type == "update_state"
     translateStatus(data.state)
   else if data.type == "update_players"

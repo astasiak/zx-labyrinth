@@ -10,6 +10,7 @@ object Game {
       width: Int,
       height: Int,
       walls: Int,
+      ranking: Boolean,
       playerA: Option[String],
       playerB: Option[String],
       state: String,

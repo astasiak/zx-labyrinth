@@ -69,6 +69,7 @@ object GameMongoMapper extends MongoMapper[GameModel] {
     val stateRaw = obj.getAs[String]("state")
     val state = Map[String, GameState]("Awaiting"->Awaiting,
         "Ongoing(PlayerA)"->Ongoing(PlayerA), "Ongoing(PlayerB)"->Ongoing(PlayerB),
+        "Finishing(PlayerA)"->Finishing(PlayerA), "Finishing(PlayerB)"->Finishing(PlayerB),
         "Finished(PlayerA)"->Finished(PlayerA), "Finished(PlayerB)"->Finished(PlayerB))
       .get(stateRaw.getOrElse(""))
     val playerA = obj.getAs[String]("playerA")

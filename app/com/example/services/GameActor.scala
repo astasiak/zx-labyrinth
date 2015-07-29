@@ -118,7 +118,8 @@ trait GameActorComponent {
       def updatePlayers(playerA: Option[String], playerB: Option[String]) = gameDao.updatePlayers(id, playerA, playerB)
       def updateBoard(playerId: PlayerId, board: Board) = gameDao.updateBoard(id, playerId, board)
       def updateGameState(gameState: GameState) = gameDao.updateGameState(id, gameState)
-      def onFinish(winner: String, loser: String) = RatingActor.instance ! RatingActor.ProcessVictory(winner, loser)
+      def onFinish(winner: String, loser: String) = 
+        if(game.params.ranking) RatingActor.instance ! RatingActor.ProcessVictory(winner, loser)
     }
   }
   

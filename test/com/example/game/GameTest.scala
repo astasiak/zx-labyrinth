@@ -12,7 +12,7 @@ class GameTest extends FunSuite with BeforeAndAfter with MockFactory {
   val someBoard = Board.create(Coord2D(3,3), Coord2D(0,0), Coord2D(2,1), List())
   
   before {
-    game = new Game(GameParams(Coord2D(3,3),5))
+    game = new Game(GameParams(Coord2D(3, 3) ,5, true, true))
   }
   
   test("sitting down") {

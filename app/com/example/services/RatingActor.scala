@@ -61,6 +61,7 @@ trait RatingActorComponent {
       logger.debug("Recalculating whole history of ratings")
       val games = gameDao.listGames()
           .filter(_.state.isInstanceOf[Finished])
+          .filter(_.params.ranking) // TODO: db query
           .sortBy(game=>(game.lastActive,game.id))
       val playerPairs = games.flatMap { game =>
         game.state match {

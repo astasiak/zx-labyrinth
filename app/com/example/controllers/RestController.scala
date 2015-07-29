@@ -24,9 +24,9 @@ trait RestController extends Controller with LazyLogging {
     val games = gameDao.listGames
     val memoryGames = RoomManager.memoryGames
     val jsonGames = games.map({game=>
-      val GameModel(id,GameParams(Coord2D(h,w),walls), state, playerA, playerB, lastActive, created) = game
+      val GameModel(id,GameParams(Coord2D(h,w),walls, afterFinish, ranking), state, playerA, playerB, lastActive, created) = game
       val inMemory = memoryGames.contains(id)
-      GameRestModel(id, w, h, walls, playerA.map(_.id), playerB.map(_.id), state.toString, lastActive, created, inMemory)
+      GameRestModel(id, w, h, walls, ranking, playerA.map(_.id), playerB.map(_.id), state.toString, lastActive, created, inMemory)
     })
     Ok(Json.toJson(jsonGames))
   }

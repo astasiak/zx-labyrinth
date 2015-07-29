@@ -8,6 +8,7 @@
           <tr>
             <th><a href="" ng-click="order('id')">{{i18n['listGames.id']}}</a></th>
             <th>{{i18n['listGames.parameters']}}</th>
+            <th><a href="" ng-click="order('ranking')">{{i18n['listGames.ranking']}}</a></th>
             <th>{{i18n['listGames.players']}}</th>
             <th><a href="" ng-click="order('state')">{{i18n['listGames.state']}}</a></th>
             <th><a href="" ng-click="order('created')">{{i18n['listGames.created']}}</a></th>
@@ -19,6 +20,7 @@
           <tr ng-repeat="game in games | orderBy:predicate:reverse">
             <td><a href="@{routes.Application.game("")}{{game.id}}">{{game.id}}</a></td>
             <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
+            <td>{{game.ranking}}</td>
             <td>{{game.playerA}},{{game.playerB}}</td>
             <td>{{game.state}}</td>
             <td>{{game.created}}</td>
