@@ -21,11 +21,16 @@ class MongoGameDao(db: MongoDB) extends GameDao with LazyLogging {
     gameCollection -= MongoDBObject("_id"->id)
   }
   
-  override def listGames() =
-    find(MongoDBObject())
-    
-  override def listGamesByUser(userId: String) =
-    find($or(List(MongoDBObject("playerA"->userId), MongoDBObject("playerB"->userId))))
+  override def listGames(user: Option[String], limit: Option[Int]) = {
+    val query = user
+      .map(userId => $or(List(MongoDBObject("playerA"->userId), MongoDBObject("playerB"->userId))))
+      .getOrElse(MongoDBObject())
+    val cursor = gameCollection
+      .find(query, MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1, "created"->1, "lastActive"->1))
+      .sort(MongoDBObject("lastActive"-> -1))
+      .limit(limit.getOrElse(0))
+    GameMongoMapper.mapFromMongo(cursor).toList
+  }
     
   override def dropAllGames(): Unit = {
     gameCollection.drop
@@ -60,19 +65,12 @@ class MongoGameDao(db: MongoDB) extends GameDao with LazyLogging {
       game
     }
   }
-  
-  private def find(query: MongoDBObject) = {
-    val cursor = gameCollection.find(query,
-        MongoDBObject("id"->1, "state"->1, "params"->1, "playerA"->1, "playerB"->1, "created"->1, "lastActive"->1))
-    GameMongoMapper.mapFromMongo(cursor).toList
-  }
 }
 
 trait GameDao {
   def saveGame(game: GameModel): Unit
   def remove(id: String): Unit
-  def listGames(): List[GameModel]
-  def listGamesByUser(userId: String): List[GameModel]
+  def listGames(user: Option[String], limit: Option[Int]): List[GameModel]
   def dropAllGames: Unit
   def updateGameState(id: String, gameState: GameState): Unit
   def updatePlayers(id: String, playerA: Option[String], playerB: Option[String]): Unit

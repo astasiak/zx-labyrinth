@@ -1,0 +1,29 @@
+@(userId: Option[String], limit: Option[Integer])
+  <div ng-controller="GamesController" ng-init="init(@userId.map("'"+_+"'").getOrElse("null") , @limit.getOrElse("null") )">
+    <table class="table">
+      <thead>
+        <tr>
+          <th><a href="" ng-click="order('id')">{{i18n['listGames.id']}}</a></th>
+          <th>{{i18n['listGames.parameters']}}</th>
+          <th><a href="" ng-click="order('ranking')">{{i18n['listGames.ranking']}}</a></th>
+          <th>{{i18n['listGames.players']}}</th>
+          <th><a href="" ng-click="order('state')">{{i18n['listGames.state']}}</a></th>
+          <th><a href="" ng-click="order('created')">{{i18n['listGames.created']}}</a></th>
+          <th><a href="" ng-click="order('lastActive')">{{i18n['listGames.lastActive']}}</th>
+          <th><a href="" ng-click="order('inMemory')">{{i18n['listGames.inMemory']}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="game in games | orderBy:predicate:reverse">
+          <td><a href="@{routes.Application.game("")}{{game.id}}">{{game.id}}</a></td>
+          <td>{{game.width}}x{{game.height}} ({{game.walls}})</td>
+          <td>{{game.ranking}}</td>
+          <td>{{game.playerA}},{{game.playerB}}</td>
+          <td>{{game.state}}</td>
+          <td>{{game.created}}</td>
+          <td>{{game.lastActive}}</td>
+          <td>{{game.inMemory}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

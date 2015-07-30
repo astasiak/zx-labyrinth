@@ -134,7 +134,7 @@ trait ZxController extends Controller with LazyLogging {
   }
 
   def getUser(name: String) = Action { implicit request =>
-    val userGames = gameDao.listGamesByUser(name).map { game=>
+    val userGames = gameDao.listGames(Some(name),None).map { game=>
       val (myPlayerId, opponentData) =
         if(game.playerA.map(_.id)==Some(name)) (PlayerA, game.playerB)
         else (PlayerB, game.playerA)

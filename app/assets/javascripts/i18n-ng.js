@@ -14,6 +14,8 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'afterPlay': 'Z dogrywką',
       'rankingGame': 'Gra rankingowa',
       'createGame': 'Utwórz grę',
+
+      'lastGamesList':'Ostatnie gry',
       
       // zx.coffee
       'unknownGameState': 'Nieznany stan gry',
@@ -89,6 +91,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'user.opponentGames':'Gier',
       'user.opponentLastGame':'Ostatnia',
       'user.nobodyYet':'Jeszcze nikt',
+      'user.gamesList':'Gry gracza',
       
       // errors
       'errors.badParameters':'Nieprawidłowe parametry gry',
@@ -118,6 +121,8 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'afterPlay': 'With after-play',
       'rankingGame': 'Ranking game',
       'createGame': 'Create game',
+
+      'lastGamesList':'Last games',
 
       // zx.coffee
       'unknownGameState': 'Unknown game state',
@@ -193,6 +198,7 @@ zxApp.controller('I18nController', ['$scope', '$compile', function($scope, $comp
       'user.opponentGames':'Number of games',
       'user.opponentLastGame':'Last game',
       'user.nobodyYet':'Nobody yet',
+      'user.gamesList':'Games of the player',
       
       //errors
       'errors.badParameters':'Bad game parameters',

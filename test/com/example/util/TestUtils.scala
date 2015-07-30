@@ -1,4 +1,6 @@
-package com.example.game
+package com.example.util
+
+import com.example.game._
 
 object TestUtils {
   class BoardBuilder(history: List[Coord2D]) {

@@ -3,20 +3,23 @@ var zxApp = angular.module('zxApp', ['ngResource']);
 zxApp.controller('GamesController', ['$scope', 'GamesResource', function($scope, GamesResource) {
     $scope.games = []
 
-    $scope.loadGames = function() {
-      GamesResource.query(function(data) {
+    $scope.loadGames = function(user,limit) {
+      params = {}
+      if(limit) params.limit = limit;
+      if(user) params.user = user;
+      GamesResource.query(params,function(data) {
         $scope.games = data;
       });
     };
-    $scope.predicate = 'id';
-    $scope.reverse = false;
+    $scope.predicate = 'lastActive';
+    $scope.reverse = true;
     $scope.order = function(predicate) {
       $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
       $scope.predicate = predicate;
     };
-    var init = function(){
-      $scope.loadGames();
-    }();
+    $scope.init = function(userId,limit){
+      $scope.loadGames(userId,limit);
+    };
 }]);
 
 zxApp.factory("GamesResource", function($resource) {

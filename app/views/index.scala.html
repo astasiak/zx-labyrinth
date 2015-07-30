@@ -12,4 +12,7 @@
             <tr><td><input class="button" type="submit" value="{{i18n['createGame']}}"></input></td></tr>
         </table>
     </form>
+    
+    <h4>{{i18n['lastGamesList']}}</h4>
+    @partGames(None,Some(5))
 }

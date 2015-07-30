@@ -21,7 +21,9 @@ trait RestController extends Controller with LazyLogging {
   this: DataAccessLayer with ServicesLayer =>
   
   def restGames = Action { request =>
-    val games = gameDao.listGames
+    val limit = request.queryString.get("limit").flatMap(_.headOption).map(_.toInt)
+    val userId = request.queryString.get("user").flatMap(_.headOption)
+    val games = gameDao.listGames(userId, limit)
     val memoryGames = RoomManager.memoryGames
     val jsonGames = games.map({game=>
       val GameModel(id,GameParams(Coord2D(h,w),walls, afterFinish, ranking), state, playerA, playerB, lastActive, created) = game
@@ -33,7 +35,7 @@ trait RestController extends Controller with LazyLogging {
   
   def restUsers = Action { request =>
     val users = userDao.listUsers
-    val games = gameDao.listGames
+    val games = gameDao.listGames(None, None)
     def getPlayers(games: List[GameModel]) = games
       .flatMap(game=>List(game.playerA.map(_.id), game.playerB.map(_.id)))
       .groupBy(identity).mapValues(_.size)
