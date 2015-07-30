@@ -1,7 +1,7 @@
 var zxApp = angular.module('zxApp', ['ngResource']);
 
 zxApp.controller('GamesController', ['$scope', 'GamesResource', function($scope, GamesResource) {
-    $scope.games = []
+    $scope.games = null
 
     $scope.loadGames = function(user,limit) {
       params = {}
@@ -27,7 +27,7 @@ zxApp.factory("GamesResource", function($resource) {
 });
 
 zxApp.controller('UsersController', ['$scope', 'UsersResource', function($scope, UsersResource) {
-    $scope.users = []
+    $scope.users = null
 
     $scope.loadUsers = function() {
     	UsersResource.query(function(data) {

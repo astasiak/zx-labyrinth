@@ -43,6 +43,7 @@ table.board { border: none; border-spacing: 0px; }
 #playAgainButton, #joinButton { border-style: solid; text-align: center; margin: 5px; padding: 5px; cursor: pointer; }
 #playAgainButton { display: none; background-color: #ff8; border-color: #bb4; }
 #joinButton { background-color: #99f; border-color: #55b; }
+#gameParams { border: solid 1px; margin: 0px 0px 10px; width: 300px;}
 
 .boardArea { position: relative }
 
@@ -70,4 +71,6 @@ body { background-color: #888; overflow-x: hidden; }
 .greyGlass { z-index: 8; opacity: 0.5; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; display: none;
   background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px); }
 
-#gameParams { border: solid 1px; margin: 0px 0px 10px; }
+
+.tableLoading {text-align: center;}
+.tableLoading img { height: 60px; }
