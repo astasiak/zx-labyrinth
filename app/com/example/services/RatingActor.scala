@@ -63,13 +63,15 @@ trait RatingActorComponent {
           .filter(_.state.isInstanceOf[Finished])
           .filter(_.params.ranking) // TODO: db query
           .sortBy(game=>(game.lastActive,game.id))
-      val playerPairs = games.flatMap { game =>
-        game.state match {
-          case Finished(PlayerA) => Some((game.playerA.get.id, game.playerB.get.id))
-          case Finished(PlayerB) => Some((game.playerB.get.id, game.playerA.get.id))
-          case _ => None
+      val playerPairs =
+        for {
+          game <- games
+          playerA <- game.playerA
+          playerB <- game.playerB
+        } yield game.state match {
+          case Finished(PlayerA) => (playerA.id, playerB.id)
+          case Finished(PlayerB) => (playerB.id, playerA.id)
         }
-      }
       var ratingMap = Map[String,Int]() withDefaultValue(userDao.INIT_RATING)
       for((winnerId, loserId) <- playerPairs) {
         val winnerRating = ratingMap(winnerId)

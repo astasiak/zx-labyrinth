@@ -1,7 +1,6 @@
 package com.example.game
 
-import com.example.game._
-
+import com.example.util._
 import org.scalatest.FunSuite
 import org.scalatest.BeforeAndAfter
 

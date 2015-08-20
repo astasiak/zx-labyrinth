@@ -92,10 +92,11 @@ class Game(val params: GameParams) extends LazyLogging {
             players.get(PlayerA).map(_.userId),
             players.get(PlayerB).map(_.userId))
       }
-      val opponentBoard = players.get(playerId.theOther).flatMap(_.board)
-      opponentBoard.foreach(board=>{
-        subscribers(userId).callback.updateBoard(playerId.theOther, board.privatize)
-      })
+      for {
+        player <- players.get(playerId.theOther)
+        board <- player.board
+        subscriber <- subscribers.get(userId)
+      } subscriber.callback.updateBoard(playerId.theOther, board.privatize)
       return Some(playerId)
     }
     return None

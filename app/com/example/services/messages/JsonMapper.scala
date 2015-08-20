@@ -25,29 +25,24 @@ object JsonMapper {
     case None => ErrorIMsg("Cannot parse 'chat' message - no 'msg'")
     case Some(msg) => ChatMessageIMsg(msg)
   }
-  private def mapInitMsg(js: JsValue) = {
-    val size = mapPair(js \ "size")
-    val start = mapPair(js \ "start")
-    val end = mapPair(js \ "end")
-    val wallsH = (js \ "wallsH").asOpt[String]
-    val wallsV = (js \ "wallsV").asOpt[String]
-    (size, start, end, wallsH, wallsV) match {
-      case (Some((width,height)), Some((startY,startX)), Some((endY,endX)), Some(wallsH), Some(wallsV)) => {
-        val wallsList = (mapBorders(wallsH,false,width)++mapBorders(wallsV,true,width-1)).toList
-        val board = Board.create(Coord2D(height,width), Coord2D(startX,startY), Coord2D(endX,endY), wallsList)
-        InitBoardIMsg(board)
-      }
-      case _ => ErrorIMsg("Cannot parse 'init' message")
-    }
+  private def mapInitMsg(js: JsValue): InboudMessage = {
+    val initMsg = for {
+      (width,height) <- mapPair(js \ "size")
+      (startY,startX) <- mapPair(js \ "start")
+      (endY,endX) <- mapPair(js \ "end")
+      wallsH <- (js \ "wallsH").asOpt[String]
+      wallsV <- (js \ "wallsV").asOpt[String]
+      wallsList = (mapBorders(wallsH,false,width)++mapBorders(wallsV,true,width-1)).toList
+      board = Board.create(Coord2D(height,width), Coord2D(startX,startY), Coord2D(endX,endY), wallsList)
+    } yield InitBoardIMsg(board)
+    initMsg getOrElse ErrorIMsg("Cannot parse 'init' message")
   }
-  private def mapBorders(string: String, vertical: Boolean, rowLength: Int): Iterator[ProtoBorder] =
-    if(rowLength==0) List[ProtoBorder]().iterator
-    else string.grouped(rowLength).zipWithIndex.flatMap {
-    case(w,r) => w.zipWithIndex.flatMap {
-      case ('-',c) => Some(ProtoBorder(r,c,vertical))
-      case _ => None
-    }
-  }
+  private def mapBorders(string: String, vertical: Boolean, rowLength: Int) =
+    for {
+      (w,r) <- string.grouped(rowLength).zipWithIndex
+      ('-',c) <- w.zipWithIndex
+    } yield ProtoBorder(r,c,vertical)
+
   private def mapPair(js: JsValue): Option[(Int, Int)] = js match {
     case JsArray(Seq(JsNumber(a),JsNumber(b))) => Some((a.toInt,b.toInt)) // FIXME > MAX_INT
     case _ => None
