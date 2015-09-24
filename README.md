@@ -12,6 +12,6 @@ After you find your opponent and start a game, there are just simple steps to pl
 **2. PUT YOUR WALLS**  
 At the beginning, you've got to put some walls into your labirynth. Everytime you click somewhere between labirynth cells, it will put another wall in a place you want. Your goal here is to make the labirynth as hard as possible!
 
-**3. GOING INTO EACH OTHERS LABIRYNTHS**
-Now it is your chance (and your foe's). 
+**3. GOING INTO EACH OTHERS LABIRYNTHS**  
+Now it is your chance (and your foe's).  
 Use arrows to go out of your opponent's labirynth. Be careful, if you hit a wall, your turn is OVER.
