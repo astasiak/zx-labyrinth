@@ -31,7 +31,8 @@ object UserMongoMapper extends MongoMapper[UserModel] {
         "_id"->entity.name,
         "password"->entity.password,
         "lastSeen"->entity.lastSeen.toDate,
-        "registered"->entity.registered.toDate)
+        "registered"->entity.registered.toDate,
+        "rating"->entity.rating)
 
   override def mapFromMongo(obj: MongoDBObject): Option[UserModel] = {
     val name = obj.getAs[String]("_id")
